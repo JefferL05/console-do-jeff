@@ -1,0 +1,48 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+
+const categories = allPosts.reduce((acc, post) => {
+  const category = post.data.category;
+  if (!acc[category]) acc[category] = [];
+  acc[category].push(post);
+  return acc;
+}, {} as Record<string, typeof allPosts>);
+
+const sortedCategories = Object.entries(categories).sort((a, b) => b[1].length - a[1].length);
+---
+
+<BaseLayout title="Categorias | Console do Jeff" description="Navegue por categorias">
+  <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-12">
+      <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+        Categorias
+      </h1>
+      <p class="text-gray-600 dark:text-gray-400">
+        {sortedCategories.length} categorias
+      </p>
+    </div>
+    
+    <div class="grid gap-4 sm:grid-cols-2">
+      {sortedCategories.map(([category, posts]) => (
+        <a href={`/categories/${category.toLowerCase()}`} class="group">
+          <article class="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
+            <div class="flex items-center gap-3 mb-3">
+              <svg class="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"></path>
+              </svg>
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                {category}
+              </h2>
+            </div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              {posts.length} {posts.length === 1 ? 'artigo' : 'artigos'}
+            </p>
+          </article>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

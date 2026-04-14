@@ -1,0 +1,484 @@
+---
+title: "Como Começar com React em 2026"
+description: "Um guia completo para iniciar no React com as melhores práticas modernas, incluindo Hooks, TypeScript e composition de componentes."
+pubDate: 2026-04-13
+author: "Jeff"
+category: "React"
+tags: ["react", "javascript", "typescript", "frontend", "hooks"]
+image:
+  url: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=1200"
+  alt: "Código React no VS Code"
+draft: false
+---
+
+import Callout from '../../components/Callout.astro';
+
+# Como Começar com React em 2026
+
+React continua sendo a biblioteca mais popular para construção de interfaces de usuário. Lançada pelo Facebook em 2013, evoluiu constantemente e em 2026 mantém-se como a escolha número um para desenvolvedores front-end em todo o mundo.
+
+Neste guia completo, vamos explorar tudo o que precisas saber para começar a construir aplicações React profissionais.
+
+## O Que é React e Por Que Ainda é Relevante em 2026?
+
+React é uma biblioteca JavaScript para construção de interfaces de usuário baseada em **componentes**. A sua proposta é simples: criar UIs declarativas que sejam fáceis de reasonar e manter.
+
+### Vantagens que Mantêm React no Topo
+
+- **Virtual DOM**: Reconciliação eficiente que atualiza apenas o necessário
+- **Ecossistema massive**: Milhares de bibliotecas e ferramentas disponíveis
+- **TypeScript First-Class**: Suporte nativo e excelente Developer Experience
+- **Comunidade ativa**: Documentação, tutorials e suporte abundam
+- **Carreira**: Demanda extrema no mercado de trabalho
+
+<Callout type="info">
+  Empresas como Meta, Netflix, Airbnb, Uber e muitas outras continuam a usar React em produção, garantindo que a tecnologia se mantém atual e relevante.
+</Callout>
+
+## Pré-requisitos
+
+Antes de começar com React, precisas ter:
+
+1. **JavaScript sólido** — ES6+, arrow functions, destructuring, modules
+2. **HTML e CSS** — Estrutura e estilização de páginas
+3. **Node.js instalado** — Para executar npm/yarn/pnpm
+4. **Um editor de código** — VS Code é a escolha mais popular
+
+## Criando o Primeiro Projeto
+
+Em 2026, a forma recomendada é usar **Vite** como build tool. É extremamente rápido e funciona perfeitamente com React.
+
+```bash
+# Criar projeto com Vite + React + TypeScript
+npm create vite@latest meu-projeto -- --template react-ts
+
+# Entrar na pasta
+cd meu-projeto
+
+# Instalar dependências
+npm install
+
+# Iniciar servidor de desenvolvimento
+npm run dev
+```
+
+<Callout type="success">
+  Este comando cria um projeto completo com React 19, TypeScript 5, ESLint e HMR (Hot Module Replacement) configurados.
+</Callout>
+
+### Alternativas Populares
+
+| Ferramenta | Quando Usar |
+|------------|-------------|
+| **Vite** | Projetos SPA simples a médios |
+| **Next.js** | Apps com SSR, SSG, ou necessidade de SEO |
+| **Remix** | Apps full-stack com focus em web fundamentals |
+| **Astro** | Sites estáticos com ilhas de interactivity |
+
+## Estrutura de um Projeto React
+
+Após criar o projeto, vais encontrar esta estrutura:
+
+```
+meu-projeto/
+├── src/
+│   ├── App.tsx          # Componente principal
+│   ├── main.tsx         # Entry point
+│   ├── index.css        # Estilos globais
+│   └── assets/          # Imagens, fontes, etc.
+├── public/              # Ficheiros públicos
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
+```
+
+## Componentes: A Base do React
+
+Um componente React é uma função que retorna JSX (JavaScript XML). É assim que se define a UI.
+
+### Exemplo: Componente Simples
+
+```tsx
+// src/components/Botao.tsx
+interface BotaoProps {
+  texto: string;
+  onClick: () => void;
+  variant?: 'primary' | 'secondary';
+}
+
+export function Botao({ texto, onClick, variant = 'primary' }: BotaoProps) {
+  const classesBase = 'px-4 py-2 rounded-lg font-medium transition-colors';
+  const classesVariant = variant === 'primary'
+    ? 'bg-blue-600 text-white hover:bg-blue-700'
+    : 'bg-gray-200 text-gray-800 hover:bg-gray-300';
+
+  return (
+    <button className={`${classesBase} ${classesVariant}`} onClick={onClick}>
+      {texto}
+    </button>
+  );
+}
+```
+
+### Usando o Componente
+
+```tsx
+// src/App.tsx
+import { Botao } from './components/Botao';
+
+function App() {
+  const handleClick = () => {
+    console.log('Botão clicado!');
+  };
+
+  return (
+    <main>
+      <h1>Minha App</h1>
+      <Botao texto="Clique aqui" onClick={handleClick} />
+      <Botao texto="Cancelar" onClick={handleClick} variant="secondary" />
+    </main>
+  );
+}
+
+export default App;
+```
+
+## Props: Comunicação entre Componentes
+
+**Props** são parâmetros que passas para componentes. São read-only e permitem criar componentes reutilizáveis.
+
+```tsx
+// Componente Card reutilizável
+interface CardProps {
+  titulo: string;
+  descricao: string;
+  imagemUrl?: string;
+  tags: string[];
+}
+
+export function Card({ titulo, descricao, imagemUrl, tags }: CardProps) {
+  return (
+    <article className="rounded-xl border shadow-sm overflow-hidden">
+      {imagemUrl && (
+        <img src={imagemUrl} alt={titulo} className="w-full h-48 object-cover" />
+      )}
+      <div className="p-4">
+        <h3 className="font-bold text-lg">{titulo}</h3>
+        <p className="text-gray-600 mt-2">{descricao}</p>
+        <div className="flex gap-2 mt-4">
+          {tags.map(tag => (
+            <span key={tag} className="px-2 py-1 bg-gray-100 rounded text-sm">
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+    </article>
+  );
+}
+```
+
+## State: Gerindo Dados Mutáveis
+
+O **state** é usado para guardar dados que mudam ao longo do tempo e fazem a UI re-renderizar.
+
+### useState: O Hook Mais Básico
+
+```tsx
+import { useState } from 'react';
+
+export function Contador() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <p>Contagem: {count}</p>
+      <button onClick={() => setCount(count + 1)}>
+        Incrementar
+      </button>
+      <button onClick={() => setCount(c => c - 1)}>
+        Decrementar
+      </button>
+      <button onClick={() => setCount(0)}>
+        Reset
+      </button>
+    </div>
+  );
+}
+```
+
+### useState com Objetos
+
+```tsx
+interface Usuario {
+  nome: string;
+  email: string;
+}
+
+export function FormularioUsuario() {
+  const [usuario, setUsuario] = useState<Usuario>({
+    nome: '',
+    email: ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Dados:', usuario);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        value={usuario.nome}
+        onChange={e => setUsuario({ ...usuario, nome: e.target.value })}
+        placeholder="Nome"
+      />
+      <input
+        type="email"
+        value={usuario.email}
+        onChange={e => setUsuario({ ...usuario, email: e.target.value })}
+        placeholder="Email"
+      />
+      <button type="submit">Enviar</button>
+    </form>
+  );
+}
+```
+
+<Callout type="warning">
+  Ao atualizar objetos ou arrays no state, **sempre usa o spread operator** (`...`) para não perder as outras propriedades.
+</Callout>
+
+## useEffect: Efeitos Colaterais
+
+O `useEffect` executa código após o render. É usado para fetching de dados, subscriptions, e manipulação do DOM.
+
+### Uso Básico
+
+```tsx
+import { useState, useEffect } from 'react';
+
+interface Post {
+  id: number;
+  title: string;
+  body: string;
+}
+
+export function ListaPosts() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchPosts() {
+      try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+        if (!response.ok) throw new Error('Erro ao carregar posts');
+        const data = await response.json();
+        setPosts(data.slice(0, 10)); // Apenas os 10 primeiros
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erro desconhecido');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPosts();
+  }, []); // Array vazio = executa apenas uma vez
+
+  if (loading) return <p>Carregando...</p>;
+  if (error) return <p>Erro: {error}</p>;
+
+  return (
+    <ul>
+      {posts.map(post => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### Cleanup com useEffect
+
+```tsx
+useEffect(() => {
+  const timer = setInterval(() => {
+    console.log('Tick');
+  }, 1000);
+
+  // Cleanup: executa quando o componente é desmontado
+  return () => clearInterval(timer);
+}, []);
+```
+
+## useMemo e useCallback: Otimização de Performance
+
+### useMemo: Memoização de Valores
+
+```tsx
+import { useMemo } from 'react';
+
+export function ListaFiltrada({ items, filtro }: { items: number[], filtro: string }) {
+  // Só recalcula quando 'items' ou 'filtro' mudam
+  const itensFiltrados = useMemo(() => {
+    return items.filter(item => item.toString().includes(filtro));
+  }, [items, filtro]);
+
+  return (
+    <ul>
+      {itensFiltrados.map(item => (
+        <li key={item}>{item}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### useCallback: Memoização de Funções
+
+```tsx
+import { useState, useCallback } from 'react';
+
+export function Botoes({ onIncrement }: { onIncrement: () => void }) {
+  return (
+    <div>
+      <button onClick={onIncrement}>+</button>
+    </div>
+  );
+}
+
+export function ContadorPai() {
+  const [count, setCount] = useState(0);
+
+  // A função só é recriada se 'count' mudar
+  const handleIncrement = useCallback(() => {
+    setCount(c => c + 1);
+  }, []);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <Botoes onIncrement={handleIncrement} />
+    </div>
+  );
+}
+```
+
+<Callout type="info">
+  Não uses useMemo ou useCallback prematuramente. Mede primeiro se há um problema de performance real.
+</Callout>
+
+## Boas Práticas em 2026
+
+### 1. Componentes Pequenos e Focados
+
+```tsx
+// ❌ Componente muito grande
+function PaginaUsuario() {
+  // 200 linhas de código...
+}
+
+// ✅ Componentes pequenos e reutilizáveis
+function PaginaUsuario() {
+  return (
+    <div>
+      <UsuarioHeader />
+      <UsuarioInfo />
+      <UsuarioPosts />
+      <UsuarioConfiguracoes />
+    </div>
+  );
+}
+```
+
+### 2. TypeScript Sempre
+
+```tsx
+// ❌ Any é o diabo
+function processar(dados: any) { ... }
+
+// ✅ Tipos fortes
+interface DadosUsuario {
+  id: string;
+  nome: string;
+  email: string;
+  criadoEm: Date;
+}
+
+function processar(dados: DadosUsuario) { ... }
+```
+
+### 3. Evitar Prop Drilling
+
+```tsx
+// ❌ Props atravessam muitos níveis desnecessariamente
+<Container>
+  <Layout>
+    <Sidebar>
+      <Menu>
+        <MenuItem title={title} /> {/* title passou por 4 níveis! */}
+      </Menu>
+    </Sidebar>
+  </Layout>
+</Container>
+
+// ✅ Usar Context ou bibliotecas de estado
+const MenuContext = createContext<{ title: string }>({});
+
+<MenuContext.Provider value={{ title }}>
+  <MenuItem /> {/* Acede diretamente ao context */}
+</MenuContext.Provider>
+```
+
+### 4. Nomes Descritivos
+
+| ❌ Evitar | ✅ Recomendado |
+|-----------|---------------|
+| `Comp1` | `UserCard` |
+| `Btn` | `PrimaryButton` |
+| `handleClick` genérico | `handleSubmitForm` |
+| `data` | `userData` |
+
+## Ferramentas Recomendadas do Ecossistema
+
+### Gestão de Estado
+- **Zustand** — Simples e minimalista
+- **Jotai** — Atomic state management
+- **Redux Toolkit** — Para apps complexas
+
+### UI Components
+- **Radix UI** — Primitivos de UI acessíveis
+- **shadcn/ui** — Componentes copy-paste beautiful
+- **Headless UI** — Invisíveis, totalmente customizáveis
+
+### Routing
+- **React Router** — O standard para SPAs
+
+### Data Fetching
+- **TanStack Query** — Gestão de estado server-state
+- **SWR** — Fetching com cache automático
+
+## Recursos Oficiais
+
+- [Documentação React](https://react.dev)
+- [Documentação Vite](https://vitejs.dev)
+- [Documentação TypeScript](https://www.typescriptlang.org/docs/)
+- [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
+
+## Próximos Passos
+
+Agora que conheces o básico:
+
+1. **Pratica** — Constrói projetos reais, mesmo pequenos
+2. **React Router** — Aprende navegação entre páginas
+3. **State Management** — Escolhe uma biblioteca e domina-a
+4. **Next.js** — Se precisas de SSR ou SSG
+5. **Testes** — Jest + Testing Library
+
+<Callout type="success">
+  Parabéns por dar o primeiro passo! React é uma skill extremamente valiosa no mercado. Continua a praticar e não desistas.
+</Callout>
+
+Boa sorte na tua jornada com React! 🚀

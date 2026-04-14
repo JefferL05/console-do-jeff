@@ -1,0 +1,85 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+  
+  const categories = [...new Set(allPosts.map(post => post.data.category))];
+  
+  return categories.map(category => ({
+    params: { category: category.toLowerCase() },
+    props: { category }
+  }));
+}
+
+const { category } = Astro.props;
+
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+const posts = allPosts
+  .filter(post => post.data.category.toLowerCase() === category)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString('pt-BR', {
+    timeZone: 'America/Sao_Paulo'
+  });
+}
+---
+
+<BaseLayout 
+  title={`${category} | Console do Jeff`} 
+  description={`Artigos da categoria ${category}`}
+>
+  <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <a href="/categories" class="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mb-6">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Voltar para categorias
+    </a>
+    
+    <div class="mb-12">
+      <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+        {category}
+      </h1>
+      <p class="text-gray-600 dark:text-gray-400">
+        {posts.length} {posts.length === 1 ? 'artigo' : 'artigos'}
+      </p>
+    </div>
+    
+    <div class="space-y-6">
+      {posts.map(post => (
+        <a href={`/blog/${post.slug}`} class="group block">
+          <article class="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
+            <div class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mb-3">
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                {formatDate(post.data.pubDate)}
+              </span>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+              {post.data.title}
+            </h2>
+            <p class="text-gray-600 dark:text-gray-400">
+              {post.data.description}
+            </p>
+            <div class="flex flex-wrap gap-2 mt-4">
+              {post.data.tags.slice(0, 3).map(tag => (
+                <span class="inline-flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          </article>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

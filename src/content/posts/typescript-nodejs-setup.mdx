@@ -1,0 +1,514 @@
+---
+title: "Configurando TypeScript para Projetos Node.js"
+description: "Guia completo para configurar TypeScript em projetos Node.js com as melhores práticas em 2026."
+pubDate: 2026-04-13
+author: "Jeff"
+category: "TypeScript"
+tags: ["typescript", "nodejs", "configuração", "boas-práticas", "backend"]
+image:
+  url: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=1200"
+  alt: "Terminal com código TypeScript"
+draft: false
+---
+
+import Callout from '../../components/Callout.astro';
+
+# Configurando TypeScript para Projetos Node.js
+
+TypeScript é hoje considerado o **padrão de facto** para projetos JavaScript profissionais. Quando combinado com Node.js, oferece uma experiência de desenvolvimento robusta, segura e altamente produtiva.
+
+Neste guia completo, vamos configurar um projeto Node.js com TypeScript do zero, usando as melhores práticas recomendadas para 2026.
+
+## O Que é TypeScript e Por Que Usar?
+
+TypeScript é um superset de JavaScript que adiciona **tipagem estática opcional**. Ou seja, todo o código JavaScript válido é também código TypeScript válido, mas TypeScript adiciona:
+
+- **Type Safety** — Erros de tipo apanhados em tempo de compilação
+- **IDE Support** — Autocomplete inteligente e refactoring seguro
+- **Documentação Implícita** — Os tipos documentam o código
+- **Prevenção de Bugs** — Muitos erros comuns são evitados
+
+### Vantagens Específicas no Node.js
+
+- APIs Node.js têm typings disponíveis via `@types/node`
+- Frameworks como Express, Fastify, NestJS são totalmente tipados
+- Menos runtime errors = código mais confiável em produção
+- Melhor experiência em equipas grandes
+
+<Callout type="info">
+  TypeScript não adiciona overhead em runtime — o código compilado é JavaScript puro. Os benefícios são todos em tempo de desenvolvimento.
+</Callout>
+
+## Instalação e Configuração do Zero
+
+### 1. Criar o Projeto
+
+```bash
+# Criar pasta e inicializar npm
+mkdir meu-projeto-api
+cd meu-projeto-api
+npm init -y
+
+# Instalar TypeScript e tipos Node.js como devDependencies
+npm install -D typescript @types/node @types/express
+
+# Instalar tsx para executar TypeScript diretamente
+npm install -D tsx
+
+# Inicializar TypeScript
+npx tsc --init
+```
+
+<Callout type="success">
+  `tsx` é o substituto moderno do `ts-node`. É mais rápido, suporta ESM nativamente e funciona perfeitamente com TypeScript.
+</Callout>
+
+### 2. Configuração do tsconfig.json
+
+O ficheiro `tsconfig.json` gerado pelo `tsc --init` vem com muitas opções. Para Node.js em 2026, usa esta configuração otimizada:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+### Explicação das Opções Mais Importantes
+
+| Opção | Valor | Porquê |
+|-------|-------|--------|
+| `target` | ES2022 | Node.js 20+ suporta todas as features ES2022 |
+| `module` | NodeNext | Suporte completo a ESM e CommonJS |
+| `moduleResolution` | NodeNext | Resolução de módulos moderna |
+| `strict` | true | Ativa todas as checks de tipo (altamente recomendado) |
+| `skipLibCheck` | true | Pula verificação de tipos em node_modules |
+| `noUnusedLocals` | true | Erro se houver variáveis locais não usadas |
+| `noImplicitReturns` | true | Erro se função não retornar em todos os caminhos |
+
+<Callout type="warning">
+  **Nunca desatives `strict: true`!** É a opção mais importante. Se fores novo em TypeScript, vais ter alguns erros no início, mas vale muito a pena.
+</Callout>
+
+## Estrutura de Projeto Recomendada
+
+Para APIs Node.js em 2026, usa esta estrutura:
+
+```
+meu-projeto-api/
+├── src/
+│   ├── controllers/       # Lógica de requisição HTTP
+│   │   └── userController.ts
+│   ├── services/          # Lógica de negócio
+│   │   └── userService.ts
+│   ├── models/            # Tipos e interfaces
+│   │   └── user.ts
+│   ├── routes/            # Definição de rotas
+│   │   └── userRoutes.ts
+│   ├── middleware/        # Middlewares Express
+│   │   └── auth.ts
+│   ├── config/            # Configurações da app
+│   │   └── index.ts
+│   ├── utils/             # Funções utilitárias
+│   │   └── validation.ts
+│   ├── database/          # Conexão com BD
+│   │   └── connection.ts
+│   └── index.ts           # Entry point
+├── tests/                  # Testes
+│   └── user.test.ts
+├── package.json
+├── tsconfig.json
+└── .gitignore
+```
+
+## Scripts npm
+
+Atualiza o `package.json` com scripts úteis:
+
+```json
+{
+  "name": "meu-projeto-api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "lint": "eslint src/**/*.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+<Callout type="info">
+  `tsx watch` é como um hot-reload para TypeScript. Sempre que guardares um ficheiro, o servidor reinicia automaticamente.
+</Callout>
+
+## Exemplo Prático: API com Express
+
+Vamos criar uma API simples para entender a estrutura.
+
+### 1. Modelos e Tipos
+
+```typescript
+// src/models/user.ts
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: Date;
+}
+
+export interface CreateUserDTO {
+  name: string;
+  email: string;
+}
+
+export interface UpdateUserDTO {
+  name?: string;
+  email?: string;
+}
+```
+
+### 2. Service (Lógica de Negócio)
+
+```typescript
+// src/services/userService.ts
+import type { User, CreateUserDTO, UpdateUserDTO } from '../models/user.js';
+
+// Simulated database
+const users: User[] = [];
+let idCounter = 1;
+
+export const userService = {
+  async findAll(): Promise<User[]> {
+    return [...users];
+  },
+
+  async findById(id: string): Promise<User | undefined> {
+    return users.find(user => user.id === id);
+  },
+
+  async create(data: CreateUserDTO): Promise<User> {
+    const user: User = {
+      id: String(idCounter++),
+      ...data,
+      createdAt: new Date()
+    };
+    users.push(user);
+    return user;
+  },
+
+  async update(id: string, data: UpdateUserDTO): Promise<User | undefined> {
+    const user = users.find(u => u.id === id);
+    if (!user) return undefined;
+
+    Object.assign(user, data);
+    return user;
+  },
+
+  async delete(id: string): Promise<boolean> {
+    const index = users.findIndex(u => u.id === id);
+    if (index === -1) return false;
+
+    users.splice(index, 1);
+    return true;
+  }
+};
+```
+
+### 3. Controller (HTTP)
+
+```typescript
+// src/controllers/userController.ts
+import type { Request, Response, NextFunction } from 'express';
+import { userService } from '../services/userService.js';
+import type { CreateUserDTO, UpdateUserDTO } from '../models/user.js';
+
+export const userController = {
+  async getAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const users = await userService.findAll();
+      res.json(users);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = await userService.findById(req.params.id);
+      if (!user) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+      res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data: CreateUserDTO = req.body;
+      const user = await userService.create(data);
+      res.status(201).json(user);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data: UpdateUserDTO = req.body;
+      const user = await userService.update(req.params.id, data);
+      if (!user) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+      res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const deleted = await userService.delete(req.params.id);
+      if (!deleted) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  }
+};
+```
+
+### 4. Routes
+
+```typescript
+// src/routes/userRoutes.ts
+import { Router } from 'express';
+import { userController } from '../controllers/userController.js';
+
+const router = Router();
+
+router.get('/users', userController.getAll);
+router.get('/users/:id', userController.getById);
+router.post('/users', userController.create);
+router.put('/users/:id', userController.update);
+router.delete('/users/:id', userController.delete);
+
+export default router;
+```
+
+### 5. Entry Point
+
+```typescript
+// src/index.ts
+import express from 'express';
+import userRoutes from './routes/userRoutes.js';
+
+const app = express();
+const PORT = process.env.PORT ?? 3000;
+
+// Middleware
+app.use(express.json());
+
+// Routes
+app.use('/api', userRoutes);
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Error handling
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Error:', err.message);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+```
+
+## Boas Práticas de Tipagem
+
+### 1. Usa Interfaces para Objetos
+
+```typescript
+// ✅ Interface para objetos
+interface User {
+  id: string;
+  name: string;
+}
+
+// ❌ Type alias para objetos (menos legível)
+type User = {
+  id: string;
+  name: string;
+};
+```
+
+### 2. Usa Types para Uniões e Interseções
+
+```typescript
+// ✅ Type alias para uniões
+type Status = 'pending' | 'active' | 'inactive';
+type UserStatus = Status | 'deleted';
+
+// ✅ Type alias para interseções
+type Admin = User & { permissions: string[] };
+```
+
+### 3. Generic Constraints
+
+```typescript
+// ✅ Generic com constraints
+async function findById<T extends { id: string }>(
+  items: T[],
+  id: string
+): Promise<T | undefined> {
+  return items.find(item => item.id === id);
+}
+
+// Uso
+const user = await findById(users, '123');
+```
+
+### 4. Utility Types
+
+TypeScript tem tipos utilitários built-in:
+
+```typescript
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+}
+
+// Partial - todos os campos opcionais
+type UpdateUser = Partial<User>;
+
+// Pick - selecionar apenas alguns campos
+type UserPreview = Pick<User, 'id' | 'name'>;
+
+// Omit - remover campos
+type UserWithoutPassword = Omit<User, 'password'>;
+
+// Required - todos os campos obrigatórios
+type CompleteUser = Required<User>;
+```
+
+## Dicas de Produtividade
+
+### 1. VS Code Extensions
+
+Instala estas extensões essenciais:
+
+- **TypeScript Vue Plugin** (ou React)
+- **ESLint** — Linting automático
+- **Prettier** — Formatação de código
+- **Error Lens** — Mostra erros inline
+
+### 2. Auto-imports
+
+No VS Code, escreve o nome de uma função ou tipo e pressiona:
+- **Tab** para aceitar o auto-import
+- **Ctrl+Space** para ver sugestões
+
+### 3. Go to Definition
+
+- **Ctrl+Click** em qualquer tipo/função para ir à definição
+- **F12** para ver a definição
+- **Alt+F12** para ver num split
+
+### 4. Rename Symbol
+
+- **F2** sobre qualquer símbolo para o renomear em todo o projeto
+
+<Callout type="info">
+  Estas dicas funcionam com qualquer linguagem suportada pelo VS Code, mas são especialmente úteis com TypeScript.
+</Callout>
+
+## Ferramentas Recomendadas
+
+### Desenvolvimento
+
+| Ferramenta | Uso |
+|------------|-----|
+| **tsx** | Executar TypeScript diretamente |
+| **tsx watch** | Hot-reload durante desenvolvimento |
+| **ts-node** | Alternativa (mais lenta que tsx) |
+| **nodemon** | Reiniciar servidor em mudanças |
+
+### Linting e Formatting
+
+| Ferramenta | Uso |
+|------------|-----|
+| **ESLint** | Linting com regras TypeScript |
+| **Prettier** | Formatação automática |
+| **dprint** | Alternativa rápida ao Prettier |
+
+### Testes
+
+| Ferramenta | Uso |
+|------------|-----|
+| **Vitest** | Test runner moderno e rápido |
+| **Jest** | Test runner popular |
+| **Playwright** | Testes E2E |
+
+## Recursos Oficiais
+
+- [Documentação TypeScript](https://www.typescriptlang.org/docs/)
+- [Documentação Node.js](https://nodejs.org/docs/)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
+- [TypeScript Deep Dive (livro gratuito)](https://basarat.gitbook.io/typescript/)
+
+## Conclusão
+
+TypeScript com Node.js é uma combinação poderosa. A configuração inicial pode parecer intimidante, mas os benefícios em termos de produtividade, segurança e manutenção de código compensam largamente.
+
+Começa com a configuração básica, adota `strict: true`, e vai adicionando mais opções conforme a tua confiança cresce. Em pouco tempo, não vais querer voltar a JavaScript puro.
+
+<Callout type="success">
+  Lembra-te: TypeScript não é sobre ser perfeito, é sobre ser mais seguro. Faz sentido para projetos de qualquer tamanho.
+</Callout>
+
+Boa sorte com o teu projeto! 🚀

@@ -1,0 +1,80 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+const filteredHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
+---
+
+{filteredHeadings.length > 0 && (
+  <nav id="toc" class="hidden lg:block sticky top-24 w-64 max-h-[calc(100vh-8rem)] overflow-y-auto">
+    <div class="flex items-center gap-2 mb-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <line x1="8" y1="6" x2="21" y2="6"></line>
+        <line x1="8" y1="12" x2="21" y2="12"></line>
+        <line x1="8" y1="18" x2="21" y2="18"></line>
+        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+      </svg>
+      <span>Índice</span>
+    </div>
+    <ul class="space-y-2 text-sm">
+      {filteredHeadings.map(heading => (
+        <li>
+          <a
+            href={`#${heading.slug}`}
+            data-toc-link
+            class:list={[
+              'block py-1 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors border-l-2 border-transparent pl-3',
+              heading.depth === 3 && 'pl-6'
+            ]}
+          >
+            {heading.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<script>
+  function initTOC() {
+    const tocLinks = document.querySelectorAll('[data-toc-link]');
+    const headings = Array.from(document.querySelectorAll('article h2, article h3'));
+    
+    if (tocLinks.length === 0 || headings.length === 0) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('id');
+            tocLinks.forEach((link) => {
+              link.classList.remove('text-primary-600', 'dark:text-primary-400', 'border-primary-500');
+              link.classList.add('text-gray-600', 'dark:text-gray-400', 'border-transparent');
+            });
+            
+            const activeLink = document.querySelector(`[data-toc-link][href="#${id}"]`);
+            if (activeLink) {
+              activeLink.classList.remove('text-gray-600', 'dark:text-gray-400', 'border-transparent');
+              activeLink.classList.add('text-primary-600', 'dark:text-primary-400', 'border-primary-500');
+            }
+          }
+        });
+      },
+      { rootMargin: '-80px 0px -80% 0px' }
+    );
+    
+    headings.forEach((heading) => observer.observe(heading));
+  }
+  
+  document.addEventListener('DOMContentLoaded', initTOC);
+</script>

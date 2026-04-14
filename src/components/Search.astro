@@ -1,0 +1,107 @@
+---
+---
+
+<div class="relative">
+  <div class="relative">
+    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8"></circle>
+      <path d="m21 21-4.35-4.35"></path>
+    </svg>
+    <input
+      type="text"
+      id="search-input"
+      placeholder="Pesquisar..."
+      class="w-full sm:w-64 pl-10 pr-4 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-all"
+    />
+  </div>
+  
+  <div id="search-results" class="hidden absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl max-h-96 overflow-y-auto z-50">
+  </div>
+</div>
+
+<script>
+  interface Post {
+    slug: string;
+    title: string;
+    description: string;
+    category: string;
+    tags: string[];
+  }
+  
+  let fuse: any;
+  let posts: Post[] = [];
+  
+  async function loadPosts() {
+    try {
+      const response = await fetch('/search-index.json');
+      posts = await response.json();
+      initSearch();
+    } catch (e) {
+      console.log('Search index not available yet');
+    }
+  }
+  
+  function initSearch() {
+    if (typeof window !== 'undefined' && posts.length > 0) {
+      import('fuse.js').then(({ default: Fuse }) => {
+        fuse = new Fuse(posts, {
+          keys: ['title', 'description', 'category', 'tags'],
+          threshold: 0.3,
+          includeScore: true
+        });
+      });
+    }
+  }
+  
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const searchResults = document.getElementById('search-results') as HTMLDivElement;
+  
+  searchInput?.addEventListener('focus', () => {
+    if (posts.length === 0) loadPosts();
+  });
+  
+  searchInput?.addEventListener('input', (e) => {
+    const query = (e.target as HTMLInputElement).value;
+    
+    if (query.length < 2) {
+      searchResults?.classList.add('hidden');
+      return;
+    }
+    
+    if (!fuse && posts.length > 0) {
+      loadPosts().then(() => showResults(query));
+    } else if (fuse) {
+      showResults(query);
+    }
+  });
+  
+  async function showResults(query: string) {
+    if (!fuse) return;
+    
+    const results = fuse.search(query).slice(0, 10);
+    
+    if (results.length === 0) {
+      searchResults.innerHTML = `
+        <div class="p-4 text-center text-gray-500 dark:text-gray-400">
+          Nenhum resultado encontrado
+        </div>
+      `;
+    } else {
+      searchResults.innerHTML = results.map(({ item }: { item: Post }) => `
+        <a href="/blog/${item.slug}" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0">
+          <div class="font-medium text-gray-900 dark:text-gray-100">${item.title}</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">${item.description}</div>
+          <div class="text-xs text-primary-600 dark:text-primary-400 mt-2">${item.category}</div>
+        </a>
+      `).join('');
+    }
+    
+    searchResults.classList.remove('hidden');
+  }
+  
+  document.addEventListener('click', (e) => {
+    if (!searchInput?.contains(e.target as Node) && !searchResults?.contains(e.target as Node)) {
+      searchResults?.classList.add('hidden');
+    }
+  });
+</script>
