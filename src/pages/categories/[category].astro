@@ -51,7 +51,7 @@ function formatDate(date: Date) {
     
     <div class="space-y-6">
       {posts.map(post => (
-        <a href={`/blog/${post.slug}`} class="group block">
+        <a href={`/blog/${post.id}`} class="group block">
           <article class="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
             <div class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mb-3">
               <span class="flex items-center gap-1">
