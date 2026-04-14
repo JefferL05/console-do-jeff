@@ -20,6 +20,9 @@
 </div>
 
 <script>
+  /**
+   * Interface para os dados do post no índice de busca
+   */
   interface Post {
     slug: string;
     title: string;
@@ -28,55 +31,55 @@
     tags: string[];
   }
   
-  let fuse: any;
+  // Estado global da pesquisa
+  let fuse: any = null;
   let posts: Post[] = [];
+  let isSearchReady = false;
   
+  /**
+   * Carrega o índice de busca do servidor
+   * Este JSON contém todos os posts para busca offline
+   */
   async function loadPosts() {
     try {
       const response = await fetch('/search-index.json');
+      if (!response.ok) {
+        throw new Error('Falha ao carregar índice de busca');
+      }
       posts = await response.json();
-      initSearch();
-    } catch (e) {
-      console.log('Search index not available yet');
-    }
-  }
-  
-  function initSearch() {
-    if (typeof window !== 'undefined' && posts.length > 0) {
+      
+      // Inicializa Fuse.js após carregar os dados
       import('fuse.js').then(({ default: Fuse }) => {
         fuse = new Fuse(posts, {
           keys: ['title', 'description', 'category', 'tags'],
           threshold: 0.3,
           includeScore: true
         });
+        isSearchReady = true;
       });
+    } catch (e) {
+      console.warn('Índice de busca não disponível');
+      posts = [];
     }
   }
   
-  const searchInput = document.getElementById('search-input') as HTMLInputElement;
-  const searchResults = document.getElementById('search-results') as HTMLDivElement;
+  /**
+   * Escapa caracteres HTML para prevenir XSS
+   * @param str - String a ser escapada
+   */
+  function escapeHtml(str: string): string {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
   
-  searchInput?.addEventListener('focus', () => {
-    if (posts.length === 0) loadPosts();
-  });
-  
-  searchInput?.addEventListener('input', (e) => {
-    const query = (e.target as HTMLInputElement).value;
-    
-    if (query.length < 2) {
-      searchResults?.classList.add('hidden');
-      return;
-    }
-    
-    if (!fuse && posts.length > 0) {
-      loadPosts().then(() => showResults(query));
-    } else if (fuse) {
-      showResults(query);
-    }
-  });
-  
-  async function showResults(query: string) {
-    if (!fuse) return;
+  /**
+   * Renderiza os resultados da pesquisa
+   * @param query - Termo de busca
+   */
+  function showResults(query: string) {
+    const searchResults = document.getElementById('search-results');
+    if (!searchResults || !fuse) return;
     
     const results = fuse.search(query).slice(0, 10);
     
@@ -87,20 +90,68 @@
         </div>
       `;
     } else {
-      searchResults.innerHTML = results.map(({ item }: { item: Post }) => `
-        <a href="/blog/${item.slug}" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0">
-          <div class="font-medium text-gray-900 dark:text-gray-100">${item.title}</div>
-          <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">${item.description}</div>
-          <div class="text-xs text-primary-600 dark:text-primary-400 mt-2">${item.category}</div>
-        </a>
-      `).join('');
+      // Mapeia os resultados e escapa o HTML
+      const html = results.map(({ item }: { item: Post }) => {
+        // Escapa todos os dados antes de injetar
+        const safeTitle = escapeHtml(item.title);
+        const safeDesc = escapeHtml(item.description);
+        const safeCategory = escapeHtml(item.category);
+        const safeSlug = escapeHtml(item.slug);
+        
+        return `
+          <a href="/blog/${safeSlug}" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0 transition-colors">
+            <div class="font-medium text-gray-900 dark:text-gray-100">${safeTitle}</div>
+            <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">${safeDesc}</div>
+            <div class="text-xs text-primary-600 dark:text-primary-400 mt-2 font-medium">${safeCategory}</div>
+          </a>
+        `;
+      }).join('');
+      
+      searchResults.innerHTML = html;
     }
     
     searchResults.classList.remove('hidden');
   }
   
+  // Elementos do DOM
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const searchResults = document.getElementById('search-results') as HTMLDivElement;
+  
+  // Carrega os posts ao focar no input
+  searchInput?.addEventListener('focus', () => {
+    if (posts.length === 0) loadPosts();
+  });
+  
+  // Input: busca enquanto digita
+  searchInput?.addEventListener('input', (e) => {
+    const query = (e.target as HTMLInputElement).value.trim();
+    
+    // Oculta resultados se query muito curta
+    if (query.length < 2) {
+      searchResults?.classList.add('hidden');
+      return;
+    }
+    
+    // Aguarda Fuse.js estar pronto
+    if (!fuse && posts.length > 0) {
+      loadPosts().then(() => showResults(query));
+    } else if (fuse) {
+      showResults(query);
+    }
+  });
+  
+  // Tecla Escape fecha os resultados
+  searchInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      searchResults?.classList.add('hidden');
+      searchInput.blur();
+    }
+  });
+  
+  // Clique fora fecha os resultados
   document.addEventListener('click', (e) => {
-    if (!searchInput?.contains(e.target as Node) && !searchResults?.contains(e.target as Node)) {
+    if (!searchInput?.contains(e.target as Node) && 
+        !searchResults?.contains(e.target as Node)) {
       searchResults?.classList.add('hidden');
     }
   });
