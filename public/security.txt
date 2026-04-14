@@ -1,0 +1,34 @@
+# Security Policy
+
+Thank you for helping keep our project secure!
+
+## Reporting a Vulnerability
+
+If you discover a security vulnerability, please report it responsibly:
+
+1. **Do NOT** create a public GitHub issue for security vulnerabilities
+2. Send a private report via [GitHub Security Advisories](https://github.com/JefferL05/console-do-jeff/security/advisories)
+3. Or contact the maintainer directly
+
+## Scope
+
+This security policy applies to:
+- The Console do Jeff blog application
+- All related subdomains
+- Associated APIs and services
+
+## Response Timeline
+
+- **Initial Response:** Within 48 hours
+- **Assessment:** Within 7 days
+- **Fix Timeline:** Based on severity (Critical: 24h, High: 7 days, Medium: 30 days, Low: 90 days)
+
+## Security Updates
+
+Security patches will be released as needed and announced through:
+- GitHub Security Advisories
+- Project releases
+
+---
+
+*Last updated: 2026-04-14*
