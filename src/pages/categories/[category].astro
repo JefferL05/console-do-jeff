@@ -13,11 +13,11 @@ export async function getStaticPaths() {
   }));
 }
 
-const { category } = Astro.props;
+const categorySlug = Astro.params.category;
 
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
 const posts = allPosts
-  .filter(post => post.data.category.toLowerCase() === category)
+  .filter(post => post.data.category.toLowerCase() === categorySlug)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 function formatDate(date: Date) {
@@ -28,8 +28,8 @@ function formatDate(date: Date) {
 ---
 
 <BaseLayout 
-  title={`${category} | Console do Jeff`} 
-  description={`Artigos da categoria ${category}`}
+  title={`${categorySlug} | Console do Jeff`} 
+  description={`Artigos da categoria ${categorySlug}`}
 >
   <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <a href="/categories" class="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mb-6">
@@ -41,8 +41,8 @@ function formatDate(date: Date) {
     </a>
     
     <div class="mb-12">
-      <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-        {category}
+      <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4 capitalize">
+        {categorySlug}
       </h1>
       <p class="text-gray-600 dark:text-gray-400">
         {posts.length} {posts.length === 1 ? 'artigo' : 'artigos'}
