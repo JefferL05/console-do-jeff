@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import PostViews from '@components/PostViews';
 
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
 const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
@@ -86,7 +87,7 @@ function formatDate(date: Date, options?: Intl.DateTimeFormatOptions) {
                 </div>
               )}
               <div class="p-6">
-                <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
+                <div class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mb-3">
                   <span class="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded text-xs font-medium">
                     {post.data.category}
                   </span>
@@ -99,6 +100,7 @@ function formatDate(date: Date, options?: Intl.DateTimeFormatOptions) {
                     </svg>
                     {formatDate(post.data.pubDate, { month: 'short', day: 'numeric' })}
                   </span>
+                  <PostViews client:visible slug={post.id} />
                 </div>
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                   {post.data.title}

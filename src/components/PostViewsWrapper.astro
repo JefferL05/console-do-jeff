@@ -1,0 +1,12 @@
+---
+import PostViews from '@components/PostViews';
+
+interface Props {
+  slug: string;
+  views?: number;
+}
+
+const { slug, views } = Astro.props;
+---
+
+<PostViews client:load slug={slug} initialViews={views} />
