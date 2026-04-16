@@ -4,7 +4,7 @@ Blog
 =======
 # TechBlog - Blog Técnico de Alta Performance
 
-Blog técnico inspirado no AkitaOnRails, construí­do com Astro 4.0 para máxima performance e legibilidade.
+Blog técnico, construí­do com Astro 4.0 para máxima performance e legibilidade.
 
 ## Stack
 
