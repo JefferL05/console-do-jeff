@@ -1,6 +1,6 @@
 ---
 interface Props {
-  type?: 'pixel' | 'title' | 'subtitle' | 'stars' | 'dotted';
+  type?: 'pixel' | 'title' | 'subtitle' | 'stars' | 'dotted' | 'comic-box' | 'neon-box' | 'tech-box' | 'action-box' | 'retro-box' | 'squad-box';
   text?: string;
 }
 
@@ -40,6 +40,22 @@ const { type = 'pixel', text } = Astro.props;
 {type === 'dotted' && (
   <div class="retro-divider retro-divider--dotted">
     · · · · · · · · · · · · · · ·
+  </div>
+)}
+
+{(type === 'comic-box' || type === 'neon-box' || type === 'tech-box' || type === 'action-box' || type === 'retro-box' || type === 'squad-box') && (
+  <div class={`retro-box retro-box--${type}`}>
+    <div class="retro-box__inner">
+      <div class="retro-box__corner retro-box__corner--tl"></div>
+      <div class="retro-box__corner retro-box__corner--tr"></div>
+      <div class="retro-box__corner retro-box__corner--bl"></div>
+      <div class="retro-box__corner retro-box__corner--br"></div>
+      <div class="retro-box__content">
+        {Astro.props.title && <div class="retro-box__title"><slot name="title" /></div>}
+        {Astro.props.content && <div class="retro-box__text"><slot name="content" /></div>}
+        <slot />
+      </div>
+    </div>
   </div>
 )}
 
@@ -171,6 +187,162 @@ const { type = 'pixel', text } = Astro.props;
     color: #666;
   }
 
+  /* Retro Box - Sem Imagens */
+  .retro-box {
+    margin: 2rem 0;
+    padding: 0 1rem;
+  }
+
+  .retro-box__inner {
+    position: relative;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+    border: 3px solid;
+    text-align: center;
+  }
+
+  .retro-box__corner {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 3px solid;
+  }
+
+  .retro-box__corner--tl {
+    top: -3px;
+    left: -3px;
+    border-right: none;
+    border-bottom: none;
+    border-color: #4ecdc4;
+  }
+
+  .retro-box__corner--tr {
+    top: -3px;
+    right: -3px;
+    border-left: none;
+    border-bottom: none;
+    border-color: #4ecdc4;
+  }
+
+  .retro-box__corner--bl {
+    bottom: -3px;
+    left: -3px;
+    border-right: none;
+    border-top: none;
+    border-color: #4ecdc4;
+  }
+
+  .retro-box__corner--br {
+    bottom: -3px;
+    right: -3px;
+    border-left: none;
+    border-top: none;
+    border-color: #4ecdc4;
+  }
+
+  .retro-box__title {
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+    margin-bottom: 0.5rem;
+  }
+
+  .retro-box__text {
+    font-size: 0.875rem;
+    color: #a0aec0;
+    letter-spacing: 1px;
+  }
+
+  /* Comic Box */
+  .retro-box--comic-box .retro-box__inner {
+    border-color: #ff6b6b;
+    background: linear-gradient(135deg, #2d1f3d 0%, #1a1a2e 50%, #2d1f3d 100%);
+  }
+
+  .retro-box--comic-box .retro-box__title {
+    color: #ff6b6b;
+    text-shadow: 0 0 10px #ff6b6b, 0 0 20px #ff6b6b;
+  }
+
+  /* Neon Box */
+  .retro-box--neon-box .retro-box__inner {
+    border-color: #ff006e;
+    background: linear-gradient(135deg, #1a0a1a 0%, #2d1f3d 50%, #1a0a1a 100%);
+    animation: neon-pulse 2s ease-in-out infinite;
+  }
+
+  .retro-box--neon-box .retro-box__title {
+    color: #ff006e;
+    text-shadow: 0 0 10px #ff006e, 0 0 20px #8338ec, 0 0 30px #3a86ff;
+  }
+
+  @keyframes neon-pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(255, 0, 110, 0.3); }
+    50% { box-shadow: 0 0 25px rgba(255, 0, 110, 0.6); }
+  }
+
+  /* Tech Box */
+  .retro-box--tech-box .retro-box__inner {
+    border-color: #00ff88;
+    background: linear-gradient(135deg, #0a1a1a 0%, #0f2d2d 50%, #0a1a1a 100%);
+  }
+
+  .retro-box--tech-box .retro-box__title {
+    color: #00ff88;
+    text-shadow: 0 0 10px #00ff88, 0 0 20px #00aaff;
+  }
+
+  /* Action Box */
+  .retro-box--action-box .retro-box__inner {
+    border-color: #ff4444;
+    background: linear-gradient(135deg, #2d1a1a 0%, #3d1f1f 50%, #2d1a1a 100%);
+    animation: action-pulse 1s ease-in-out infinite;
+  }
+
+  .retro-box--action-box .retro-box__title {
+    color: #ff4444;
+    text-shadow: 0 0 10px #ff4444, 0 0 20px #ff8800;
+  }
+
+  @keyframes action-pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(255, 68, 68, 0.5); }
+    50% { box-shadow: 0 0 30px rgba(255, 68, 68, 0.8); }
+  }
+
+  /* Retro Box */
+  .retro-box--retro-box .retro-box__inner {
+    border-color: #ffd700;
+    background: linear-gradient(135deg, #2d2d1a 0%, #3d3d2d 50%, #2d2d1a 100%);
+  }
+
+  .retro-box--retro-box .retro-box__title {
+    color: #ffd700;
+    text-shadow: 0 0 10px #ffd700, 0 0 20px #ff6b6b;
+  }
+
+  /* Squad Box */
+  .retro-box--squad-box .retro-box__inner {
+    border-color: #4ecdc4;
+    background: linear-gradient(135deg, #1a2d3d 0%, #16213e 50%, #1a2d3d 100%);
+    padding: 1rem 1.5rem;
+  }
+
+  .retro-box--squad-box .retro-box__title {
+    color: #4ecdc4;
+    text-shadow: 0 0 10px #4ecdc4, 0 0 20px #4ecdc4;
+    font-size: 1.25rem;
+    letter-spacing: 5px;
+  }
+
+  .retro-box--squad-box .retro-box__text {
+    color: #96ceb4;
+    margin-top: 0.5rem;
+  }
+
+  /* Dark mode */
   :global(.dark) .retro-divider__line {
     background: linear-gradient(90deg, transparent, #4ecdc4, transparent);
   }
@@ -181,5 +353,9 @@ const { type = 'pixel', text } = Astro.props;
 
   :global(.dark) .retro-divider--dotted {
     color: #888;
+  }
+
+  :global(.dark) .retro-box__inner {
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
   }
 </style>

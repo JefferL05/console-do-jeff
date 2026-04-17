@@ -12,7 +12,6 @@ draft: false
 ---
 
 import Callout from '../../components/Callout.astro';
-import RetroFigure from '../../components/RetroFigure.astro';
 import RetroDivider from '../../components/RetroDivider.astro';
 
 # Comix Zone: O Jogo Que Virou História em Quadrinhos
@@ -21,14 +20,10 @@ import RetroDivider from '../../components/RetroDivider.astro';
 
 Em 1994, a Sega fez algo que ninguém esperava: criou um jogo que parecia ter saído diretamente de uma página de quadrinhos. **Comix Zone** não era apenas inspirado em HQs — ele *era* uma HQ interativa.
 
-<RetroFigure
-  src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80"
-  alt="Pixel art 16-bits estilo Mega Drive com personagem em pose heroica"
-  caption="▶ ENTER THE COMIX ZONE ◀"
-  frame="comic"
-/>
-
-O jogador não controlava um personagem em um mundo. Ele controlava um personagem dentro de uma história em quadrinhos que se desenrolava em tempo real. Cada painel, cada balão de fala, cada fundo colorido era uma página de arte feita à mão.
+<RetroDivider type="comic-box">
+  <span slot="title">▶ ENTER THE COMIX ZONE ◀</span>
+  <span slot="content">O jogador controlava um personagem dentro de uma história em quadrinhos que se desenrolava em tempo real. Cada painel, cada balão de fala, cada fundo colorido era uma página de arte feita à mão.</span>
+</RetroDivider>
 
 <RetroDivider type="pixel" />
 
@@ -46,12 +41,9 @@ A ideia surgiu após uma visita a uma loja de quadrinhos em Palo Alto, Califórn
   **Curiosidade:** O protótipo original de 1992 se chamava *"Joe Pencil Trapped In The Comix Zone"* — um vídeo de demonstração que impressionou tanto a direção que o projeto foi aprovado imediatamente.
 </Callout>
 
-<RetroFigure
-  src="https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=800&q=80"
-  alt="Tela de jogo arcade com cores neon estilo 16-bits"
-  caption="* POW! * ESTILO REVOLUCIONARIO * BAM! *"
-  frame="neon"
-/>
+<RetroDivider type="neon-box">
+  <span slot="title">* POW! * ESTILO REVOLUCIONARIO * BAM! *</span>
+</RetroDivider>
 
 ### A Influência dos Quadrinhos dos Anos 90
 
@@ -69,12 +61,10 @@ A história foi inspirada pelo clipe de **"Take On Me"** do A-ha (1985), que mos
 
 Diferente dos grandes produções da Sega, Comix Zone foi criado por uma equipe surpreendentemente pequena. Mas o que faltava em números, sobrava em paixão.
 
-<RetroFigure
-  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80"
-  alt="Arte em quadrinhos estilo pop art com cores vibrantes"
-  caption="SQUAD 16-BITS: MORAVIEC + STEPHENS + DROSSIN"
-  frame="comic"
-/>
+<RetroDivider type="squad-box">
+  <span slot="title">SQUAD 16-BITS</span>
+  <span slot="content">MORAVIEC + STEPHENS + DROSSIN + DEZUNIGA + SENN + HEDLUND</span>
+</RetroDivider>
 
 | Função | Responsável | Contribuição |
 |--------|------------|--------------|
@@ -89,12 +79,9 @@ A equipe cresceu para cerca de uma dúzia de pessoas e recebeu alta prioridade n
 
 ### Os Desafios Técnicos do Mega Drive
 
-<RetroFigure
-  src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80"
-  alt="Placa de circuito eletrônico representando tecnologia 16-bits"
-  caption="* TECH LEVEL: 16-BITS * MEGA POWER *"
-  frame="tech"
-/>
+<RetroDivider type="tech-box">
+  <span slot="title">* TECH LEVEL: 16-BITS * MEGA POWER *</span>
+</RetroDivider>
 
 O Mega Drive de 16 bits tinha limitações significativas. Renderizar arte de quadrinhos em tempo real era um pesadelo técnico.
 
@@ -130,12 +117,9 @@ END:
 
 A arte de Comix Zone era algo nunca visto em um videogame. Cada painel era uma obra de arte em si — cores vibrantes, traços definidos, detalhes miniados.
 
-<RetroFigure
-  src="https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=800&q=80"
-  alt="Controle de videogame com iluminação neon estilo retrô"
-  caption="* ESTETICA UNICA * ESTILO PROPIO *"
-  frame="neon"
-/>
+<RetroDivider type="neon-box">
+  <span slot="title">* ESTETICA UNICA * ESTILO PROPIO *</span>
+</RetroDivider>
 
 Tony DeZuniga (co-criador de Jonah Hex) desenhou as sequências de abertura e encerramento com tinta e lápis antes de escanear para o computador.
 
@@ -157,12 +141,9 @@ Howard Drossin compôs uma trilha que mesclava rock com música eletrônica — 
 
 ### Mecânicas Únicas
 
-<RetroFigure
-  src="https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80"
-  alt="Combate estilo beat em up com efeitos visuais vibrantes"
-  caption="* COMBATE! * COMBOS! * PODER! *"
-  frame="action"
-/>
+<RetroDivider type="action-box">
+  <span slot="title">* COMBATE! * COMBOS! * PODER! *</span>
+</RetroDivider>
 
 Comix Zone era um jogo de ação lateral (side-scroller) com combate estilo **Street Fighter**. O jogador controlava **Sketch Turner**, um artista de quadrinhos transportado para dentro de sua própria criação.
 
@@ -197,12 +178,9 @@ Sketch deve atravessar três "episódios" do seu quadrinho:
 
 ### O Hardware Era o Inimigo
 
-<RetroFigure
-  src="https://images.unsplash.com/photo-1531525645387-7f14be1bdbbd?w=800&q=80"
-  alt="Coleção de cartuchos de videogame estilo anos 90"
-  caption="* 16-BITS * 2 MEGS * NO LIMIT *"
-  frame="retro"
-/>
+<RetroDivider type="retro-box">
+  <span slot="title">* 16-BITS * 2 MEGS * NO LIMIT *</span>
+</RetroDivider>
 
 Por mais brilhante que fosse, Comix Zone sofria com as limitações do Mega Drive:
 
@@ -231,12 +209,9 @@ Os jogadores reclamavam de:
 
 ### Influência em Jogos Posteriores
 
-<RetroFigure
-  src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80"
-  alt="Visual arcade com personagens pixel art estilo 16-bits"
-  caption="* LEGADO * INFLUENCIA * CLASSICO *"
-  frame="neon"
-/>
+<RetroDivider type="neon-box">
+  <span slot="title">* LEGADO * INFLUENCIA * CLASSICO *</span>
+</RetroDivider>
 
 Comix Zone pode não ter tenido sequência direta, mas sua influência permeia vários jogos:
 
@@ -269,12 +244,10 @@ Comix Zone está disponível em múltiplas plataformas:
 
 ### O Que Comix Zone Ensina
 
-<RetroFigure
-  src="https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=800&q=80"
-  alt="Interface de jogo 16-bits com texto pixelado"
-  caption="* DEV TIPS * CODE * CREATE * INSPIRE *"
-  frame="comic"
-/>
+<RetroDivider type="comic-box">
+  <span slot="title">* DEV TIPS * CODE * CREATE * INSPIRE *</span>
+  <span slot="content">Visão > Recursos | Estilo Próprio | Limitações = Criatividade | Autenticidade</span>
+</RetroDivider>
 
 1. **Visão > Recursos**: Uma equipe pequena com uma ideia forte pode superar grandes produções
 2. **Estilo próprio importa**: Comix Zone era imediatamente reconhecível
@@ -289,20 +262,14 @@ Comix Zone está disponível em múltiplas plataformas:
 
 ## Conclusão: Quadrinhos Eternos
 
-Comix Zone não foi um sucesso comercial. Não vendeu milhões de cópias. Não teve sequência. Mas mudou a forma como pensamos sobre jogos e narrativas visuais.
+Comix Zone não foi um sucesso comercial. Não vendeu milhões de cópias. Não tuvo sequência. Mas mudou a forma como pensamos sobre jogos e narrativas visuais.
 
 Trinta anos depois, pessoas ainda falam de Sketch Turner, Mortus e Roadkill. Ainda existem comunidades dedicadas a completar este clássico. Ainda há jogadores descobrindo este artefato dos anos 90 pela primeira vez.
 
-<RetroFigure
-  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80"
-  alt="Arte final estilo quadrinhos com cores vibrantes"
-  caption="* FIM * THE END * FIN *"
-  frame="comic"
-/>
-
-A próxima vez que você jogar um jogo com estilo visual forte, lembre-se de Comix Zone: um sonho de um jovem programador que transformou sua paixão por quadrinhos em arte interativa.
-
-**Kurt ainda está esperando você entrar na Zona dos Quadrinhos.**
+<RetroDivider type="comic-box">
+  <span slot="title">* FIM * THE END * FIN *</span>
+  <span slot="content">Kurt ainda está esperando você entrar na Zona dos Quadrinhos.</span>
+</RetroDivider>
 
 ---
 
