@@ -1,0 +1,185 @@
+---
+interface Props {
+  type?: 'pixel' | 'title' | 'subtitle' | 'stars' | 'dotted';
+  text?: string;
+}
+
+const { type = 'pixel', text } = Astro.props;
+---
+
+{type === 'pixel' && (
+  <div class="retro-divider retro-divider--pixel">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+)}
+
+{type === 'title' && (
+  <div class="retro-divider retro-divider--title">
+    <span class="retro-divider__line"></span>
+    <span class="retro-divider__icon">◆</span>
+    <span class="retro-divider__line"></span>
+  </div>
+)}
+
+{type === 'subtitle' && (
+  <div class="retro-divider retro-divider--subtitle">
+    <span class="retro-divider__square"></span>
+    <span class="retro-divider__number">{text}</span>
+    <span class="retro-divider__square"></span>
+  </div>
+)}
+
+{type === 'stars' && (
+  <div class="retro-divider retro-divider--stars">
+    ★ ★ ★ ★ ★ ★ ★ ★
+  </div>
+)}
+
+{type === 'dotted' && (
+  <div class="retro-divider retro-divider--dotted">
+    · · · · · · · · · · · · · · ·
+  </div>
+)}
+
+<style>
+  .retro-divider {
+    margin: 2.5rem 0;
+    text-align: center;
+  }
+
+  /* Pixel divider */
+  .retro-divider--pixel {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    height: 16px;
+    align-items: center;
+  }
+
+  .retro-divider--pixel span {
+    display: block;
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(135deg, #4ecdc4, #45b7d1);
+    animation: pixel-flicker 1.5s ease-in-out infinite;
+  }
+
+  .retro-divider--pixel span:nth-child(odd) {
+    animation-delay: 0.1s;
+    background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+  }
+
+  .retro-divider--pixel span:nth-child(3n) {
+    background: linear-gradient(135deg, #ffd93d, #ff9500);
+  }
+
+  .retro-divider--pixel span:nth-child(4n) {
+    background: linear-gradient(135deg, #6bcb77, #4ecdc4);
+  }
+
+  @keyframes pixel-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  /* Title divider */
+  .retro-divider--title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .retro-divider__line {
+    display: block;
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #4ecdc4, transparent);
+  }
+
+  .retro-divider__icon {
+    font-size: 1.5rem;
+    color: #4ecdc4;
+    text-shadow: 0 0 10px #4ecdc4, 0 0 20px #4ecdc4;
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { 
+      text-shadow: 0 0 10px #4ecdc4, 0 0 20px #4ecdc4;
+      transform: scale(1);
+    }
+    50% { 
+      text-shadow: 0 0 20px #4ecdc4, 0 0 40px #4ecdc4, 0 0 60px #4ecdc4;
+      transform: scale(1.1);
+    }
+  }
+
+  /* Subtitle divider */
+  .retro-divider--subtitle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .retro-divider__square {
+    display: block;
+    width: 12px;
+    height: 12px;
+    background: #ff6b6b;
+    transform: rotate(45deg);
+    animation: rotate-square 3s linear infinite;
+  }
+
+  .retro-divider__number {
+    font-family: 'Courier New', monospace;
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #fff;
+    padding: 0.25rem 0.75rem;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 2px solid #4ecdc4;
+    text-shadow: 0 0 10px #4ecdc4;
+  }
+
+  @keyframes rotate-square {
+    from { transform: rotate(45deg); }
+    to { transform: rotate(405deg); }
+  }
+
+  /* Stars divider */
+  .retro-divider--stars {
+    font-size: 0.75rem;
+    letter-spacing: 0.5rem;
+    color: #ffd93d;
+    text-shadow: 0 0 10px #ff9500, 0 0 20px #ffd93d;
+    animation: twinkle 1.5s ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* Dotted divider */
+  .retro-divider--dotted {
+    font-size: 0.5rem;
+    letter-spacing: 0.75rem;
+    color: #666;
+  }
+
+  :global(.dark) .retro-divider__line {
+    background: linear-gradient(90deg, transparent, #4ecdc4, transparent);
+  }
+
+  :global(.dark) .retro-divider__number {
+    background: linear-gradient(135deg, #0f0f1a, #1a1a2e);
+  }
+
+  :global(.dark) .retro-divider--dotted {
+    color: #888;
+  }
+</style>

@@ -6,27 +6,35 @@ author: "Jeff"
 category: "Geral"
 tags: ["comix-zone", "mega-drive", "sega", "gaming", "historia", "desenvolvimento", "quadrinhos", "16-bits"]
 image:
-  url: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200"
-  alt: "Arte em quadrinhos com cores vibrantes e estilo pop art"
+  url: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200"
+  alt: "Visual 16-bits pixel art estilo Mega Drive com cores vibrantes"
 draft: false
 ---
 
 import Callout from '../../components/Callout.astro';
-import Figure from '../../components/Figure.astro';
+import RetroFigure from '../../components/RetroFigure.astro';
+import RetroDivider from '../../components/RetroDivider.astro';
 
 # Comix Zone: O Jogo Que Virou História em Quadrinhos
 
-Em 1994, a Sega fez algo que ninguém esperava: criou um jogo que parecia ter saído diretamente de uma página de quadrinhos. Comix Zone não era apenas inspirado em HQs — ele *era* uma HQ interativa.
+<RetroDivider type="title" />
+
+Em 1994, a Sega fez algo que ninguém esperava: criou um jogo que parecia ter saído diretamente de uma página de quadrinhos. **Comix Zone** não era apenas inspirado em HQs — ele *era* uma HQ interativa.
+
+<RetroFigure
+  src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80"
+  alt="Pixel art 16-bits estilo Mega Drive com personagem em pose heroica"
+  caption="▶ ENTER THE COMIX ZONE ◀"
+  frame="comic"
+/>
 
 O jogador não controlava um personagem em um mundo. Ele controlava um personagem dentro de uma história em quadrinhos que se desenrolava em tempo real. Cada painel, cada balão de fala, cada fundo colorido era uma página de arte feita à mão.
 
-<Figure
-  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80"
-  alt="Arte em quadrinhos com cores vibrantes e estilo pop art"
-  caption="Comix Zone revolucionou a estética de quadrinhos em jogos com arte detalhada e animações únicas"
-/>
+<RetroDivider type="pixel" />
 
 ## A Génese de Uma Ideia Brilhante
+
+<RetroDivider type="subtitle" text="1" />
 
 ### O Nascimento de Uma Visão
 
@@ -35,8 +43,15 @@ A história começa com um jovem designer da Sega Technical Institute: **Peter M
 A ideia surgiu após uma visita a uma loja de quadrinhos em Palo Alto, Califórnia. Morawiec pensou: "Comics e games podiam ser muito complementares". Ele começou a trabalhar em uma demonstração tecnológica no Amiga.
 
 <Callout type="info">
-  **Curiosidade:** O protótipo original de 1992 se chamava "Joe Pencil Trapped In The Comix Zone" - um vídeo de demonstração que impressionou tanto a direção que o projeto foi aprovado imediatamente por Tom Kalinske, CEO da Sega of America.
+  **Curiosidade:** O protótipo original de 1992 se chamava *"Joe Pencil Trapped In The Comix Zone"* — um vídeo de demonstração que impressionou tanto a direção que o projeto foi aprovado imediatamente.
 </Callout>
+
+<RetroFigure
+  src="https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=800&q=80"
+  alt="Tela de jogo arcade com cores neon estilo 16-bits"
+  caption="* POW! * ESTILO REVOLUCIONARIO * BAM! *"
+  frame="neon"
+/>
 
 ### A Influência dos Quadrinhos dos Anos 90
 
@@ -44,17 +59,22 @@ A década de 90 era a era de ouro dos quadrinhos. Marvel vivia sua idade de ouro
 
 A história foi inspirada pelo clipe de **"Take On Me"** do A-ha (1985), que mostrava um piloto de corrida interagindo com um mundo de quadrinhos.
 
-<Figure
-  src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80"
-  alt="Placa de circuito eletrônico representando a tecnologia do Mega Drive"
-  caption="Comix Zone foi lançado no fim do ciclo de vida do Mega Drive, competindo com PlayStation e Saturn"
-/>
+<RetroDivider type="pixel" />
 
-## O desenvolvimento: Uma Luta Criativa
+## O Desenvolvimento: Uma Luta Criativa
+
+<RetroDivider type="subtitle" text="2" />
 
 ### A Equipe Mínima
 
 Diferente dos grandes produções da Sega, Comix Zone foi criado por uma equipe surpreendentemente pequena. Mas o que faltava em números, sobrava em paixão.
+
+<RetroFigure
+  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80"
+  alt="Arte em quadrinhos estilo pop art com cores vibrantes"
+  caption="SQUAD 16-BITS: MORAVIEC + STEPHENS + DROSSIN"
+  frame="comic"
+/>
 
 | Função | Responsável | Contribuição |
 |--------|------------|--------------|
@@ -63,12 +83,18 @@ Diferente dos grandes produções da Sega, Comix Zone foi criado por uma equipe 
 | Programador | Stieg Hedlund | Otimização |
 | Artista | Chris Senn | Animações, backgrounds |
 | Artista | Tony DeZuniga | Quadrinhos |
-| Artista | Alex Niño | Arte final |
 | Compositor | Howard Drossin | Trilha sonora |
 
 A equipe cresceu para cerca de uma dúzia de pessoas e recebeu alta prioridade na Sega Technical Institute.
 
 ### Os Desafios Técnicos do Mega Drive
+
+<RetroFigure
+  src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80"
+  alt="Placa de circuito eletrônico representando tecnologia 16-bits"
+  caption="* TECH LEVEL: 16-BITS * MEGA POWER *"
+  frame="tech"
+/>
 
 O Mega Drive de 16 bits tinha limitações significativas. Renderizar arte de quadrinhos em tempo real era um pesadelo técnico.
 
@@ -78,30 +104,38 @@ O Mega Drive de 16 bits tinha limitações significativas. Renderizar arte de qu
 - Apenas 2MB de RAM para trabalhar
 - Sem capacidade de rotação ou escala de hardware
 
-O maior desafio era fazer a descompressão de grandes páginas de gráficos durante o jogo. Stephens lembra: "O Genesis não foi projetado para isso, mas conseguimos fazer acontecer."
-
 ```assembly
-; A compressão permitia armazenar mais frames de animação
-; Técnica criada pela equipe para caber tudo na ROM
+; Compressão de tiles - técnica da equipe
 TILE_COMPRESS:
     move.w  (A0)+, D0
     cmp.b   #$FF, D0
-    beq.s   DECOMPRESS_END
+    beq.s   END
     move.w  D0, (A1)+
     bra.s   TILE_COMPRESS
-DECOMPRESS_END:
+END:
     rts
 ```
 
 <Callout type="warning">
-  **Para Desenvolvedores:** O sistema de compressão de tiles do Comix Zone é um excelente estudo de caso em otimização. A equipe conseguiu armazenar arte detalhada de quadrinhos em um hardware extremamente limitado.
+  **Para Devs:** O sistema de compressão de tiles do Comix Zone é um excelente estudo de caso em otimização. A equipe conseguiu armazenar arte detalhada de quadrinhos em um hardware extremamente limitado.
 </Callout>
 
+<RetroDivider type="pixel" />
+
 ## A Arte que Definia Gênero
+
+<RetroDivider type="subtitle" text="3" />
 
 ### Design Visual Revolucionário
 
 A arte de Comix Zone era algo nunca visto em um videogame. Cada painel era uma obra de arte em si — cores vibrantes, traços definidos, detalhes miniados.
+
+<RetroFigure
+  src="https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=800&q=80"
+  alt="Controle de videogame com iluminação neon estilo retrô"
+  caption="* ESTETICA UNICA * ESTILO PROPIO *"
+  frame="neon"
+/>
 
 Tony DeZuniga (co-criador de Jonah Hex) desenhou as sequências de abertura e encerramento com tinta e lápis antes de escanear para o computador.
 
@@ -111,25 +145,24 @@ O protagonista passou por várias transformações:
 - **Joe Pencil** (protótipo) - um nerd magricela
 - **Sketch Turner** - redesign inspirado em rock grunge
 
-O personagem foi inspirado pelo visual dos Smashing Pumpkins e outras bandas da época.
-
 ### Trilha Sonora Que Complementava a Arte
 
 Howard Drossin compôs uma trilha que mesclava rock com música eletrônica — perfeito para a estética dos anos 90.
 
-<Figure
-  src="https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=800&q=80"
-  alt="Tela de jogo pixel art com cores neon estilo retrô"
-  caption="O combate de Comix Zone combinava a profundidade de jogos de luta com a estética única de quadrinhos"
-/>
-
-<Callout type="success">
-  **Para Designers:** A identidade visual forte de Comix Zone demonstra como estilo consistente pode elevar um jogo. Cada frame parece desenhado por um artista de quadrinhos profissional — porque era.
-</Callout>
+<RetroDivider type="pixel" />
 
 ## O Gameplay Que Unia Quadrinhos e Ação
 
+<RetroDivider type="subtitle" text="4" />
+
 ### Mecânicas Únicas
+
+<RetroFigure
+  src="https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80"
+  alt="Combate estilo beat em up com efeitos visuais vibrantes"
+  caption="* COMBATE! * COMBOS! * PODER! *"
+  frame="action"
+/>
 
 Comix Zone era um jogo de ação lateral (side-scroller) com combate estilo **Street Fighter**. O jogador controlava **Sketch Turner**, um artista de quadrinhos transportado para dentro de sua própria criação.
 
@@ -145,6 +178,10 @@ Comix Zone era um jogo de ação lateral (side-scroller) com combate estilo **St
 - Quadrinhos eram desenhados sobre a jogabilidade
 - Efeitos especiais de HQ (POW!, BAM!, CRACK!)
 
+<Callout type="warning">
+  **Game Design Insight:** Comix Zone usava uma estrutura narrativa não-linear para a época. O jogador podia escolher caminhos, mas todos convergiam para o mesmo final.
+</Callout>
+
 ### A Estrutura Narrativa
 
 Sketch deve atravessar três "episódios" do seu quadrinho:
@@ -152,15 +189,20 @@ Sketch deve atravessar três "episódios" do seu quadrinho:
 2. **Himalaia** (Mountains)
 3. **Atóis da Nova Zelândia** (Stronghold)
 
-O jogo tinha 6 níveis e caminhos ramificados que eventualmente convergiam.
-
-<Callout type="warning">
-  **Game Design Insight:** Comix Zone usava uma estrutura narrativa não-linear para a época. O jogador podia escolher caminhos, mas todos convergiam para o mesmo final — uma escolha estética, não narrativa.
-</Callout>
+<RetroDivider type="pixel" />
 
 ## Limitações e Controvérsias
 
+<RetroDivider type="subtitle" text="5" />
+
 ### O Hardware Era o Inimigo
+
+<RetroFigure
+  src="https://images.unsplash.com/photo-1531525645387-7f14be1bdbbd?w=800&q=80"
+  alt="Coleção de cartuchos de videogame estilo anos 90"
+  caption="* 16-BITS * 2 MEGS * NO LIMIT *"
+  frame="retro"
+/>
 
 Por mais brilhante que fosse, Comix Zone sofria com as limitações do Mega Drive:
 
@@ -177,25 +219,28 @@ Os jogadores reclamavam de:
 - **Combo system complexo** — requeria prática extensiva
 - **Sem continues** — só erhalten um continue ao completar um episódio
 
-Peter Morawiec depois admitiu: "Me arrependo de ter seguido a recomendação do departamento de testes de aumentar a dificuldade."
+<Callout type="success">
+  **Curiosidade:** Peter Morawiec depois admitiu: "Me arrependo de ter seguido a recomendação do departamento de testes de aumentar a dificuldade."
+</Callout>
 
-### Por Que Não Vendeu
-
-O jogo foi lançado tarde no ciclo de vida do Genesis, quando PlayStation e Saturn já estavam nas prateleiras.
-
-<Figure
-  src="https://images.unsplash.com/photo-1551103782-8ab07afd45c1?w=800&q=80"
-  alt="Controle de videogame com iluminação neon azul"
-  caption="Comix Zone está disponível em múltiplas plataformas modernas incluindo Sega Genesis Classics e Nintendo Switch Online"
-/>
+<RetroDivider type="pixel" />
 
 ## O Legado de Comix Zone
 
+<RetroDivider type="subtitle" text="6" />
+
 ### Influência em Jogos Posteriores
+
+<RetroFigure
+  src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80"
+  alt="Visual arcade com personagens pixel art estilo 16-bits"
+  caption="* LEGADO * INFLUENCIA * CLASSICO *"
+  frame="neon"
+/>
 
 Comix Zone pode não ter tenido sequência direta, mas sua influência permeia vários jogos:
 
-|<span style="color: orange">**Jogo**</span>|<span style="color: lightgreen">**Influência**</span>|
+|<span style="color: #ff6b6b">**Jogo**</span>|<span style="color: #4ecdc4">**Influência**</span>|
 |---|---|
 | **Viewtiful Joe** (2003) | Quadrinhos como mecânica central |
 | **Scribblenauts** (2009) | Criatividade acima de tudo |
@@ -203,12 +248,8 @@ Comix Zone pode não ter tenido sequência direta, mas sua influência permeia v
 | **Little Nightmares** (2017) | Atmosfera sombria e estilo visual |
 
 <Callout type="info">
-  **Fato pouquíssimo conhecido:** Em 1995, a Sega tentou criar uma versão para PC com ferramentas para os jogadores criarem seus próprios quadrinhos jogáveis. O projeto foi cancelado, mas protótipos existem até hoje.
+  **Fato pouquíssimo conhecido:** Em 2022, a Sega anunciou uma adaptação cinematográfica de Comix Zone em parceria com Picturestart!
 </Callout>
-
-### Adaptação Cinematográfica
-
-Em agosto de 2022, a Sega anunciou uma parceria com Picturestart para adaptar Comix Zone para o cinema. A roteirista Mae Catt (Young Justice) está escrevendo o script.
 
 ### Disponibilidade Moderna
 
@@ -220,20 +261,31 @@ Comix Zone está disponível em múltiplas plataformas:
 - **Sega Forever** - iOS e Android
 - **Coleções:** Sonic Mega Collection, Sega Genesis Classics
 
+<RetroDivider type="pixel" />
+
 ## Lições Para Desenvolvedores Modernos
+
+<RetroDivider type="subtitle" text="7" />
 
 ### O Que Comix Zone Ensina
 
-1. **Visão > Recursos**: Uma equipe pequena com uma ideia forte pode superar grandes produções
-2. **Estilo próprio importa**: Comix Zone era imediatamente reconhecível — muitos jogos perdem identidade tentando agradar todos
-3. **Limitações inspiram criatividade**: O hardware limitado forçou soluções inovadoras
-4. **Autenticidade vende**: Sketch Turner era claramente um passion project, não um produto corporativo
+<RetroFigure
+  src="https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=800&q=80"
+  alt="Interface de jogo 16-bits com texto pixelado"
+  caption="* DEV TIPS * CODE * CREATE * INSPIRE *"
+  frame="comic"
+/>
 
-Peter Morawiec depois trabalharia em outros projetos, mas nunca esqueceu seu Comix Zone.
+1. **Visão > Recursos**: Uma equipe pequena com uma ideia forte pode superar grandes produções
+2. **Estilo próprio importa**: Comix Zone era imediatamente reconhecível
+3. **Limitações inspiram criatividade**: O hardware limitado forçou soluções inovadoras
+4. **Autenticidade vende**: Sketch Turner era claramente um passion project
 
 <Callout type="success">
-  **Para Startups de Games:** Comix Zone demonstra que nichos podem ser mais valiosos que mercados de massa. Um jogo para 100.000 fãs dedicados vale mais que um jogo medíocre para 1 milhão de jogadores casuais.
+  **Para Startups de Games:** Comix Zone demonstra que nichos podem ser mais valiosos que mercados de massa. Um jogo para 100.000 fãs dedicados vale mais que um jogo medíocre para 1 milhão.
 </Callout>
+
+<RetroDivider type="title" />
 
 ## Conclusão: Quadrinhos Eternos
 
@@ -241,11 +293,16 @@ Comix Zone não foi um sucesso comercial. Não vendeu milhões de cópias. Não 
 
 Trinta anos depois, pessoas ainda falam de Sketch Turner, Mortus e Roadkill. Ainda existem comunidades dedicadas a completar este clássico. Ainda há jogadores descobrindo este artefato dos anos 90 pela primeira vez.
 
+<RetroFigure
+  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80"
+  alt="Arte final estilo quadrinhos com cores vibrantes"
+  caption="* FIM * THE END * FIN *"
+  frame="comic"
+/>
+
 A próxima vez que você jogar um jogo com estilo visual forte, lembre-se de Comix Zone: um sonho de um jovem programador que transformou sua paixão por quadrinhos em arte interativa.
 
-Peter Morawiec provou algo importante: às vezes, a melhor forma de contar uma história não é com palavras ou imagens — é deixando o jogador viver dentro delas.
-
-Sketch Turner ainda está esperando você entrar na Zona dos Quadrinhos.
+**Kurt ainda está esperando você entrar na Zona dos Quadrinhos.**
 
 ---
 
@@ -255,5 +312,3 @@ Sketch Turner ainda está esperando você entrar na Zona dos Quadrinhos.
 - [Wikipedia: Comix Zone](https://en.wikipedia.org/wiki/Comix_Zone)
 - [Hardcore Gaming 101: Comix Zone](http://www.hardcoregaming101.net/comix-zone/)
 - [Sega-16: Interview Peter Morawiec](https://www.sega-16.com/2007/04/interview-peter-morawiec/)
-
-**Título Original:** Comix Zone - A História Completa do Jogo que Virou HQ Interativa (1994)

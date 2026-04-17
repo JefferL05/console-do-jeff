@@ -1,0 +1,163 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  frame?: 'comic' | 'neon' | 'tech' | 'action' | 'retro';
+}
+
+const { src, alt, caption, frame = 'comic' } = Astro.props;
+---
+
+<figure class={`retro-figure retro-figure--${frame}`}>
+  <div class="retro-figure__frame">
+    <div class="retro-figure__corner retro-figure__corner--tl"></div>
+    <div class="retro-figure__corner retro-figure__corner--tr"></div>
+    <div class="retro-figure__corner retro-figure__corner--bl"></div>
+    <div class="retro-figure__corner retro-figure__corner--br"></div>
+    <div class="retro-figure__inner">
+      <img 
+        src={src} 
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+      />
+      <div class="retro-figure__scanlines"></div>
+    </div>
+  </div>
+  {caption && <figcaption class="retro-figure__caption">{caption}</figcaption>}
+</figure>
+
+<style>
+  .retro-figure {
+    margin: 2.5rem 0;
+    text-align: center;
+  }
+
+  .retro-figure__frame {
+    position: relative;
+    display: inline-block;
+    padding: 8px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 3px solid;
+    border-image: linear-gradient(135deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4) 1;
+    border-radius: 4px;
+  }
+
+  .retro-figure__corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #4ecdc4;
+  }
+
+  .retro-figure__corner--tl {
+    top: -2px;
+    left: -2px;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  .retro-figure__corner--tr {
+    top: -2px;
+    right: -2px;
+    border-left: none;
+    border-bottom: none;
+  }
+
+  .retro-figure__corner--bl {
+    bottom: -2px;
+    left: -2px;
+    border-right: none;
+    border-top: none;
+  }
+
+  .retro-figure__corner--br {
+    bottom: -2px;
+    right: -2px;
+    border-left: none;
+    border-top: none;
+  }
+
+  .retro-figure__inner {
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+
+  .retro-figure__inner img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+    filter: contrast(1.1) saturate(1.2);
+  }
+
+  .retro-figure__scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.1) 2px,
+      rgba(0, 0, 0, 0.1) 4px
+    );
+    pointer-events: none;
+  }
+
+  .retro-figure__caption {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(90deg, transparent, #1a1a2e 20%, #1a1a2e 80%, transparent);
+    text-shadow: 0 0 10px #4ecdc4, 0 0 20px #4ecdc4;
+    letter-spacing: 2px;
+  }
+
+  /* Frame variants */
+  .retro-figure--neon .retro-figure__frame {
+    border-image: linear-gradient(135deg, #ff006e, #8338ec, #3a86ff, #06ffa5) 1;
+    box-shadow: 0 0 20px rgba(78, 205, 196, 0.3), inset 0 0 20px rgba(78, 205, 196, 0.1);
+  }
+
+  .retro-figure--neon .retro-figure__caption {
+    text-shadow: 0 0 10px #ff006e, 0 0 20px #8338ec;
+  }
+
+  .retro-figure--tech .retro-figure__frame {
+    border-image: linear-gradient(135deg, #00ff88, #00aaff, #0066ff) 1;
+  }
+
+  .retro-figure--action .retro-figure__frame {
+    border-image: linear-gradient(135deg, #ff4444, #ff8800, #ffcc00) 1;
+    animation: pulse-border 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-border {
+    0%, 100% { box-shadow: 0 0 10px rgba(255, 68, 68, 0.5); }
+    50% { box-shadow: 0 0 25px rgba(255, 136, 0, 0.8); }
+  }
+
+  .retro-figure--retro .retro-figure__frame {
+    border-image: linear-gradient(135deg, #ffd700, #ff6b6b, #4ecdc4) 1;
+  }
+
+  .retro-figure--retro .retro-figure__caption {
+    background: linear-gradient(90deg, transparent, #2d2d2d 20%, #2d2d2d 80%, transparent);
+  }
+
+  :global(.dark) .retro-figure__frame {
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+  }
+
+  :global(.dark) .retro-figure__caption {
+    background: linear-gradient(90deg, transparent, #0f0f1a 20%, #0f0f1a 80%, transparent);
+  }
+</style>
