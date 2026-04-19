@@ -99,3 +99,33 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-gray-400 dark:bg-gray-500;
 }
+
+/* Acessibilidade - Skip Link */
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.skip-link:focus {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  width: auto;
+  height: auto;
+  padding: 1rem 1.5rem;
+  background: #000;
+  color: #fff;
+  z-index: 100;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+/* Foco visível para navegação por teclado */
+*:focus-visible {
+  outline: 2px solid #ffd93d;
+  outline-offset: 2px;
+}

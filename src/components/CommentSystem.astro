@@ -1,0 +1,49 @@
+---
+interface Props {
+  repo?: string;
+}
+
+const { repo = "JefferL05/console-do-jeff" } = Astro.props;
+const slug = Astro.url.pathname.split('/').filter(Boolean).pop() || 'index';
+---
+
+<section class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+  <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+    Comentários
+  </h2>
+  
+  <div 
+    class="comments-container" 
+    data-repo={repo}
+    data-issue-term={slug}
+  >
+    <script 
+      src="https://utteranc.es/client.js"
+      async
+      crossorigin="anonymous"
+    ></script>
+  </div>
+</section>
+
+<style>
+  .comments-container {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 2px solid #4ecdc4;
+    border-radius: 8px;
+  }
+
+  :global(.dark) .comments-container {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  /* Customização para tema escuro do Utterances */
+  :global(.utterances) {
+    background-color: transparent !important;
+  }
+
+  :global(.utterances-frame) {
+    border-radius: 8px;
+  }
+</style>
