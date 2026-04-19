@@ -1,7 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import TableOfContents from '@components/TableOfContents.astro';
-import CommentSystem from '@components/CommentSystem.astro';
 
 interface Heading {
   depth: number;
@@ -150,8 +149,6 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString('pt-BR', {
             ))}
           </div>
         </div>
-
-        <CommentSystem />
       </div>
     </div>
   </article>
