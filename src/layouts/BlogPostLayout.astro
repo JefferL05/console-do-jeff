@@ -1,6 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import TableOfContents from '@components/TableOfContents.astro';
+import { url } from '@utils/index';
 
 interface Heading {
   depth: number;
@@ -52,7 +53,7 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString('pt-BR', {
 <BaseLayout title={`${title} | Console do Jeff`} description={description} image={image?.url} article pubDate={pubDate}>
   <article class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-8">
-      <a href="/blog" class="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mb-6">
+      <a href={url('/blog')} class="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mb-6">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
@@ -87,7 +88,7 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString('pt-BR', {
           {author}
         </span>
         
-        <a href={`/categories/${category.toLowerCase()}`} class="flex items-center gap-1 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+        <a href={url(`/categories/${category.toLowerCase()}`)} class="flex items-center gap-1 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"></path>
             <line x1="7" y1="7" x2="7.01" y2="7"></line>
@@ -141,7 +142,7 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString('pt-BR', {
           <div class="flex flex-wrap gap-2">
             {tags.map(tag => (
               <a
-                href={`/tags/${tag.toLowerCase()}`}
+                href={url(`/tags/${tag.toLowerCase()}`)}
                 class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
               >
                 #{tag}

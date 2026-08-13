@@ -4,7 +4,7 @@ export async function GET() {
   const posts = await getCollection('posts', ({ data }) => !data.draft);
   
   const searchIndex = posts.map(post => ({
-    slug: post.slug,
+    slug: post.id,
     title: post.data.title,
     description: post.data.description,
     category: post.data.category,

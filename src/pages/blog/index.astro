@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import { url } from '@utils/index';
 
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
 const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
@@ -26,7 +27,7 @@ function formatDate(date: Date, options?: Intl.DateTimeFormatOptions) {
     
     <div class="space-y-8">
       {posts.map(post => (
-        <a href={`/blog/${post.slug}`} class="group block">
+        <a href={url(`/blog/${post.id}`)} class="group block">
           <article class="flex flex-col sm:flex-row gap-6 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
             {post.data.image && (
               <div class="sm:w-48 sm:h-32 flex-shrink-0 overflow-hidden rounded-lg">

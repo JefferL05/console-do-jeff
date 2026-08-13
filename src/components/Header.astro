@@ -1,9 +1,11 @@
 ---
+import { url } from '@utils/index';
+
 const navItems = [
-  { href: '/', label: 'Início' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/archive', label: 'Arquivo' },
-  { href: '/categories', label: 'Categorias' }
+  { href: url('/'), label: 'Início' },
+  { href: url('/blog'), label: 'Blog' },
+  { href: url('/archive'), label: 'Arquivo' },
+  { href: url('/categories'), label: 'Categorias' }
 ];
 
 const currentPath = Astro.url.pathname;
@@ -12,7 +14,7 @@ const currentPath = Astro.url.pathname;
 <header class="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
   <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
-      <a href="/" class="flex items-center gap-2 font-bold text-xl text-primary-600 dark:text-primary-400">
+      <a href={navItems[0].href} class="flex items-center gap-2 font-bold text-xl text-primary-600 dark:text-primary-400">
         <span class="text-2xl">&lt;/&gt;</span>
         <span class="hidden sm:inline">Console do Jeff</span>
       </a>

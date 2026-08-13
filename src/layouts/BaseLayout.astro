@@ -1,6 +1,7 @@
 ---
 import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
+import { url } from '@utils/index';
 import '@/styles/global.css';
 import SpeedInsights from "@vercel/speed-insights/astro";
 
@@ -21,6 +22,7 @@ const {
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const siteImage = image.startsWith('http') ? image : url(image);
 ---
 
 <!doctype html>
@@ -39,15 +41,15 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta name="description" content={description} />
     
     {/* Favicon e RSS */}
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/rss.xml" />
+    <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
+    <link rel="alternate" type="application/rss+xml" title="RSS Feed" href={url('/rss.xml')} />
     
     {/* Open Graph - SEO e partilha em redes sociais */}
     <meta property="og:type" content={article ? 'article' : 'website'} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={new URL(image, Astro.site)} />
+    <meta property="og:image" content={new URL(siteImage, Astro.site)} />
     <meta property="og:locale" content="pt_BR" />
     <meta property="og:site_name" content="Console do Jeff" />
     
@@ -55,7 +57,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={new URL(image, Astro.site)} />
+    <meta name="twitter:image" content={new URL(siteImage, Astro.site)} />
     
     {/* Data de publicação para artigos */}
     {article && pubDate && (
@@ -63,7 +65,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     )}
     
     {/* Script de tema - executa imediatamente para evitar flash */}
-    <script is:inline define:vars={{ scriptSrc: '/scripts/theme.js' }}>
+    <script is:inline>
       // Script inline mínimo para evitar flash de tema
       (function() {
         var theme = localStorage.getItem('theme');

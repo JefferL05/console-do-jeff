@@ -4,6 +4,7 @@ import { getCollection } from 'astro:content';
 export async function GET(context) {
   const posts = await getCollection('posts', ({ data }) => !data.draft);
   const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  const base = import.meta.env.BASE_URL;
 
   return rss({
     title: 'Console do Jeff',
@@ -13,10 +14,10 @@ export async function GET(context) {
       title: post.data.title,
       pubDate: post.data.pubDate,
       description: post.data.description,
-      link: `/blog/${post.slug}/`,
+      link: `${base}blog/${post.id}/`,
       categories: [post.data.category, ...post.data.tags]
     })),
     customData: `<language>pt-BR</language>`,
-    stylesheet: '/rss/styles.xsl'
+    stylesheet: `${base}rss/styles.xsl`
   });
 }

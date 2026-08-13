@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import { url } from '@utils/index';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('posts', ({ data }) => !data.draft);
@@ -32,7 +33,7 @@ function formatDate(date: Date) {
   description={`Artigos da categoria ${category}`}
 >
   <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <a href="/categories" class="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mb-6">
+    <a href={url('/categories')} class="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mb-6">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <line x1="19" y1="12" x2="5" y2="12"></line>
         <polyline points="12 19 5 12 12 5"></polyline>
@@ -51,7 +52,7 @@ function formatDate(date: Date) {
     
     <div class="space-y-6">
       {posts.map(post => (
-        <a href={`/blog/${post.slug}`} class="group block">
+        <a href={url(`/blog/${post.id}`)} class="group block">
           <article class="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
             <div class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mb-3">
               <span class="flex items-center gap-1">

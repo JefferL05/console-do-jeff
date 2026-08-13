@@ -1,5 +1,5 @@
 ---
-import { Copy, Check } from 'lucide-react';
+import { Copy } from 'lucide-react';
 
 interface Props {
   code: string;
@@ -22,7 +22,7 @@ const id = `code-${Math.random().toString(36).slice(2, 9)}`;
     data-code={code}
     aria-label="Copy code"
   >
-    <Copy class="w-4 h-4" />
+    <Copy className="w-4 h-4" />
   </button>
   <pre class={`language-${lang} ${filename ? 'pt-12' : ''}`}><code class={`language-${lang}`}>{code}</code></pre>
 </div>

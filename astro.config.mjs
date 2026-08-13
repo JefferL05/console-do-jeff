@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
+import { unified } from '@astrojs/markdown-remark';
 import mdx from '@astrojs/mdx';
-import tailwind from '@astrojs/tailwind';
 import react from '@astrojs/react';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeSlug from 'rehype-slug';
@@ -12,20 +12,22 @@ const __dirname = dirname(__filename);
 
 export default defineConfig({
   site: 'https://JefferL05.github.io/console-do-jeff',
+  base: '/console-do-jeff/',
   integrations: [
     mdx(),
-    tailwind(),
     react()
   ],
   markdown: {
+    processor: unified({
+      rehypePlugins: [
+        rehypeSlug,
+        [rehypeAutolinkHeadings, { behavior: 'wrap' }]
+      ]
+    }),
     shikiConfig: {
       theme: 'github-dark',
       wrap: true
-    },
-    rehypePlugins: [
-      rehypeSlug,
-      [rehypeAutolinkHeadings, { behavior: 'wrap' }]
-    ]
+    }
   },
   vite: {
     resolve: {

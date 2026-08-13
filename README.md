@@ -1,14 +1,10 @@
-<<<<<<< HEAD
-# console-do-jeff
-Blog
-=======
-# TechBlog - Blog Técnico de Alta Performance
+# Console do Jeff
 
-Blog técnico, construí­do com Astro 4.0 para máxima performance e legibilidade.
+Blog técnico focado em desenvolvimento de software, boas práticas e tecnologias modernas. Construído com Astro para máxima performance e legibilidade.
 
 ## Stack
 
-- **Framework**: Astro 4.0 (SSG)
+- **Framework**: Astro 4 (SSG)
 - **Styling**: Tailwind CSS + Typography Plugin
 - **Content**: MDX (Markdown + React Components)
 - **Search**: Fuse.js (Fuzzy Search)
@@ -22,12 +18,9 @@ Blog técnico, construí­do com Astro 4.0 para máxima performance e legibilida
 - Code highlighting com botão de copiar
 - Busca fuzzy instantânea no cliente
 - RSS Feed automático
-- Sitemap automático
 - SEO completo (OpenGraph, Twitter Cards)
 - Categorização e arquivo por ano
 - Componentes MDX reutilizáveis (Callout)
-
-
 
 ### Frontmatter
 
@@ -57,21 +50,23 @@ Blog técnico, construí­do com Astro 4.0 para máxima performance e legibilida
 
 Basta usar blocos de código Markdown - o botão de copiar é adicionado automaticamente.
 
+## Desenvolvimento
+
+```bash
+npm install
+npm run dev
+```
+
 ## Deploy
 
-### Vercel
+### GitHub Pages
 
 ```bash
 npm run build
-vercel deploy
+git push origin main
 ```
 
-### Netlify
-
-```bash
-npm run build
-netlify deploy --prod
-```
+O workflow `.github/workflows/deploy.yml` faz o build e publica automaticamente em `https://JefferL05.github.io/console-do-jeff/`.
 
 ## Performance
 
@@ -79,5 +74,4 @@ netlify deploy --prod
 - Sem JavaScript desnecessário
 - Imagens otimizadas com lazy loading
 - CSS minificado automaticamente
-- Sitemap e RSS generation automática
-
+- RSS generation automática

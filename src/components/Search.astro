@@ -34,7 +34,6 @@
   // Estado global da pesquisa
   let fuse: any = null;
   let posts: Post[] = [];
-  let isSearchReady = false;
   
   /**
    * Carrega o índice de busca do servidor
@@ -42,7 +41,7 @@
    */
   async function loadPosts() {
     try {
-      const response = await fetch('/search-index.json');
+      const response = await fetch(import.meta.env.BASE_URL + 'search-index.json');
       if (!response.ok) {
         throw new Error('Falha ao carregar índice de busca');
       }
@@ -55,7 +54,6 @@
           threshold: 0.3,
           includeScore: true
         });
-        isSearchReady = true;
       });
     } catch (e) {
       console.warn('Índice de busca não disponível');
@@ -99,7 +97,7 @@
         const safeSlug = escapeHtml(item.slug);
         
         return `
-          <a href="/blog/${safeSlug}" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0 transition-colors">
+          <a href="${import.meta.env.BASE_URL}blog/${safeSlug}" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0 transition-colors">
             <div class="font-medium text-gray-900 dark:text-gray-100">${safeTitle}</div>
             <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">${safeDesc}</div>
             <div class="text-xs text-primary-600 dark:text-primary-400 mt-2 font-medium">${safeCategory}</div>
