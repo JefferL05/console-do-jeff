@@ -10,9 +10,14 @@ import { dirname, resolve } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const isGithubPages = process.env.GH_PAGES === 'true';
+const site = isGithubPages
+  ? 'https://JefferL05.github.io/console-do-jeff'
+  : `https://${process.env.VERCEL_URL ?? 'console-do-jeff.vercel.app'}`;
+
 export default defineConfig({
-  site: 'https://JefferL05.github.io/console-do-jeff',
-  base: '/console-do-jeff/',
+  site,
+  base: isGithubPages ? '/console-do-jeff/' : '/',
   integrations: [
     mdx(),
     react()
