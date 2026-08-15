@@ -1,0 +1,157 @@
+---
+title: "O código parece certo — e esse é o maior perigo das LLMs"
+description: "Código gerado por IA pode parecer profissional e ainda falhar. Entenda custos, riscos e um método seguro para usar LLMs na programação."
+pubDate: 2026-08-15
+author: "Jeff"
+category: "IA"
+tags: ["inteligência-artificial", "llms", "programação", "engenharia-de-software", "seguranca"]
+image:
+  url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200"
+  alt: "Tela com código-fonte aberto em um editor, representando a revisão humana de software gerado por IA"
+draft: false
+readingTime: 12
+---
+
+import Callout from '../../components/Callout.astro';
+
+Você pede a uma IA para adicionar recuperação de senha a uma aplicação. Em segundos, ela cria a rota, o formulário, o envio de e-mail e até uma explicação elegante sobre segurança. Os nomes são bons. O código usa padrões conhecidos. A resposta termina com a tranquilidade de quem já resolveu aquilo cem vezes.
+
+Então você executa o projeto.
+
+O pacote sugerido não existe na versão instalada. O token pode ser reutilizado. A rota revela se um e-mail está cadastrado. Um teste passa, mas apenas porque não cobre expiração. A solução não é absurda; ela é pior do que isso: **é plausível**.
+
+Surge a pergunta que deveria acompanhar todo código gerado por IA:
+
+> **Se o código parece correto, quanto esforço será necessário para provar que ele realmente está correto?**
+
+O problema não é usar inteligência artificial. LLMs podem economizar trabalho, ampliar alternativas e transformar uma tarefa tediosa em um bom primeiro rascunho. O risco começa quando aparência de competência vira substituto para evidência. Texto seguro, sintaxe limpa e uma explicação convincente não constituem teste, revisão nem responsabilidade técnica.
+
+## Uma LLM não sabe automaticamente se o código funciona
+
+Um modelo de linguagem de grande porte (LLM) trabalha com **tokens**, unidades que podem representar palavras, partes de palavras ou caracteres. A partir do contexto recebido, o modelo calcula distribuições de probabilidade para possíveis continuações. Arquiteturas modernas usam mecanismos como *self-attention* para relacionar partes do contexto e construir representações úteis. A explicação do [Google Machine Learning Crash Course](https://developers.google.com/machine-learning/crash-course/llm/transformers) detalha esse processo e também lista alucinações, custo computacional e vieses entre os problemas conhecidos.
+
+Dizer que uma LLM "apenas escolhe a próxima palavra" ajuda como introdução, mas esconde muita coisa. Há bilhões de parâmetros, camadas de atenção, treinamento para seguir instruções, contexto recuperado do projeto e parâmetros de geração. Alguns produtos também executam ferramentas, pesquisam arquivos e rodam testes. Ainda assim, a saída continua sendo produzida por um sistema probabilístico; não nasce acompanhada de um certificado de verdade.
+
+Se a ferramenta não executou o código no ambiente correto, ela não observou o resultado. Mesmo quando executa, pode testar o caminho feliz e ignorar concorrência, permissões, versões ou dados reais. Por isso ela pode inventar um método com nome perfeitamente razoável, misturar duas versões de uma API ou assumir que uma coluna aceita `null`.
+
+Resultados diferentes para prompts semelhantes não significam aleatoriedade completa. Modelo, contexto, temperatura, ferramentas e histórico influenciam a resposta. A consequência prática é mais importante do que o rótulo: **uma boa tentativa não garante que a próxima preserve as mesmas decisões**.
+
+<Callout type="warning" title="Fluência não é evidência">
+  A LLM foi otimizada para produzir uma continuação útil e coerente. O compilador, o banco e o usuário malicioso não avaliam coerência: eles encontram tipos incompatíveis, dados perdidos e permissões abertas.
+</Callout>
+
+## Gerar código não é fazer engenharia de software
+
+Escrever linhas é a parte mais visível do desenvolvimento, não o trabalho inteiro. Engenharia começa antes da primeira função e continua depois do deploy. Ela inclui descobrir requisitos contraditórios, compreender regras de negócio, escolher limites arquiteturais, modelar dados, planejar migrações e decidir como o sistema falhará.
+
+Também inclui autenticação, autorização, acessibilidade, observabilidade, desempenho, compatibilidade, recuperação, revisão de dependências e manutenção. Há decisões sem resposta universal. Quanto tempo um token deve durar? O dado pode sair do país? Uma operação precisa ser idempotente? A equipe aceita indisponibilidade durante a migração? A resposta depende de contexto técnico, jurídico e comercial.
+
+Benchmarks tentam aproximar partes desse trabalho. O [SWE-bench](https://arxiv.org/abs/2310.06770), por exemplo, reuniu 2.294 problemas extraídos de issues reais em 12 repositórios Python. Resolver esses problemas exige localizar arquivos, coordenar alterações e executar testes. É uma avaliação mais representativa do que completar uma função isolada, mas ainda não mede toda a vida de um sistema: qualidade dos testes, operação futura, clareza do patch e responsabilidade continuam fora ou parcialmente representadas.
+
+Isso também explica por que "percentual de código escrito por IA" é uma métrica fraca quando aparece sozinha. Antes de celebrar um número, vale perguntar:
+
+- O que entrou na conta: produção, testes, documentação e arquivos gerados?
+- Quantas sugestões foram descartadas ou reescritas?
+- Quanto tempo foi gasto fornecendo contexto e revisando o diff?
+- A mudança chegou à produção sem aumentar defeitos?
+- Qual foi o custo de manutenção posterior?
+- Quem respondeu tecnicamente pelo resultado?
+
+Código produzido mede volume. Engenharia precisa medir resultado, risco e custo ao longo do tempo.
+
+## A dívida de verificação
+
+Quando gerar fica muito barato, verificar pode virar o novo gargalo. Chamo esse acúmulo de **dívida de verificação**: soluções chegam mais rápido do que a equipe consegue compreender, testar e sustentar.
+
+O custo total de uma resposta não termina no preço exibido pela API. Ele inclui escrever o prompt, selecionar contexto, consumir tokens, aguardar ferramentas, repetir tentativas, revisar arquivos, consultar documentação, executar testes, investigar regressões e entender código que ninguém da equipe concebeu. Se um erro chega à produção, entram também suporte, restauração e impacto para usuários.
+
+Considere a simulação abaixo. Os números são hipotéticos e servem apenas para comparar componentes de custo em uma pequena alteração de API:
+
+| Abordagem | Implementação inicial | Revisão e correção | Previsibilidade | Risco de manutenção |
+| --- | ---: | ---: | --- | --- |
+| Manual | 4 horas | 1 hora | Alta para quem conhece o sistema | Baixo a médio |
+| Assistida por IA | 2 horas | 2 horas | Média | Médio |
+| Amplamente delegada | 40 minutos | 5 horas | Baixa | Alto se o código não for compreendido |
+
+A segunda opção pode ser a melhor: quatro horas totais, mais alternativas exploradas e um responsável que entende o resultado. A terceira parece vencedora no primeiro print e perde quando a revisão encontra suposições espalhadas por dez arquivos. Em outra tarefa, os números poderiam se inverter. O ponto é medir **o ciclo completo**, não apenas o tempo até aparecer código na tela.
+
+Pesquisas reais reforçam que contexto muda a conclusão. Um [experimento controlado de 2023](https://arxiv.org/abs/2302.06590) encontrou conclusão 55,8% mais rápida entre participantes recrutados para uma única tarefa padronizada: implementar um servidor HTTP em JavaScript com GitHub Copilot. O desenho não representa, sozinho, a manutenção cotidiana de software. Já um [ensaio randomizado divulgado como preprint em 2025](https://arxiv.org/abs/2507.09089), com 16 desenvolvedores experientes realizando 246 tarefas em projetos maduros que conheciam havia anos, observou aumento médio de 19% no tempo com ferramentas de IA daquele período.
+
+Esses estudos não se anulam. Eles estudam populações, ferramentas e tarefas diferentes. Tampouco autorizam dizer que IA sempre acelera ou sempre atrasa. Antes de generalizar qualquer percentual de produtividade, é preciso examinar tarefa, amostra, modelo, métrica, intervalo de confiança e qualidade final.
+
+## Por que lembramos do acerto espetacular
+
+Uma IA resolve em trinta segundos aquele bug que consumiu a manhã inteira. É natural contar essa história. É menos divertido contar as seis respostas anteriores que sugeriram limpar o cache, reinstalar dependências e "verificar se o servidor está rodando".
+
+O acerto raro recebe peso desproporcional. O viés de confirmação faz notar evidências favoráveis à expectativa. A escrita fluente aumenta confiança. O medo de ficar para trás transforma experimentação em obrigação. E uma demonstração de cinco minutos, cuidadosamente escolhida, parece representar meses de manutenção.
+
+É aqui que a analogia com *loot boxes* pode ser útil, desde que tratada como analogia, não como equivalência científica. Uma nova tentativa pode trazer resultado diferente; um prêmio excelente apaga da memória tentativas medíocres; continuar tentando custa tokens e tempo. A expectativa de "agora vai" pode manter o ciclo de prompts.
+
+Isso não prova que fornecedores desenharam seus produtos para causar dependência. Os dados disponíveis não permitem essa conclusão geral. O fato tecnicamente observável é mais simples: a variabilidade existe, e usuários podem avaliar mal seu custo quando lembram dos melhores resultados e esquecem o retrabalho.
+
+## Onde as LLMs realmente ajudam
+
+Na prática, LLMs tendem a ser mais úteis quando a saída é barata de verificar ou quando o objetivo inicial é ampliar possibilidades. Elas podem explicar um módulo desconhecido, resumir documentação, transformar uma mensagem de erro em hipóteses investigáveis e produzir um rascunho que será revisado.
+
+Também podem ajudar a sugerir casos de teste, gerar dados fictícios, automatizar tarefas repetitivas, comparar alternativas, documentar uma API existente e criar protótipos descartáveis. No aprendizado, uma explicação adaptada ao nível do estudante pode destravar conceitos — desde que documentação e experimentos confirmem os detalhes.
+
+A regra prática é observar a assimetria entre geração e validação. Pedir cinco nomes melhores para uma função tem risco pequeno. Pedir uma migração irreversível do banco tem risco enorme. Quanto mais fácil for conferir a resposta, mais segura tende a ser a delegação.
+
+Experiência humana continua relevante porque permite fazer perguntas melhores e detectar respostas sedutoras. Um desenvolvedor sênior não precisa digitar cada linha para contribuir; ele precisa reconhecer premissas ausentes, escolher compromissos e saber qual teste reduzirá a incerteza.
+
+## Onde o risco aumenta
+
+Autenticação, autorização, pagamentos, criptografia, dados pessoais e migrações merecem revisão reforçada. O mesmo vale para exclusão em massa, infraestrutura, configuração de produção e software para os setores jurídico, médico ou financeiro. Nesses contextos, uma pequena suposição pode gerar dano desproporcional.
+
+O risco cresce ainda mais quando um agente pode executar comandos, acessar segredos, alterar o repositório ou fazer deploy. A edição deixa de ser uma sugestão e vira ação. O [OWASP Top 10 para aplicações de LLM de 2025](https://genai.owasp.org/llm-top-10/) destaca tratamento inadequado de saídas, agência excessiva, cadeia de suprimentos e consumo sem limites entre os riscos relevantes. A saída do modelo deve ser tratada como entrada não confiável antes de chegar a shell, SQL, navegador ou pipeline.
+
+Um estudo com 47 participantes apresentado na [ACM CCS 2023](https://arxiv.org/abs/2211.03622) observou que aqueles com um assistente baseado no `codex-davinci-002` produziram soluções menos seguras e demonstraram mais confiança na segurança delas. A amostra pequena e o modelo anterior limitam qualquer generalização para ferramentas atuais, mas o resultado ilustra uma combinação perigosa: erro técnico acompanhado de confiança crescente.
+
+Quanto maior a autonomia, mais fortes devem ser os controles: permissões mínimas, ambiente isolado, comandos permitidos, limites de custo, logs auditáveis, testes obrigatórios e aprovação humana para ações críticas. "Autônomo" não pode significar "sem freios".
+
+## Um método responsável de uso
+
+Usar IA com rigor não exige burocracia infinita. Exige transformar uma resposta probabilística em evidência verificável:
+
+1. **Defina uma tarefa pequena.** Especifique resultado observável e o que não deve mudar.
+2. **Forneça contexto necessário.** Inclua contratos, versões e restrições; não despeje segredos.
+3. **Peça premissas.** Faça a ferramenta declarar o que assumiu e onde há incerteza.
+4. **Revise antes de aplicar.** Leia o diff, não apenas o resumo produzido pela própria IA.
+5. **Confirme APIs.** Consulte documentação oficial para bibliotecas, parâmetros e versões.
+6. **Execute verificações determinísticas.** Rode lint, análise estática e checagem de tipos.
+7. **Teste comportamento.** Cubra caminho feliz, falhas, permissões e regressões.
+8. **Avalie segurança.** Procure exposição de dados, comandos perigosos e dependências novas.
+9. **Meça o ciclo completo.** Some geração, espera, revisão, correção e manutenção.
+10. **Mantenha autoria humana.** Uma pessoa identificável decide se a mudança está pronta.
+
+O [perfil de IA generativa do NIST](https://doi.org/10.6028/NIST.AI.600-1) recomenda avaliar o sistema completo — modelo, dados, interfaces, pessoas e contexto — e não apenas o modelo isolado. Essa visão combina bem com desenvolvimento: confiabilidade nasce do processo ao redor da ferramenta.
+
+### Checklist reutilizável
+
+- [ ] O requisito e os critérios de aceite estão claros?
+- [ ] As premissas da resposta foram identificadas?
+- [ ] Bibliotecas e APIs existem na versão usada?
+- [ ] O diff foi lido por uma pessoa?
+- [ ] Tipos, lint e análise estática passaram?
+- [ ] Há testes para sucesso, falha e regressão?
+- [ ] Segurança, dados e permissões foram revisados?
+- [ ] O custo total foi melhor do que fazer manualmente?
+- [ ] Existe um responsável humano pela decisão final?
+
+## Produtividade sem confiabilidade é só velocidade
+
+O debate não precisa escolher entre "a IA substituirá todos os programadores" e "a IA não serve para nada". As duas frases ignoram a variedade de tarefas e a evolução rápida das ferramentas.
+
+LLMs podem aumentar produtividade. Podem reduzir trabalho mecânico, acelerar aprendizado e oferecer caminhos que a equipe não considerou. Mas produtividade sem confiabilidade, validação e responsabilidade pode apenas produzir erros mais rapidamente.
+
+Gerar uma resposta é um evento. Sustentar um sistema é um compromisso: observar o que acontece, corrigir quando falha, proteger quem depende dele e explicar por que cada decisão existe. A IA pode participar de quase todas essas etapas. A responsabilidade por conectá-las ainda precisa ter nome, contexto e alguém disposto a atender quando o alerta tocar às três da manhã.
+
+## Referências
+
+- Google for Developers. [LLMs: What's a large language model?](https://developers.google.com/machine-learning/crash-course/llm/transformers). Material sobre tokens, Transformers, probabilidades e limitações.
+- Peng, S. et al. [The Impact of AI on Developer Productivity: Evidence from GitHub Copilot](https://arxiv.org/abs/2302.06590), 2023.
+- Becker, J. et al. [Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity](https://arxiv.org/abs/2507.09089), 2025.
+- Jimenez, C. E. et al. [SWE-bench: Can Language Models Resolve Real-World GitHub Issues?](https://arxiv.org/abs/2310.06770), ICLR 2024.
+- Perry, N. et al. [Do Users Write More Insecure Code with AI Assistants?](https://arxiv.org/abs/2211.03622), ACM CCS 2023.
+- NIST. [Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile](https://doi.org/10.6028/NIST.AI.600-1), 2024.
+- OWASP GenAI Security Project. [Top 10 for LLM Applications 2025](https://genai.owasp.org/llm-top-10/), 2025.
