@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { url } from '@utils/index';
+import { formatDate, url } from '@utils/index';
 
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
 const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
@@ -9,12 +9,6 @@ const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.
 const featuredPost = posts[0];
 const recentPosts = posts.slice(1, 7);
 
-function formatDate(date: Date, options?: Intl.DateTimeFormatOptions) {
-  return date.toLocaleDateString('pt-BR', {
-    timeZone: 'America/Sao_Paulo',
-    ...options
-  });
-}
 ---
 
 <BaseLayout title="Console do Jeff | Blog Técnico">

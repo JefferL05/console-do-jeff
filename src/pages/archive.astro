@@ -1,12 +1,12 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { url } from '@utils/index';
+import { formatDate, url } from '@utils/index';
 
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
 
 const postsByYear = allPosts.reduce((acc, post) => {
-  const year = post.data.pubDate.getFullYear();
+  const year = post.data.pubDate.getUTCFullYear();
   if (!acc[year]) acc[year] = [];
   acc[year].push(post);
   return acc;
@@ -14,12 +14,7 @@ const postsByYear = allPosts.reduce((acc, post) => {
 
 const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
 
-function formatDate(date: Date) {
-  return date.toLocaleDateString('pt-BR', {
-    timeZone: 'America/Sao_Paulo',
-    month: 'short'
-  });
-}
+Object.values(postsByYear).forEach(posts => posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()));
 ---
 
 <BaseLayout title="Arquivo | Console do Jeff" description="Arquivo de todos os artigos por ano">
@@ -53,7 +48,7 @@ function formatDate(date: Date) {
             {postsByYear[Number(year)].map(post => (
               <li class="flex items-start gap-4">
                 <span class="text-sm text-gray-500 dark:text-gray-400 w-16 flex-shrink-0 pt-1">
-                  {formatDate(post.data.pubDate)}
+                  {formatDate(post.data.pubDate, { year: undefined, day: undefined, month: 'short' })}
                 </span>
                 <a
                   href={url(`/blog/${post.id}`)}

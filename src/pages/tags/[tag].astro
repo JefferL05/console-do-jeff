@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { formatDate, slugify, url } from '@utils/index';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  const tags = new Map(posts.flatMap(post => post.data.tags.map(tag => [slugify(tag), tag] as const)));
+  return Array.from(tags, ([slug, tag]) => ({
+    params: { tag: slug },
+    props: { tag }
+  }));
+}
+
+const { tag } = Astro.props;
+const posts = (await getCollection('posts', ({ data }) =>
+  !data.draft && data.tags.some(value => slugify(value) === slugify(tag))
+)).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout title={`#${tag} | Console do Jeff`} description={`Artigos com a tag ${tag}`}>
+  <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <a href={url('/blog')} class="text-primary-600 dark:text-primary-400 hover:underline">Voltar para o blog</a>
+    <h1 class="text-3xl font-bold mt-6 mb-4">#{tag}</h1>
+    <p class="text-gray-600 dark:text-gray-400 mb-8">{posts.length} {posts.length === 1 ? 'artigo' : 'artigos'}</p>
+    <div class="space-y-6">
+      {posts.map(post => (
+        <a href={url(`/blog/${post.id}`)} class="group block">
+          <article class="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
+            <time datetime={post.data.pubDate.toISOString()} class="text-sm text-gray-500 dark:text-gray-400">{formatDate(post.data.pubDate)}</time>
+            <h2 class="text-xl font-semibold my-2 group-hover:text-primary-600 dark:group-hover:text-primary-400">{post.data.title}</h2>
+            <p class="text-gray-600 dark:text-gray-400">{post.data.description}</p>
+          </article>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

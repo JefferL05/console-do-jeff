@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 import { unified } from '@astrojs/markdown-remark';
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
+import sitemap from '@astrojs/sitemap';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeSlug from 'rehype-slug';
 import { fileURLToPath } from 'url';
@@ -13,14 +14,15 @@ const __dirname = dirname(__filename);
 const isGithubPages = process.env.GH_PAGES === 'true';
 const site = isGithubPages
   ? 'https://JefferL05.github.io/console-do-jeff'
-  : `https://${process.env.VERCEL_URL ?? 'console-do-jeff.vercel.app'}`;
+  : (process.env.SITE_URL ?? 'https://console-do-jeff.vercel.app');
 
 export default defineConfig({
   site,
   base: isGithubPages ? '/console-do-jeff/' : '/',
   integrations: [
     mdx(),
-    react()
+    react(),
+    sitemap()
   ],
   markdown: {
     processor: unified({

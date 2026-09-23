@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { url } from '@utils/index';
+import { formatDate, slugify, url } from '@utils/index';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('posts', ({ data }) => !data.draft);
@@ -9,7 +9,7 @@ export async function getStaticPaths() {
   const categories = [...new Set(allPosts.map(post => post.data.category))];
   
   return categories.map(category => ({
-    params: { category: category.toLowerCase() },
+    params: { category: slugify(category) },
     props: { category }
   }));
 }
@@ -18,14 +18,9 @@ const { category } = Astro.props;
 
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
 const posts = allPosts
-  .filter(post => post.data.category.toLowerCase() === category)
+  .filter(post => slugify(post.data.category) === slugify(category))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-function formatDate(date: Date) {
-  return date.toLocaleDateString('pt-BR', {
-    timeZone: 'America/Sao_Paulo'
-  });
-}
 ---
 
 <BaseLayout 

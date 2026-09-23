@@ -12,6 +12,7 @@ draft: false
 ---
 
 import Callout from '../../components/Callout.astro';
+import { url as siteUrl } from '../../utils/index';
 
 # Bem-vindo ao Console do Jeff
 
@@ -93,8 +94,8 @@ O que torna este blog diferente?
 
 Se és novo por aqui, sugiro esta ordem:
 
-1. **[Como Começar com React em 2026](/blog/react-guia-2026)** — Uma das tecnologias mais requisitadas no mercado
-2. **[Configurando TypeScript para Node.js](/blog/typescript-nodejs-setup)** — A base para código mais seguro e manutenível
+1. **<a href={siteUrl('/blog/react-guia-2026')}>Como Começar com React em 2026</a>** — Uma das tecnologias mais requisitadas no mercado
+2. **<a href={siteUrl('/blog/typescript-nodejs-setup')}>Configurando TypeScript para Node.js</a>** — A base para código mais seguro e manutenível
 
 ## Partilha e Participa
 

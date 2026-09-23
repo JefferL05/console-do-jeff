@@ -1,17 +1,11 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { url } from '@utils/index';
+import { formatDate, url } from '@utils/index';
 
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
 const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-function formatDate(date: Date, options?: Intl.DateTimeFormatOptions) {
-  return date.toLocaleDateString('pt-BR', {
-    timeZone: 'America/Sao_Paulo',
-    ...options
-  });
-}
 ---
 
 <BaseLayout title="Blog | Console do Jeff" description="Todos os artigos do Console do Jeff">

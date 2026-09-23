@@ -1,7 +1,8 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import TableOfContents from '@components/TableOfContents.astro';
-import { url } from '@utils/index';
+import { formatDate, slugify, url } from '@utils/index';
+import CopyCode from '@components/CopyCode.astro';
 
 interface Heading {
   depth: number;
@@ -35,19 +36,8 @@ const {
   headings
 } = Astro.props;
 
-const formattedPubDate = pubDate.toLocaleDateString('pt-BR', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-  timeZone: 'America/Sao_Paulo'
-});
-
-const formattedUpdatedDate = updatedDate?.toLocaleDateString('pt-BR', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-  timeZone: 'America/Sao_Paulo'
-});
+const formattedPubDate = formatDate(pubDate);
+const formattedUpdatedDate = updatedDate && formatDate(updatedDate);
 ---
 
 <BaseLayout title={`${title} | Console do Jeff`} description={description} image={image?.url} article pubDate={pubDate}>
@@ -88,7 +78,7 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString('pt-BR', {
           {author}
         </span>
         
-        <a href={url(`/categories/${category.toLowerCase()}`)} class="flex items-center gap-1 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+        <a href={url(`/categories/${slugify(category)}`)} class="flex items-center gap-1 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"></path>
             <line x1="7" y1="7" x2="7.01" y2="7"></line>
@@ -142,7 +132,7 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString('pt-BR', {
           <div class="flex flex-wrap gap-2">
             {tags.map(tag => (
               <a
-                href={url(`/tags/${tag.toLowerCase()}`)}
+                href={url(`/tags/${slugify(tag)}`)}
                 class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
               >
                 #{tag}
@@ -153,4 +143,5 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString('pt-BR', {
       </div>
     </div>
   </article>
+  <CopyCode />
 </BaseLayout>

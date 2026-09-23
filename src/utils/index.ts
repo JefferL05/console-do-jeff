@@ -4,11 +4,13 @@ export function calculateReadingTime(content: string): number {
   return Math.ceil(words / wordsPerMinute);
 }
 
-export function formatDate(date: Date, locale = 'pt-BR'): string {
-  return date.toLocaleDateString(locale, {
+export function formatDate(date: Date, options: Intl.DateTimeFormatOptions = {}): string {
+  return date.toLocaleDateString('pt-BR', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'UTC',
+    ...options
   });
 }
 

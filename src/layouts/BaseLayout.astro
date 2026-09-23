@@ -68,7 +68,8 @@ const siteImage = image.startsWith('http') ? image : url(image);
     <script is:inline>
       // Script inline mínimo para evitar flash de tema
       (function() {
-        var theme = localStorage.getItem('theme');
+        var theme;
+        try { theme = localStorage.getItem('theme'); } catch {}
         if (!theme) {
           theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }

@@ -1,28 +1,20 @@
----
----
-
-<div class="relative">
-  <div class="relative">
-    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <circle cx="11" cy="11" r="8"></circle>
-      <path d="m21 21-4.35-4.35"></path>
-    </svg>
-    <input
-      type="text"
-      id="search-input"
-      placeholder="Pesquisar..."
-      class="w-full sm:w-64 pl-10 pr-4 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-all"
-    />
-  </div>
-  
-  <div id="search-results" class="hidden absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl max-h-96 overflow-y-auto z-50">
-  </div>
+<div class="relative min-w-0">
+  <label for="search-input" class="sr-only">Pesquisar artigos</label>
+  <input
+    type="search"
+    id="search-input"
+    placeholder="Pesquisar..."
+    autocomplete="off"
+    aria-controls="search-results"
+    class="w-32 sm:w-48 lg:w-64 px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+  />
+  <div id="search-results" hidden class="absolute top-full right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl max-h-96 overflow-y-auto z-50"></div>
+  <span id="search-status" role="status" class="sr-only"></span>
 </div>
 
 <script>
-  /**
-   * Interface para os dados do post no índice de busca
-   */
+  import type Fuse from 'fuse.js';
+
   interface Post {
     slug: string;
     title: string;
@@ -30,127 +22,92 @@
     category: string;
     tags: string[];
   }
-  
-  // Estado global da pesquisa
-  let fuse: any = null;
-  let posts: Post[] = [];
-  
-  /**
-   * Carrega o índice de busca do servidor
-   * Este JSON contém todos os posts para busca offline
-   */
-  async function loadPosts() {
-    try {
-      const response = await fetch(import.meta.env.BASE_URL + 'search-index.json');
-      if (!response.ok) {
-        throw new Error('Falha ao carregar índice de busca');
-      }
-      posts = await response.json();
-      
-      // Inicializa Fuse.js após carregar os dados
-      import('fuse.js').then(({ default: Fuse }) => {
-        fuse = new Fuse(posts, {
-          keys: ['title', 'description', 'category', 'tags'],
-          threshold: 0.3,
-          includeScore: true
-        });
+
+  const input = document.querySelector<HTMLInputElement>('#search-input');
+  const results = document.querySelector<HTMLDivElement>('#search-results');
+  const status = document.querySelector<HTMLElement>('#search-status');
+  let loading: Promise<Fuse<Post>> | undefined;
+  let request = 0;
+
+  function loadIndex() {
+    if (!loading) {
+      loading = Promise.all([
+        fetch(`${import.meta.env.BASE_URL}search-index.json`).then(response => {
+          if (!response.ok) throw new Error('Índice indisponível');
+          return response.json() as Promise<Post[]>;
+        }),
+        import('fuse.js')
+      ]).then(([posts, { default: Fuse }]) => new Fuse(posts, {
+        keys: ['title', 'description', 'category', 'tags'],
+        threshold: 0.3
+      })).catch(error => {
+        loading = undefined;
+        throw error;
       });
-    } catch (e) {
-      console.warn('Índice de busca não disponível');
-      posts = [];
     }
+    return loading;
   }
-  
-  /**
-   * Escapa caracteres HTML para prevenir XSS
-   * @param str - String a ser escapada
-   */
-  function escapeHtml(str: string): string {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+
+  function closeResults() {
+    request++;
+    if (results) results.hidden = true;
+    if (status) status.textContent = '';
   }
-  
-  /**
-   * Renderiza os resultados da pesquisa
-   * @param query - Termo de busca
-   */
-  function showResults(query: string) {
-    const searchResults = document.getElementById('search-results');
-    if (!searchResults || !fuse) return;
-    
-    const results = fuse.search(query).slice(0, 10);
-    
-    if (results.length === 0) {
-      searchResults.innerHTML = `
-        <div class="p-4 text-center text-gray-500 dark:text-gray-400">
-          Nenhum resultado encontrado
-        </div>
-      `;
-    } else {
-      // Mapeia os resultados e escapa o HTML
-      const html = results.map(({ item }: { item: Post }) => {
-        // Escapa todos os dados antes de injetar
-        const safeTitle = escapeHtml(item.title);
-        const safeDesc = escapeHtml(item.description);
-        const safeCategory = escapeHtml(item.category);
-        const safeSlug = escapeHtml(item.slug);
-        
-        return `
-          <a href="${import.meta.env.BASE_URL}blog/${safeSlug}" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0 transition-colors">
-            <div class="font-medium text-gray-900 dark:text-gray-100">${safeTitle}</div>
-            <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">${safeDesc}</div>
-            <div class="text-xs text-primary-600 dark:text-primary-400 mt-2 font-medium">${safeCategory}</div>
-          </a>
-        `;
-      }).join('');
-      
-      searchResults.innerHTML = html;
-    }
-    
-    searchResults.classList.remove('hidden');
-  }
-  
-  // Elementos do DOM
-  const searchInput = document.getElementById('search-input') as HTMLInputElement;
-  const searchResults = document.getElementById('search-results') as HTMLDivElement;
-  
-  // Carrega os posts ao focar no input
-  searchInput?.addEventListener('focus', () => {
-    if (posts.length === 0) loadPosts();
-  });
-  
-  // Input: busca enquanto digita
-  searchInput?.addEventListener('input', (e) => {
-    const query = (e.target as HTMLInputElement).value.trim();
-    
-    // Oculta resultados se query muito curta
+
+  async function search() {
+    if (!input || !results || !status) return;
+    const query = input.value.trim();
+    const current = ++request;
     if (query.length < 2) {
-      searchResults?.classList.add('hidden');
+      closeResults();
       return;
     }
-    
-    // Aguarda Fuse.js estar pronto
-    if (!fuse && posts.length > 0) {
-      loadPosts().then(() => showResults(query));
-    } else if (fuse) {
-      showResults(query);
+    results.hidden = false;
+    results.textContent = 'Carregando...';
+    status.textContent = 'Carregando busca.';
+    try {
+      const fuse = await loadIndex();
+      if (current !== request) return;
+      const matches = fuse.search(query).slice(0, 10);
+      results.replaceChildren();
+      status.textContent = `${matches.length} resultados encontrados.`;
+      if (!matches.length) results.textContent = 'Nenhum resultado encontrado.';
+      for (const { item } of matches) {
+        const link = document.createElement('a');
+        link.href = `${import.meta.env.BASE_URL}blog/${encodeURIComponent(item.slug)}/`;
+        link.className = 'block p-4 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 border-b border-gray-200 dark:border-gray-700';
+        const title = document.createElement('strong');
+        title.textContent = item.title;
+        const description = document.createElement('p');
+        description.className = 'text-sm text-gray-500 dark:text-gray-400 mt-1';
+        description.textContent = item.description;
+        link.append(title, description);
+        results.append(link);
+      }
+    } catch {
+      if (current !== request) return;
+      results.textContent = 'Busca indisponível. Digite novamente para tentar.';
+      status.textContent = results.textContent;
+    }
+  }
+
+  input?.addEventListener('focus', () => {
+    if (input.value.trim().length >= 2) void search();
+    else void loadIndex().catch(() => {});
+  });
+  input?.addEventListener('input', () => void search());
+  input?.parentElement?.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      closeResults();
+      if (document.activeElement !== input) input?.focus();
+      closeResults();
+    }
+    if (event.key === 'ArrowDown' && document.activeElement === input && results && !results.hidden) {
+      const first = results.querySelector('a');
+      if (first) { event.preventDefault(); first.focus(); }
     }
   });
-  
-  // Tecla Escape fecha os resultados
-  searchInput?.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      searchResults?.classList.add('hidden');
-      searchInput.blur();
-    }
-  });
-  
-  // Clique fora fecha os resultados
-  document.addEventListener('click', (e) => {
-    if (!searchInput?.contains(e.target as Node) && 
-        !searchResults?.contains(e.target as Node)) {
-      searchResults?.classList.add('hidden');
-    }
+  document.addEventListener('click', event => {
+    if (!input?.parentElement?.contains(event.target as Node)) closeResults();
   });
 </script>

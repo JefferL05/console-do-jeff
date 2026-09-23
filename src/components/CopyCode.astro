@@ -1,0 +1,34 @@
+<script>
+  document.querySelectorAll<HTMLElement>('.prose pre').forEach(pre => {
+    const code = pre.querySelector('code');
+    if (!code || pre.parentElement?.querySelector('.copy-btn')) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'relative';
+    pre.before(wrapper);
+    wrapper.append(pre);
+    pre.style.paddingTop = '3.5rem';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-btn absolute top-2 right-2 rounded px-3 py-1 text-sm bg-gray-700 text-white hover:bg-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-400';
+    button.textContent = 'Copiar código';
+    button.setAttribute('aria-label', 'Copiar código');
+    const status = document.createElement('span');
+    status.className = 'sr-only';
+    status.setAttribute('role', 'status');
+    wrapper.append(button, status);
+
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(code.textContent ?? '');
+        button.textContent = 'Copiado!';
+        status.textContent = 'Código copiado.';
+      } catch {
+        button.textContent = 'Tentar novamente';
+        status.textContent = 'Não foi possível copiar. Selecione o código e copie manualmente.';
+      }
+      window.setTimeout(() => { button.textContent = 'Copiar código'; }, 2000);
+    });
+  });
+</script>

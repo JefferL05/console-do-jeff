@@ -4,7 +4,7 @@ Blog técnico focado em desenvolvimento de software, boas práticas e tecnologia
 
 ## Stack
 
-- **Framework**: Astro 4 (SSG)
+- **Framework**: Astro 7 (SSG)
 - **Styling**: Tailwind CSS + Typography Plugin
 - **Content**: MDX (Markdown + React Components)
 - **Search**: Fuse.js (Fuzzy Search)
@@ -19,7 +19,7 @@ Blog técnico focado em desenvolvimento de software, boas práticas e tecnologia
 - Busca fuzzy instantânea no cliente
 - RSS Feed automático
 - SEO completo (OpenGraph, Twitter Cards)
-- Categorização e arquivo por ano
+- Categorias, páginas de tags e arquivo por ano
 - Componentes MDX reutilizáveis (Callout)
 
 ### Frontmatter
@@ -35,6 +35,10 @@ Blog técnico focado em desenvolvimento de software, boas práticas e tecnologia
 | tags | string[] | Não | Tags (padrão: []) |
 | image | object | Não | Objeto com url e alt |
 | draft | boolean | Não | Se true, não aparece em produção |
+| readingTime | number | Não | Tempo de leitura em minutos; calculado quando omitido |
+
+As datas são apresentadas em UTC para preservar o dia de valores como `2026-04-13`.
+Datas com horário e fuso são convertidas para UTC antes da apresentação.
 
 ## Componentes MDX
 
@@ -49,13 +53,26 @@ Blog técnico focado em desenvolvimento de software, boas práticas e tecnologia
 ### CodeBlock (usado automaticamente)
 
 Basta usar blocos de código Markdown - o botão de copiar é adicionado automaticamente.
+O componente `CopyCode.astro` adiciona os botões aos blocos renderizados pelo Shiki.
 
 ## Desenvolvimento
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
+
+Requer Node.js 22.12 ou superior. Para validar:
+
+```bash
+npm run lint
+npm run build
+npm run check:site
+```
+
+`check:site` verifica links internos, categorias, datas, busca no HTML, RSS e arquivos de SEO.
+Ao testar GitHub Pages localmente, defina `GH_PAGES=true` tanto para o build quanto para a verificação.
+Pull requests são validados com e sem o prefixo do GitHub Pages.
 
 ## Deploy
 
@@ -68,10 +85,18 @@ git push origin main
 
 O workflow `.github/workflows/deploy.yml` faz o build e publica automaticamente em `https://JefferL05.github.io/console-do-jeff/`.
 
+### Vercel
+
+O domínio canônico padrão é `https://console-do-jeff.vercel.app`.
+Para um domínio próprio, configure `SITE_URL` com a URL pública completa.
+URLs temporárias de preview não são usadas como canonical. O sitemap é gerado no build.
+
+A imagem de compartilhamento padrão é `public/og-default.png`; o SVG correspondente é o arquivo editável.
+
 ## Performance
 
 - SSG: Páginas pré-renderizadas
 - Sem JavaScript desnecessário
-- Imagens otimizadas com lazy loading
+- Imagens externas com lazy loading
 - CSS minificado automaticamente
 - RSS generation automática
