@@ -107,7 +107,7 @@ const formattedUpdatedDate = updatedDate && formatDate(updatedDate);
     {image && (
       <figure class="mb-8">
         <img
-          src={image.url}
+          src={image.url.startsWith('http') ? image.url : url(image.url)}
           alt={image.alt}
           class="w-full h-auto rounded-xl shadow-lg"
           loading="lazy"

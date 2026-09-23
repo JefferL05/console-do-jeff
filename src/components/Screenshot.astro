@@ -1,0 +1,23 @@
+---
+import { url } from '@utils/index';
+
+interface Props {
+  src: string;
+  alt: string;
+  caption: string;
+  width: number;
+  height: number;
+}
+
+const { src, alt, caption, width, height } = Astro.props;
+const imageUrl = url(src);
+---
+
+<figure class="my-8">
+  <a href={imageUrl} target="_blank" rel="noopener noreferrer" aria-label={`Ampliar imagem: ${alt} (abre em nova aba)`} class="block !border-0 rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-500">
+    <img src={imageUrl} alt={alt} width={width} height={height} loading="lazy" decoding="async" class="!my-0 w-full h-auto rounded-xl border border-gray-200 dark:border-gray-700" />
+  </a>
+  <figcaption class="mt-3 text-sm text-gray-500 dark:text-gray-400">
+    {caption} Clique na imagem para ampliar.
+  </figcaption>
+</figure>

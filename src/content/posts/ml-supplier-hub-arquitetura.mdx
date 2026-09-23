@@ -1,0 +1,294 @@
+---
+title: "ML Supplier Hub: como estruturei meu SaaS para vendedores do Mercado Livre"
+description: "Conheça meu ML Supplier Hub: arquitetura com Next.js e Prisma, estoque seguro, margem por pedido, integração com o Mercado Livre e capturas do projeto."
+pubDate: 2026-09-23
+author: "Jeff"
+category: "Projetos"
+tags: ["nextjs", "typescript", "saas", "mercado-livre", "arquitetura", "postgresql"]
+image:
+  url: "/images/posts/ml-supplier-hub/landing.webp"
+  alt: "Página pública do ML Supplier Hub; os indicadores da prévia comercial são ilustrativos."
+draft: false
+---
+
+import Callout from '../../components/Callout.astro';
+import Screenshot from '../../components/Screenshot.astro';
+
+Vender em um marketplace é só uma parte do trabalho. Depois da venda, aparecem perguntas que uma lista de pedidos não responde sozinha: **quem fornece o produto, quanto realmente está disponível, qual é o custo da operação e quanto sobra no final?**
+
+É nesse problema que estou trabalhando com o **ML Supplier Hub**, meu projeto de gestão para vendedores do Mercado Livre. A proposta é reunir produtos, fornecedores, estoque, pedidos, envios e financeiro em uma operação conectada.
+
+Neste post, vou mostrar como o projeto está montado, quais responsabilidades ficam em cada camada e algumas decisões que tornam o sistema mais interessante do que um conjunto de telas de cadastro.
+
+**[Conheça o site do ML Supplier Hub](https://meusprojetos-production.up.railway.app/).** A plataforma é independente e utiliza integrações com o Mercado Livre; não é um produto oficial do marketplace.
+
+<Callout type="info" title="Sobre as imagens deste post">
+  A imagem de abertura é uma captura da landing page publicada, que contém uma prévia comercial com números ilustrativos. As telas operacionais abaixo foram capturadas no sandbox local do próprio projeto: usam dados de demonstração, armazenados no navegador, e não representam vendas reais ou uma conta conectada ao Mercado Livre.
+</Callout>
+
+## O problema que o projeto organiza
+
+O ponto central é ligar informações que normalmente ficam separadas:
+
+- **Produto:** SKU, preço de venda, custo e vínculo com fornecedores.
+- **Estoque:** saldo disponível, quantidade reservada e margem de segurança.
+- **Pedido:** itens vendidos, situação operacional e envio.
+- **Fornecedor:** disponibilidade, prazo e participação na preparação do pedido.
+- **Financeiro:** receita, taxas, custos, reembolsos e resultado calculado.
+
+Um exemplo: o preço de venda pode parecer bom, mas o resultado muda quando entram a taxa do marketplace, o frete e o custo do fornecedor. Da mesma forma, publicar todo o estoque informado por um fornecedor pode deixar a operação sem proteção contra mudanças de disponibilidade.
+
+A interface precisa mostrar essas relações, e o backend precisa aplicar as regras que sustentam essa visão.
+
+<Screenshot
+  src="/images/posts/ml-supplier-hub/dashboard-demo.webp"
+  alt="Visão geral do sandbox com receita de R$ 319,70, lucro estimado, dois pedidos e fluxo operacional."
+  caption="Visão geral da demonstração: indicadores e pedidos recentes na mesma tela. Os valores são fictícios."
+  width={1440}
+  height={960}
+/>
+
+## A arquitetura: um monólito modular
+
+O ML Supplier Hub usa **Next.js 15, React 19 e TypeScript**. A aplicação reúne interface e backend no mesmo projeto, com páginas no App Router e endpoints implementados por Route Handlers.
+
+Essa organização é um **monólito modular**: o sistema compartilha uma aplicação, mas divide as responsabilidades em módulos. Não há um segundo backend independente apenas para atender às próprias telas.
+
+A stack principal ficou assim:
+
+| Tecnologia | Papel no projeto |
+| --- | --- |
+| Next.js e React | Páginas públicas, área autenticada e interface operacional |
+| TypeScript e Zod | Tipagem e validação dos dados recebidos |
+| Prisma e PostgreSQL | Persistência, relacionamentos, transações e migrations |
+| BullMQ e Redis | Fila de integração quando Redis está configurado |
+| API oficial do Mercado Livre | Autorização, anúncios, pedidos, envios e atualização de estoque |
+| Railway | Hospedagem da aplicação web |
+
+Uma visão simplificada das camadas:
+
+```text
+Navegador
+  └─ Next.js: páginas, componentes e Route Handlers
+       ├─ Autenticação e permissões
+       ├─ Serviços e regras de domínio
+       │    └─ Prisma → PostgreSQL
+       └─ Integração com o Mercado Livre
+            ├─ Chamadas à API oficial
+            └─ BullMQ → Redis → worker, quando habilitado
+```
+
+O worker é uma entrada de execução separada, mas continua usando os módulos do mesmo código-base. Essa abordagem mantém o projeto organizado sem exigir uma arquitetura de microsserviços desde o início.
+
+## Como organizei as pastas
+
+O código fica dentro de `ml-supplier-hub/`, no repositório `MeusProjetos`. Esta é uma seleção da estrutura, com os arquivos mais relevantes para entender a aplicação:
+
+```text
+ml-supplier-hub/
+├── app/
+│   ├── page.tsx                 # Landing pública
+│   ├── dashboard/               # Visão operacional autenticada
+│   ├── products/                # Catálogo
+│   ├── suppliers/               # Gestão de fornecedores
+│   ├── supplier/                # Área do fornecedor
+│   ├── orders/                  # Pedidos
+│   ├── shipping/                # Separação e etiquetas
+│   ├── financial/               # Resultado financeiro
+│   ├── exceptions/              # Alertas e exceções
+│   ├── integrations/            # Conexão com o marketplace
+│   ├── onboarding/              # Configuração inicial
+│   ├── billing/                 # Assinatura e cobrança
+│   ├── platform-admin/          # Administração global
+│   ├── demo/                    # Sandbox local
+│   └── api/                     # Route Handlers
+├── components/                  # Componentes da interface
+├── lib/
+│   ├── domain/                  # Regras centrais do negócio
+│   │   ├── profitability.ts
+│   │   ├── inventory.ts
+│   │   ├── plans.ts
+│   │   └── subscription-lifecycle.ts
+│   ├── mercadolivre.ts          # Acesso à API e renovação de token
+│   ├── meli-notifications.ts    # Processamento de notificações
+│   ├── meli-sync.ts             # Sincronizações
+│   ├── rbac.ts                  # Permissões por papel
+│   ├── entitlements.ts          # Permissões comerciais do plano
+│   └── queue.ts                 # Configuração da fila
+├── prisma/                      # Schema e migrations
+├── tests/                       # Testes automatizados
+├── scripts/                     # Verificações e utilitários
+├── docs/                        # Decisões e documentação técnica
+└── worker.ts                    # Processamento de jobs
+```
+
+A separação mais importante é entre **apresentar uma informação**, **coordenar uma operação** e **calcular uma regra de negócio**. O cálculo de margem, por exemplo, tem um módulo próprio em `lib/domain/profitability.ts`, em vez de depender de uma fórmula diferente em cada tela operacional.
+
+## Banco de dados: cada operação pertence a uma organização
+
+O projeto foi estruturado para atender mais de uma empresa na mesma aplicação. A unidade central é a `Organization`.
+
+Um usuário se relaciona com uma organização por meio de `OrganizationMember`, que registra seu papel. Os dados operacionais são vinculados à organização, e as consultas do cliente usam o `organizationId` da sessão revalidada.
+
+Entre as entidades do schema estão:
+
+| Grupo | Entidades |
+| --- | --- |
+| Acesso | `Organization`, `User`, `OrganizationMember` |
+| Catálogo e origem | `Product`, `Supplier`, `SupplierProduct` |
+| Estoque | `Inventory`, `InventoryMovement`, `InventorySnapshot` |
+| Marketplace | `MarketplaceAccount`, `MarketplaceListing` |
+| Venda e entrega | `Order`, `OrderItem`, `Shipment`, `SupplierFulfillment` |
+| Financeiro | `Payment`, `Refund` |
+| SaaS | `Subscription`, `SubscriptionPayment` |
+| Rastreabilidade | `WebhookEvent`, `Alert`, `AuditLog` |
+
+Um detalhe importante: **produto interno e anúncio do marketplace são conceitos diferentes**. O produto guarda o contexto da operação; o anúncio representa sua publicação no canal de venda.
+
+Outro detalhe é o acesso de fornecedores. O papel `SUPPLIER` é combinado com vínculos explícitos em `SupplierUserAccess`, para restringir quais fornecedores aquele usuário pode acessar.
+
+<Screenshot
+  src="/images/posts/ml-supplier-hub/fornecedores-demo.webp"
+  alt="Tela de fornecedores do sandbox, com formulário de cadastro e dois fornecedores fictícios com seus prazos."
+  caption="No sandbox, o cadastro simplificado mostra fornecedores e prazos. A aplicação autenticada acrescenta as regras de organização e acesso."
+  width={1440}
+  height={960}
+/>
+
+## Estoque: disponível não significa publicável
+
+Uma das regras centrais está em `lib/domain/inventory.ts`. O módulo calcula quanto estoque pode ser publicado, considerando a origem do saldo e a reserva de segurança.
+
+Quando o cálculo recebe estoque de fornecedor, usa esse saldo e desconta o maior buffer aplicável entre fornecedor e produto. Quando usa estoque interno, desconta primeiro as reservas e depois a proteção configurada.
+
+Exemplo com estoque interno:
+
+```text
+Estoque físico:              30
+Quantidade reservada:         4
+Proteção no inventário:       3
+Proteção no produto:          5
+
+Disponível antes da proteção: 30 - 4 = 26
+Proteção aplicada:            maior entre 3 e 5 = 5
+Quantidade publicável:        26 - 5 = 21
+```
+
+O resultado nunca fica negativo. Além disso, a sincronização registra snapshots do estoque e só solicita a atualização do anúncio quando a quantidade publicável diverge da quantidade atual.
+
+Essa distinção evita tratar “saldo recebido” e “quantidade anunciável” como se fossem a mesma coisa.
+
+<Screenshot
+  src="/images/posts/ml-supplier-hub/produtos-demo.webp"
+  alt="Catálogo do sandbox com SKU, produto, fornecedor, custo, preço, estoque e margem bruta."
+  caption="Catálogo demonstrativo com três produtos. A margem bruta exibida aqui é simplificada; não inclui todas as deduções do motor financeiro da aplicação."
+  width={1440}
+  height={960}
+/>
+
+## Financeiro: olhar além do faturamento
+
+Em `lib/domain/profitability.ts`, o cálculo considera preço de venda, custo do fornecedor, taxa do marketplace, frete, impostos, publicidade, outros custos e reembolsos.
+
+A lógica central pode ser resumida assim:
+
+```text
+Custo total = fornecedor + taxa + frete + impostos
+            + publicidade + outros custos + reembolsos
+
+Lucro calculado = preço de venda - custo total
+Margem (%)     = lucro calculado / preço de venda × 100
+```
+
+O módulo também calcula ROI, markup, preço de equilíbrio e uma sugestão de preço para a margem desejada, com base nos custos informados. O resultado recebe uma classificação: rentável, abaixo da margem mínima ou negativo.
+
+**A qualidade do indicador depende da qualidade dos dados de entrada.** Uma margem calculada sem custo atualizado ou sem todas as deduções não deve ser confundida com o resultado contábil definitivo da operação.
+
+<Screenshot
+  src="/images/posts/ml-supplier-hub/financeiro-demo.webp"
+  alt="Financeiro do sandbox com receita, custo de fornecedor, taxas simuladas e resultado por pedido."
+  caption="Financeiro da demonstração: os valores são simulados e o cálculo do sandbox usa um subconjunto das informações do motor de rentabilidade."
+  width={1440}
+  height={960}
+/>
+
+## Integração com o Mercado Livre
+
+A conexão usa **OAuth Authorization Code com PKCE S256**. Após a autorização, access token e refresh token são armazenados criptografados com AES-256-GCM. As chamadas autenticadas ficam no backend.
+
+Uma parte importante é a renovação concorrente de tokens. Como o refresh token pode ser substituído durante a renovação, duas requisições não devem renová-lo ao mesmo tempo. O módulo `lib/mercadolivre.ts` usa um lock transacional no PostgreSQL e reconsulta a conta antes de decidir pela renovação.
+
+Para atualizações externas, o fluxo de notificações está organizado assim:
+
+1. A rota `/api/webhooks/mercadolivre` valida a requisição e o payload.
+2. Calcula um identificador estável para a notificação.
+3. Responde e agenda o trabalho com `after()`.
+4. Encaminha o processamento à fila quando disponível, com fallback direto.
+5. O processador reivindica o evento e consulta o recurso correspondente na API oficial.
+6. Registra o resultado do processamento para permitir acompanhamento e retry controlado.
+
+O objetivo da **idempotência** é que uma notificação repetida não se transforme em uma venda duplicada. Isso envolve tanto o tratamento do evento quanto restrições de unicidade no banco, como a combinação de organização e identificador externo do pedido.
+
+Com Redis configurado, a fila BullMQ tem tentativas e espera exponencial entre retries. O fallback direto simplifica o ambiente inicial, mas não oferece a mesma durabilidade de uma fila dedicada.
+
+## Do pedido à preparação do envio
+
+Pedidos, fornecedores e envios formam o fluxo operacional. O projeto possui uma área de fulfillment do fornecedor e um módulo de separação e etiquetas em `/shipping`.
+
+As etiquetas são solicitadas pelos recursos oficiais do Mercado Envios, respeitando o estado do envio e a modalidade logística suportada. O backend transmite os arquivos PDF ou ZPL2; o navegador não recebe os tokens usados na integração.
+
+<Screenshot
+  src="/images/posts/ml-supplier-hub/pedidos-demo.webp"
+  alt="Tela de pedidos do sandbox com simulação de venda e fila de dois pedidos, seus fornecedores, valores e status."
+  caption="Fila do sandbox com criação de pedido de teste e avanço de status. Essas ações alteram apenas a demonstração local, sem envio ao marketplace."
+  width={1440}
+  height={960}
+/>
+
+Essa tela demonstra a ideia do fluxo, mas não comprova uma operação logística real. A integração autenticada depende da conta conectada e das condições retornadas pela API.
+
+## A camada SaaS: planos, limites e assinatura
+
+Além do núcleo operacional, o projeto tem cadastro público, onboarding, trial Pro de sete dias e planos Starter, Pro e Business. A cobrança inicial é manual via Pix, com conferência antes da ativação ou renovação.
+
+A assinatura pertence à **organização**, não ao usuário individual. Preços e limites vêm de um catálogo canônico no servidor, em `lib/domain/plans.ts`.
+
+A autorização combina duas perguntas:
+
+1. **Permissão funcional:** o papel do usuário permite executar essa ação?
+2. **Permissão comercial:** a assinatura permite escrita e ainda há capacidade no plano?
+
+Uma conta em modo somente leitura continua podendo consultar seus dados. Notificações de pedidos e envios continuam sendo ingeridas, porque representam acontecimentos externos. Já ações de escrita iniciadas pelo cliente e sincronizações de saída passam pela verificação de assinatura.
+
+Os jobs de anúncios e estoque revalidam essa permissão quando começam a executar. Assim, uma tarefa enfileirada durante o trial não recebe autorização permanente para alterar o marketplace depois da expiração.
+
+## Testes e documentação fazem parte da estrutura
+
+O repositório inclui testes para regras de estoque e rentabilidade, isolamento entre organizações, permissões, webhooks, renovação de token, cobrança e ciclo de assinatura.
+
+Alguns exemplos dos cenários tratados são:
+
+- notificações repetidas e reivindicação de eventos;
+- renovação concorrente do token do Mercado Livre;
+- criação de produtos sob o limite do plano;
+- transições entre trial, período ativo e somente leitura;
+- restrição de acesso por organização e fornecedor.
+
+Os comandos de validação documentados incluem testes, verificação de tipos, preflight, validação do Prisma e build. A CI também aplica migrations em um PostgreSQL limpo.
+
+Em `docs/`, ficam as decisões de arquitetura, banco, integração, jobs, segurança e cobrança. Isso ajuda a manter o motivo de uma regra perto do código que a implementa.
+
+## O que esse projeto mostra sobre construir um produto
+
+Para mim, o ponto mais importante do ML Supplier Hub é a conexão entre as partes. Cadastro de produto, integração e dashboard são necessários, mas o sistema ganha sentido quando estoque, pedido, fornecedor e resultado financeiro compartilham regras coerentes.
+
+Essa estrutura também deixa caminhos claros de evolução: ampliar a observabilidade dos jobs, medir a necessidade de uma fila dedicada e aprofundar os testes de integração com o marketplace. Separar serviços pode fazer sentido no futuro, quando houver uma necessidade concreta de escala ou disponibilidade.
+
+O projeto continua em evolução. Este post registra a estrutura atual e mostra a interface com exemplos demonstrativos, sem tratar números do sandbox como resultados comerciais.
+
+**[Visite o ML Supplier Hub](https://meusprojetos-production.up.railway.app/)** para conhecer a proposta e a página pública do produto.
+
+### Referência do projeto
+
+- **Código-fonte:** [MeusProjetos / ml-supplier-hub](https://github.com/JefferL05/MeusProjetos/tree/main/ml-supplier-hub) — repositório privado na data deste post; acesso restrito a colaboradores autorizados.
+- **Base técnica deste artigo:** implementação e documentação do projeto consultadas em 23 de setembro de 2026, incluindo `docs/architecture.md`, `docs/database.md`, `docs/mercadolivre.md` e os módulos citados acima.

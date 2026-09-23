@@ -73,7 +73,7 @@ const recentPosts = posts.slice(1, 7);
               {post.data.image && (
                 <div class="aspect-video overflow-hidden">
                   <img
-                    src={post.data.image.url}
+                    src={post.data.image.url.startsWith('http') ? post.data.image.url : url(post.data.image.url)}
                     alt={post.data.image.alt}
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
