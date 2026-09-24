@@ -10,7 +10,12 @@ const failures = [];
 
 for (const page of pages) {
   const html = read(page);
-  assert.ok(html.includes('id="search-input"'), `Busca ausente: ${page}`);
+  const isGame = page.replaceAll('\\', '/') === 'jogos/petroleo/index.html';
+  if (isGame) {
+    assert.ok(html.includes('id="game"') && html.includes(`${base}jogos/petroleo/boot.js`), `Entrada do jogo ausente: ${page}`);
+  } else {
+    assert.ok(html.includes('id="search-input"'), `Busca ausente: ${page}`);
+  }
   for (const [, target] of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
     if (!target.startsWith('/') || target.startsWith('//')) continue;
     const pathname = target.split(/[?#]/)[0];

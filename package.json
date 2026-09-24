@@ -12,7 +12,11 @@
     "preview": "astro preview",
     "astro": "astro",
     "lint": "astro check",
-    "check:site": "node scripts/check-site.mjs"
+    "check:site": "node scripts/check-site.mjs",
+    "check:game": "node scripts/check-petroleo.mjs",
+    "check:playables": "node scripts/check-petroleo-platform.mjs",
+    "check:balance": "node scripts/balance-petroleo.mjs",
+    "build:playables": "npm run build && node scripts/package-petroleo.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "7.2.4",

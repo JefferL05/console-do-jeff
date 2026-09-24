@@ -1,0 +1,73 @@
+---
+const assets = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/jogos/petroleo`;
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#172e2e" />
+    <title>Ouro do Subsolo — Console do Jeff</title>
+    <link rel="stylesheet" href={`${assets}/style.css`} />
+  </head>
+  <body>
+    <section id="loading" class="loading-screen" aria-live="polite"><div><span class="brand-mark" aria-hidden="true">◆</span><h2>Ouro do Subsolo</h2><p id="loading-status">Preparando expedição… / Preparing expedition…</p><button id="retry-load" class="primary wide" hidden>Tentar novamente / Retry</button></div></section>
+    <main class="game-shell">
+      <header class="topbar">
+        <div class="brand"><span class="brand-mark" aria-hidden="true">◆</span><div><h1>Ouro do Subsolo</h1><span id="concession">UMA FORTUNA A DESCOBRIR</span></div></div>
+        <button id="pause" class="icon-button" aria-label="Pausar e abrir menu">Ⅱ</button>
+      </header>
+      <section class="hud" aria-label="Recursos da operação">
+        <div><span>CAPITAL</span><strong id="cash">$ 1.500</strong></div>
+        <div><span>TEMPO</span><strong id="time">03:00</strong></div>
+        <div class="stock"><span>TANQUE <b id="storage">0/120</b></span><progress id="stock-bar" value="0" max="120" aria-label="Ocupação do tanque"></progress><small id="transit">0 b em trânsito</small></div>
+      </section>
+      <section class="field" aria-label="Área de exploração">
+        <canvas id="game" tabindex="0" aria-label="Campo de petróleo. Setas movem a mira, Enter seleciona. Confirme a ação no botão abaixo. Espaço abre pausa."></canvas>
+        <div class="field-label"><span id="field-name">VALE DOURADO</span><span id="seed-label">TERRENO 01</span></div>
+        <div id="field-badge" class="field-badge">◎ Explore o subsolo</div>
+        <button id="skip-tutorial" class="skip" hidden>Pular guia</button>
+      </section>
+      <section class="controls" aria-label="Controle da operação">
+        <div class="statusline"><span id="toast" role="status">Escolha uma concessão para começar.</span><button id="help" class="help-button" aria-label="Como jogar">?</button></div>
+        <div class="selection" id="selection"><div><strong id="selection-title">O próximo grande achado é seu.</strong><span id="selection-detail">Explore, perfure e venda no momento certo.</span></div><button id="confirm" class="primary" hidden>Confirmar</button><button id="cancel" class="cancel" aria-label="Cancelar seleção" hidden>✕</button></div>
+        <div class="tools" aria-label="Ferramentas">
+          <button id="scan" aria-pressed="true"><span aria-hidden="true">◎</span> Explorar</button>
+          <button id="drill" aria-pressed="false"><span aria-hidden="true">↧</span> Perfurar</button>
+          <button id="upgrades"><span aria-hidden="true">＋</span> Melhorar</button>
+        </div>
+        <div class="market" aria-label="Destino das próximas cargas">
+          <button id="west" aria-pressed="true"><span>← OESTE</span><strong id="west-price">$ 0,00</strong><small id="west-trend">• Estável</small></button>
+          <button id="hold" aria-pressed="false"><span>▤ TANQUE</span><strong>Guardar</strong><small>Esperar preço</small></button>
+          <button id="east" aria-pressed="false"><span>LESTE →</span><strong id="east-price">$ 0,00</strong><small id="east-trend">• Estável</small></button>
+        </div>
+        <div class="flow"><span id="flow">Extração 0,0 b/s · Frota 1</span><span id="bottleneck">Pronto para explorar</span></div>
+      </section>
+    </main>
+
+    <dialog id="home" aria-labelledby="home-title">
+      <span class="eyebrow">CONSOLE DO JEFF · JOGO ORIGINAL</span>
+      <h2 id="home-title">Sua próxima fortuna<br />começa no subsolo.</h2>
+      <p>Descubra reservas, construa sua operação e escolha a hora de vender. Cada terreno, uma nova história.</p>
+      <button id="continue" class="primary wide" hidden>Continuar expedição salva →</button>
+      <fieldset><legend>Duração da expedição</legend><div class="segmented"><button id="quick" aria-pressed="true">Rápida · 3 min</button><button id="classic" aria-pressed="false">Estratégica · 5 min</button></div></fieldset>
+      <fieldset><legend>Suas concessões</legend><div id="profiles" class="profiles"></div></fieldset>
+      <div id="profile-info" class="callout"></div>
+      <label class="check"><input type="checkbox" id="tutorial" checked /> Guia interativo na primeira concessão</label>
+      <button id="start" class="primary wide">Explorar este terreno →</button>
+      <p class="fine">Nova expedição substitui a partida salva. Seu progresso na oficina permanece.</p>
+      <div class="workshop"><h3>Oficina permanente <span id="credits">0 fichas</span></h3><p>Ganhe fichas ao concluir uma concessão. Melhorias valem a partir da próxima partida.</p><div id="research"></div></div>
+      <p class="fine" id="record">Melhor capital final: —</p>
+      <p class="fine" id="save-status" role="status"></p>
+    </dialog>
+
+    <dialog id="menu" aria-labelledby="menu-title"><span class="eyebrow">RESPIRE. PLANEJE. CONTINUE.</span><h2 id="menu-title">Operação pausada</h2><p id="save-description">O tempo está parado. Sua expedição é salva automaticamente quando o armazenamento está disponível.</p><button id="resume" class="primary wide">Continuar →</button><button id="music" class="wide" aria-pressed="true">Música: ligada</button><button id="sound" class="wide" aria-pressed="false">Efeitos sonoros: desligados</button><button id="menu-help" class="wide">Como jogar</button><button id="restart" class="wide">Recomeçar este terreno</button><button id="home-button" class="wide">Concessões e oficina</button></dialog>
+
+    <dialog id="help-dialog" aria-labelledby="help-title"><span class="eyebrow">MANUAL DO PROSPECTOR</span><h2 id="help-title">Poucos toques.<br />Boas decisões.</h2><ol><li><b>Explore:</b> selecione uma área do subsolo, veja a prévia e confirme a sondagem por $ 80.</li><li><b>Perfure:</b> toque em uma reserva descoberta. Confira o custo e confirme o tubo.</li><li><b>Ramifique:</b> com Perfurar ativo, selecione um bolsão já conectado e depois outro descoberto. A conexão de origem deve estar pronta. Tubos podem cruzar sem se conectar; cada ramificação tem seu próprio fluxo.</li><li><b>Negocie:</b> escolha Oeste, Leste ou Guardar. A frota carrega, viaja e vende pelo preço na entrega. Cargas já iniciadas mantêm seu destino.</li><li><b>Expanda:</b> compare extração e transporte. O tanque cheio interrompe a extração. Na Serra, use a broca reforçada para atravessar rochas.</li></ol><p>Tendências mostram os últimos segundos, não garantem o próximo preço. Quando o prazo termina, estoque e cargas não entregues ficam sem receita.</p><p>As três medalhas de cada concessão são: atingir a meta de lucro, vender 85% do extraído (mínimo de 50 barris) e extrair 40% das reservas. Concluir libera o próximo terreno e dá uma ficha, mais uma por medalha.</p><p class="fine">Teclado: setas e Enter no campo para selecionar; Tab para controles; Escape cancela a seleção; Espaço pausa. Sons opcionais. A animação respeita a preferência de movimento reduzido.</p><button id="close-help" class="primary wide">Entendi →</button></dialog>
+
+    <dialog id="upgrade-dialog" aria-labelledby="upgrade-title"><span class="eyebrow">INVISTA COM INTENÇÃO</span><h2 id="upgrade-title">Melhorar operação</h2><p id="upgrade-summary"></p><div class="upgrade-list"><button id="tank"><b>▤ Tanque +120 barris</b><span id="tank-cost"></span></button><button id="truck"><b>⇢ Mais um veículo</b><span id="truck-cost"></span></button><button id="bit"><b>◆ Broca reforçada</b><span id="bit-cost"></span></button></div><p class="fine">Compras usam o capital desta partida. O tempo fica pausado enquanto você escolhe.</p><button id="close-upgrades" class="primary wide">Voltar ao campo →</button></dialog>
+
+    <dialog id="result" aria-labelledby="result-title"><span class="eyebrow">CONCESSÃO ENCERRADA</span><h2 id="result-title">Sua marca no terreno.</h2><p id="result-medals"></p><div id="result-stats" class="result-grid"></div><p id="result-tip" class="callout"></p><p id="result-reward"></p><p class="fine">O terreno foi revelado. Estoque e cargas que não chegaram antes do prazo permanecem contabilizados, mas não geram receita.</p><button id="inspect" class="wide">Ver terreno revelado</button><button id="retry" class="wide">Repetir a mesma semente</button><button id="next" class="primary wide">Próxima concessão e oficina →</button></dialog>
+    <script is:inline type="module" src={`${assets}/boot.js`}></script>
+  </body>
+</html>
