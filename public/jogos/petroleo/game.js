@@ -39,11 +39,16 @@ function pollGamepad(dt) {
   gamepadCursor.y = clamp(gamepadCursor.y + input.y * 190 * dt, CONFIG.world.surface + 15, CONFIG.world.height);
   view.keyboardCursor = { ...gamepadCursor };
   const pressed = index => !!input.buttons[index] && !gamepadPrevious[index];
+  if (pressed(9)) {
+    if ($('menu').open) resume();
+    else if (!dialogs.some(id => $(id).open)) openMenu();
+    gamepadPrevious = input.buttons; return;
+  }
+  if (game?.paused || dialogs.some(id => $(id).open)) { gamepadPrevious = input.buttons; return; }
   if (pressed(0)) select(gamepadCursor);
   if (pressed(1)) clearSelection();
   if (pressed(2)) { view.tool = view.tool === 'scan' ? 'drill' : 'scan'; clearSelection(); message(view.tool === 'scan' ? 'Ferramenta: explorar.' : 'Ferramenta: perfurar.'); }
   if (pressed(3) && view.preview && !$('confirm').hidden && !$('confirm').disabled) $('confirm').click();
-  if (pressed(9)) openMenu();
   gamepadPrevious = input.buttons;
 }
 const diagnostics = { fps: 0, averageRenderMs: 0, measuredSeconds: 0, viewport: '', dpr: 1 };
@@ -227,6 +232,7 @@ function frame(now) {
 }
 text('sound', `Efeitos sonoros: ${settings.sound ? 'ligados' : 'desligados'}`); $('sound').setAttribute('aria-pressed', String(settings.sound));
 text('music', `Música: ${settings.music ? 'ligada' : 'desligada'}`); $('music').setAttribute('aria-pressed', String(settings.music));
+syncGamepadButton();
 renderHome(progress, selected, mode, game); showDialog('home');
 text('save-status', saved.invalid ? 'Um salvamento inválido ou antigo foi ignorado. O progresso válido foi preservado quando possível.' : !platform.storageAvailable ? 'Armazenamento indisponível neste navegador.' : platform.hosted ? 'Progresso sincronizado com o YouTube.' : 'Progresso salvo automaticamente neste navegador.');
 text('save-description', platform.hosted ? 'O tempo está parado. Sua expedição é salva na nuvem do YouTube.' : 'O tempo está parado. Sua expedição é salva automaticamente quando o armazenamento está disponível.');
