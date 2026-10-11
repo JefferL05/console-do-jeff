@@ -2,7 +2,7 @@
 const DEADZONE = 0.18;
 function axis(value) {
   if (!Number.isFinite(value) || Math.abs(value) < DEADZONE) return 0;
-  return Math.sign(value) * (Math.abs(value) - DEADZONE) / (1 - DEADZONE);
+  return value;
 }
 export function normalizeGamepad(gamepad) {
   return {
