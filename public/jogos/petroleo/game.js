@@ -1,4 +1,5 @@
-import { CONFIG } from './modules/config.js';
+import { CONFIG, clamp } from './modules/config.js';
+import { normalizeGamepad } from './modules/gamepad.js';
 import { createGame, scanQuote, drillQuote, commit, step, buyUpgrade, settle, buyResearch } from './modules/simulation.js';
 import { Renderer } from './modules/renderer.js';
 import { bindInput } from './modules/input.js';
@@ -15,6 +16,41 @@ const dialogs = ['home', 'menu', 'help-dialog', 'upgrade-dialog', 'result'];
 let helpReturn = null, previous = performance.now(), accumulator = 0, uiClock = 0, saveClock = 0;
 let diagnosticTime = previous, diagnosticFrames = 0, renderTotal = 0;
 let frameId = 0, runningBeforeHostPause = false, saveSequence = 0;
+let gamepadEnabled = false, gamepadPrevious = [], gamepadCursor = { x: 95, y: 130 }, gamepadWasConnected = false;
+try { gamepadEnabled = localStorage.getItem('ouro-subsolo-gamepad-v1') === 'true'; } catch { /* Optional preference. */ }
+function syncGamepadButton() {
+  const button = $('gamepad-toggle');
+  button.textContent = `Controle Xbox: ${gamepadEnabled ? 'ligado' : 'desligado'}`;
+  button.setAttribute('aria-pressed', String(gamepadEnabled));
+}
+function pollGamepad(dt) {
+  if (!gamepadEnabled || !navigator.getGamepads) { gamepadPrevious = []; gamepadWasConnected = false; return; }
+  let pad = null;
+  try { pad = Array.from(navigator.getGamepads()).find(item => item?.connected && item.mapping === 'standard') || null; } catch { /* Gamepad API may be unavailable in embedded browsers. */ }
+  if (!pad) {
+    gamepadPrevious = [];
+    if (gamepadWasConnected) message('Controle Xbox desconectado. Reconecte-o pelo Bluetooth do dispositivo.');
+    gamepadWasConnected = false; return;
+  }
+  if (!gamepadWasConnected) message('Controle conectado. Analógico move a mira; A seleciona; B cancela; X alterna ferramenta; Y confirma; Menu pausa.');
+  gamepadWasConnected = true;
+  const input = normalizeGamepad(pad);
+  gamepadCursor.x = clamp(gamepadCursor.x + input.x * 190 * dt, 0, CONFIG.world.width);
+  gamepadCursor.y = clamp(gamepadCursor.y + input.y * 190 * dt, CONFIG.world.surface + 15, CONFIG.world.height);
+  view.keyboardCursor = { ...gamepadCursor };
+  const pressed = index => !!input.buttons[index] && !gamepadPrevious[index];
+  if (pressed(9)) {
+    if ($('menu').open) resume();
+    else if (!dialogs.some(id => $(id).open)) openMenu();
+    gamepadPrevious = input.buttons; return;
+  }
+  if (game?.paused || dialogs.some(id => $(id).open)) { gamepadPrevious = input.buttons; return; }
+  if (pressed(0)) select(gamepadCursor);
+  if (pressed(1)) clearSelection();
+  if (pressed(2)) { view.tool = view.tool === 'scan' ? 'drill' : 'scan'; clearSelection(); message(view.tool === 'scan' ? 'Ferramenta: explorar.' : 'Ferramenta: perfurar.'); }
+  if (pressed(3) && view.preview && !$('confirm').hidden && !$('confirm').disabled) $('confirm').click();
+  gamepadPrevious = input.buttons;
+}
 const diagnostics = { fps: 0, averageRenderMs: 0, measuredSeconds: 0, viewport: '', dpr: 1 };
 // Read-only snapshot for local performance verification, not analytics.
 Object.defineProperty(window, 'ouroDiagnostics', { get: () => ({ ...diagnostics }) });
@@ -37,7 +73,8 @@ function resume() {
   if (platform.suspended) return;
   closeDialogs(); platform.resume(game); previous = performance.now(); accumulator = 0; update(); save();
 }
-function openHome() { selected = progress.unlocked; renderHome(progress, selected, mode, game); showDialog('home'); save(); }
+function openHome() { selected = progress.unlocked; syncGamepadButton();
+renderHome(progress, selected, mode, game); showDialog('home'); save(); }
 function openMenu() {
   if (!game) return;
   clearSelection();
@@ -110,6 +147,12 @@ function refreshPreview() {
   if (view.preview) view.preview = view.preview.type === 'scan' ? scanQuote(game, view.preview.x, view.preview.y) : drillQuote(game, view.preview.pocketId, view.preview.parentId);
 }
 $('pause').addEventListener('click', openMenu);
+$('gamepad-toggle').addEventListener('click', () => {
+  gamepadEnabled = !gamepadEnabled; gamepadPrevious = []; gamepadWasConnected = false;
+  try { localStorage.setItem('ouro-subsolo-gamepad-v1', String(gamepadEnabled)); } catch { /* The gamepad remains usable for this session. */ }
+  syncGamepadButton();
+  message(gamepadEnabled ? 'Controle ativado. Conecte o Xbox pelo Bluetooth do dispositivo e pressione um botão.' : 'Controle desativado. Toque e teclado continuam disponíveis.');
+});
 $('resume').addEventListener('click', () => { platform.setAudio(settings.sound); platform.setMusic(settings.music); resume(); });
 $('sound').addEventListener('click', () => {
   settings.sound = !settings.sound; platform.setAudio(settings.sound); text('sound', `Efeitos sonoros: ${settings.sound ? 'ligados' : 'desligados'}`); $('sound').setAttribute('aria-pressed', String(settings.sound)); save();
@@ -169,6 +212,7 @@ platform.onResume(() => {
 function frame(now) {
   if (platform.suspended) return;
   const elapsed = Math.min(.25, Math.max(0, (now - previous) / 1000)); previous = now;
+  pollGamepad(elapsed);
   if (game && !game.paused && !game.ended) {
     accumulator += elapsed;
     while (accumulator >= CONFIG.step && !game.ended) { step(game); accumulator -= CONFIG.step; }
@@ -188,6 +232,7 @@ function frame(now) {
 }
 text('sound', `Efeitos sonoros: ${settings.sound ? 'ligados' : 'desligados'}`); $('sound').setAttribute('aria-pressed', String(settings.sound));
 text('music', `Música: ${settings.music ? 'ligada' : 'desligada'}`); $('music').setAttribute('aria-pressed', String(settings.music));
+syncGamepadButton();
 renderHome(progress, selected, mode, game); showDialog('home');
 text('save-status', saved.invalid ? 'Um salvamento inválido ou antigo foi ignorado. O progresso válido foi preservado quando possível.' : !platform.storageAvailable ? 'Armazenamento indisponível neste navegador.' : platform.hosted ? 'Progresso sincronizado com o YouTube.' : 'Progresso salvo automaticamente neste navegador.');
 text('save-description', platform.hosted ? 'O tempo está parado. Sua expedição é salva na nuvem do YouTube.' : 'O tempo está parado. Sua expedição é salva automaticamente quando o armazenamento está disponível.');

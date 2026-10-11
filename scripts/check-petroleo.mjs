@@ -4,6 +4,7 @@ import { generateTerrain, validateTerrain } from '../public/jogos/petroleo/modul
 import { createGame, createProgress, scanQuote, drillQuote, commit, step, inTransit, buyUpgrade, settle, buyResearch, pocketExtractionRate, wellRate } from '../public/jogos/petroleo/modules/simulation.js';
 import { encodeSave, decodeSave, validateGame } from '../public/jogos/petroleo/modules/persistence.js';
 import { createCamera, toWorld, toScreen } from '../public/jogos/petroleo/modules/renderer.js';
+import { normalizeGamepad } from '../public/jogos/petroleo/modules/gamepad.js';
 
 let count = 0;
 function test(name, callback) { callback(); count++; console.log(`PASS ${name}`); }
@@ -150,5 +151,11 @@ test('geological pressure rewards deeper deposits and production HUD uses the sa
   g.pockets[0].y = deep.y;
   g.wells.push({ id: 0, pocketId: 0, parentId: null, from: { x: g.pockets[0].x, y: CONFIG.world.surface }, distance: 200, progress: 1 });
   assert.equal(wellRate(g), CONFIG.drill.rate * 1.35);
+});
+test('Xbox standard gamepad normalizes stick deadzone and action buttons', () => {
+  const pad = { axes: [0.1, -0.7], buttons: Array.from({ length: 10 }, (_, index) => ({ pressed: index === 0 || index === 9 })) };
+  const state = normalizeGamepad(pad);
+  assert.equal(state.x, 0); assert.equal(state.y, -0.7);
+  assert.equal(state.buttons[0], true); assert.equal(state.buttons[9], true);
 });
 console.log(`\n${count} suites passed.`);
