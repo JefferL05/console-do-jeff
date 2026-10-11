@@ -24,3 +24,15 @@ jobs:
       - run: npm run build && npm run check:site
         env:
           GH_PAGES: ${{ matrix.github-pages }}
+
+  game-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run check:game
+      - run: npm run check:balance
