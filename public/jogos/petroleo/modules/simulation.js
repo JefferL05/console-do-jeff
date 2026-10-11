@@ -25,8 +25,16 @@ export function createGame({ seed = 1, profile = 0, mode = 'quick', tutorial = f
 
 export function inTransit(game) { return game.trucks.reduce((sum, truck) => sum + truck.cargo, 0); }
 export function scanRadius(game) { return CONFIG.scan.radius + game.research.scan * 5; }
+export function pocketExtractionRate(pocket) {
+  const depth = pocket.y - CONFIG.world.surface;
+  // Deep deposits carry more pressure, rewarding the extra drilling investment.
+  return CONFIG.drill.rate * (depth >= 190 ? 1.35 : depth >= 145 ? 1.15 : 1);
+}
 export function wellRate(game) {
-  return game.wells.filter(w => w.progress >= 1 && game.pockets[w.pocketId].amount > 0).length * CONFIG.drill.rate;
+  return game.wells.reduce((sum, well) => {
+    const pocket = game.pockets[well.pocketId];
+    return sum + (well.progress >= 1 && pocket.amount > 0 ? pocketExtractionRate(pocket) : 0);
+  }, 0);
 }
 export function transportRate(game) {
   return game.trucks.reduce((sum, t) => sum + t.capacity / (CONFIG.truck.travelTime * 2 + CONFIG.truck.unloadTime + t.capacity / CONFIG.truck.loadRate), 0);
@@ -104,7 +112,7 @@ export function step(game, dt = CONFIG.step) {
   for (const well of game.wells) {
     if (well.progress < 1) { well.progress = Math.min(1, well.progress + dt * CONFIG.drill.speed / Math.max(well.distance, 1)); continue; }
     const pocket = game.pockets[well.pocketId];
-    const amount = Math.max(0, Math.min(dt * CONFIG.drill.rate, pocket.amount, game.capacity - game.storage));
+    const amount = Math.max(0, Math.min(dt * pocketExtractionRate(pocket), pocket.amount, game.capacity - game.storage));
     pocket.amount -= amount; game.storage += amount; game.extracted += amount;
     if (amount > 0 && game.tutorial === 2) { game.tutorial = 3; event(game, 'extract', 'Ouro à vista! Escolha um comprador e acompanhe a entrega.'); }
   }

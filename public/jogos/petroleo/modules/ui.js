@@ -1,5 +1,5 @@
 import { CONFIG, PROFILES, RESEARCH, money } from './config.js';
-import { inTransit, metrics, transportRate, upgradeQuote, wellRate } from './simulation.js';
+import { inTransit, metrics, pocketExtractionRate, transportRate, upgradeQuote, wellRate } from './simulation.js';
 import { t, number } from './i18n.js';
 
 export const $ = id => document.getElementById(id);
@@ -41,7 +41,11 @@ export function updateHUD(game, view) {
   } else if (view.selectedPocket !== null) {
     const p = game.pockets[view.selectedPocket], well = game.wells.find(w => w.pocketId === p.id);
     text('selection-title', `Reserva · ${Math.ceil(p.amount)} barris`);
-    text('selection-detail', game.ended ? `Foram extraídos ${Math.floor(p.initial - p.amount)} de ${p.initial} barris desta reserva.` : view.parentId !== null ? 'Origem selecionada. Toque em outro bolsão para ramificar.' : well?.progress < 1 ? `Perfurando: ${Math.floor(well.progress * 100)}%. Aguarde para ramificar.` : p.amount <= 0 ? 'Reserva esgotada.' : 'Selecione Perfurar para conectar esta reserva.');
+    const depth = p.y - CONFIG.world.surface;
+    const pressure = depth >= 190 ? 'Pressão alta · vazão +35%' : depth >= 145 ? 'Pressão média · vazão +15%' : 'Pressão padrão';
+    const depthInfo = `Profundidade ${Math.round(depth)} · ${pressure} · ${number(pocketExtractionRate(p), 1)} b/s`;
+    const detail = game.ended ? `Foram extraídos ${Math.floor(p.initial - p.amount)} de ${p.initial} barris desta reserva.` : view.parentId !== null ? 'Origem selecionada. Toque em outro bolsão para ramificar.' : well?.progress < 1 ? `Perfurando: ${Math.floor(well.progress * 100)}%. Aguarde para ramificar.` : p.amount <= 0 ? 'Reserva esgotada.' : 'Selecione Perfurar para conectar esta reserva.';
+    text('selection-detail', game.ended ? detail : `${detail} ${depthInfo}`);
   } else {
     text('selection-title', game.ended ? 'O que ficou para a próxima história?' : 'Planeje antes de investir.');
     text('selection-detail', game.ended ? 'Abra o menu para rever o resultado.' : view.tool === 'scan' ? 'Toque no subsolo. Confira a área e confirme.' : 'Toque no petróleo. Confira o custo e confirme.');

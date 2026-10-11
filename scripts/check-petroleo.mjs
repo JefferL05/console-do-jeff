@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { CONFIG } from '../public/jogos/petroleo/modules/config.js';
 import { generateTerrain, validateTerrain } from '../public/jogos/petroleo/modules/terrain.js';
-import { createGame, createProgress, scanQuote, drillQuote, commit, step, inTransit, buyUpgrade, settle, buyResearch } from '../public/jogos/petroleo/modules/simulation.js';
+import { createGame, createProgress, scanQuote, drillQuote, commit, step, inTransit, buyUpgrade, settle, buyResearch, pocketExtractionRate, wellRate } from '../public/jogos/petroleo/modules/simulation.js';
 import { encodeSave, decodeSave, validateGame } from '../public/jogos/petroleo/modules/persistence.js';
 import { createCamera, toWorld, toScreen } from '../public/jogos/petroleo/modules/renderer.js';
 
@@ -138,5 +138,17 @@ test('isotropic camera and selection transform round-trip at mobile and landscap
       assert.ok(Math.abs(restored.x-p.x) < 1e-8); assert.ok(Math.abs(restored.y-p.y) < 1e-8);
     }
   }
+});
+test('geological pressure rewards deeper deposits and production HUD uses the same rate', () => {
+  const shallow = { y: CONFIG.world.surface + 100 };
+  const medium = { y: CONFIG.world.surface + 160 };
+  const deep = { y: CONFIG.world.surface + 220 };
+  assert.equal(pocketExtractionRate(shallow), CONFIG.drill.rate);
+  assert.equal(pocketExtractionRate(medium), CONFIG.drill.rate * 1.15);
+  assert.equal(pocketExtractionRate(deep), CONFIG.drill.rate * 1.35);
+  const g = createGame();
+  g.pockets[0].y = deep.y;
+  g.wells.push({ id: 0, pocketId: 0, parentId: null, from: { x: g.pockets[0].x, y: CONFIG.world.surface }, distance: 200, progress: 1 });
+  assert.equal(wellRate(g), CONFIG.drill.rate * 1.35);
 });
 console.log(`\n${count} suites passed.`);
