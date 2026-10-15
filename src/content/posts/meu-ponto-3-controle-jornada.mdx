@@ -1,0 +1,72 @@
+---
+title: "Meu Ponto 3.0: controle de jornada offline com Astro"
+description: "Como construí o Meu Ponto 3.0: múltiplos empregos, turnos noturnos, banco de horas e sincronização opcional com Supabase em um app estático e offline."
+pubDate: 2026-10-15
+author: "Jeff"
+category: "Projetos"
+tags: ["meu-ponto", "astro", "javascript", "pwa", "supabase", "produtividade"]
+image:
+  url: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200"
+  alt: "Caderno e relógio para controle de jornada de trabalho"
+draft: false
+---
+
+import Callout from '../../components/Callout.astro';
+
+# Meu Ponto 3.0: controle de jornada offline com Astro
+
+O [Meu Ponto](https://jefferl05.github.io/meu-ponto/) chegou à versão 3.0 como um controle pessoal de jornada em Astro estático + JavaScript. Funciona offline com pré-cache e usa a nuvem Supabase apenas como opção, com revisão por conta.
+
+Código fonte: [JefferL05/meu-ponto](https://github.com/JefferL05/meu-ponto).
+
+<Callout type="info">
+  Dados sempre locais primeiro. Sem login, nada é enviado para a nuvem.
+</Callout>
+
+## O que mudou da 2.1
+
+- **Múltiplos empregos**, cada um com registros, regras e banco próprios.
+- Motor novo em `src/lib/jornada.js`: turnos noturnos com "dia seguinte", ciclos 12x36/24x48 e personalizados, tolerância, arredondamento, adicional noturno e avisos de descanso.
+- Validação que impede sobreposição, inclusive entre dias; jornada limitada a 24h; dias fora do controle não geram débito.
+- Férias, folgas, feriados, abonos e faltas por período; destino banco 1:1 ou pagamento estimado por dia; ajustes manuais do banco.
+- Histórico mensal com busca, relatórios com totais/por marcador, CSV com proteção contra fórmulas e impressão/PDF.
+- Lixeira com restauração que preserva conflitos; backup JSON versionado com validação e cópia anterior guardada.
+
+## Como a sincronização funciona
+
+Cada perfil de conta tem sua revisão na nuvem. A escrita só avança se a revisão esperada coincidir, através da função `salvar_meu_ponto` em `supabase.sql`.
+
+Se outro aparelho gravou antes, a tela pede escolha explícita entre "usar este aparelho" e "usar nuvem", com backup da cópia substituída. Sair volta ao perfil local sem vazar dados entre contas.
+
+<Callout type="success">
+  Conflito exige escolha explícita. Nenhuma sincronização silenciosa sobrescreve seus registros.
+</Callout>
+
+## Stack técnica
+
+- **Astro 7** estático + JavaScript, sem framework pesado no cliente.
+- **Service Worker** gerado no build para pré-cache offline.
+- **Supabase** opcional: Auth por e-mail + tabela `revisao`.
+- **GitHub Pages** com workflow em Node 24: `npm ci`, `npm test`, `npm run build` e publicação de `dist/`.
+- Testes em Node com `node --test tests/*.test.mjs`.
+
+```bash
+npm ci
+npm test
+npm run dev       # copie .env.example para .env para testar a nuvem
+npm run build && npm run preview
+```
+
+## Configuração da nuvem
+
+1. Crie um projeto em supabase.com.
+2. No SQL Editor, rode o conteúdo de `supabase.sql`.
+3. Em Authentication, deixe o provedor Email ligado.
+4. Em URL Configuration, use `https://SEU-USUARIO.github.io/SEU-REPO/` e `http://localhost:4321/` para testes.
+5. Copie a URL e a chave **anon** em Project Settings → API. Nunca use a `service_role` no frontend.
+
+No GitHub, ative Pages com Source **GitHub Actions** e crie as Variables `PUBLIC_SUPABASE_URL` e `PUBLIC_SUPABASE_ANON_KEY`.
+
+## Teste o projeto
+
+Acesse [jefferl05.github.io/meu-ponto](https://jefferl05.github.io/meu-ponto/), inicie uma jornada, adicione períodos, explore o histórico e os relatórios. É um projeto pessoal em evolução, ideal para quem precisa de controle de horas extras sem depender de planilhas.
