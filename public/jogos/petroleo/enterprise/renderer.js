@@ -1,5 +1,6 @@
 import { RULES, REGIONS, clamp } from './config.js';
 import { pathToRig } from './pipes.js';
+import { networkDiagnostics } from './diagnostics.js';
 
 const ellipse = (ctx, x, y, rx, ry, color) => { ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill(); };
 const line = (ctx, points, color, width = 2) => { ctx.beginPath(); points.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.strokeStyle = color; ctx.lineWidth = width; ctx.stroke(); };
@@ -23,16 +24,42 @@ export class EnterpriseRenderer {
     this.x = (this.width - RULES.width * this.scale) / 2 + this.pan.x; this.y = (this.height - RULES.height * this.scale) / 2 + this.pan.y;
   }
   setZoom(zoom) { this.zoom = clamp(zoom, 1, 3); this.camera(); }
+  focusPoint(x, y, zoom = 2) {
+    this.setZoom(zoom);
+    this.pan.x = (RULES.width / 2 - x) * this.scale;
+    this.pan.y = (RULES.height / 2 - y) * this.scale;
+    this.camera();
+  }
   world(clientX, clientY) { const r = this.canvas.getBoundingClientRect(); return { x: (clientX - r.left - this.x) / this.scale, y: (clientY - r.top - this.y) / this.scale }; }
   backdrop(region) {
     if (region === this.region) return;
     this.region = region; const ctx = this.background.getContext('2d'); ctx.setTransform(2, 0, 0, 2, 0, 0);
-    const sky = ctx.createLinearGradient(0, 0, 0, 125); sky.addColorStop(0, '#779f9f'); sky.addColorStop(1, '#f4d39b');
+    const palettes = [
+      ['#779f9f', '#f4d39b', '#99a08a', '#7e9078', '#546d5b'],
+      ['#719b9b', '#d4d5a5', '#7e9a83', '#607c68', '#3c6354'],
+      ['#8e8e9d', '#ecc297', '#a69b91', '#90776b', '#6b544b'],
+      ['#a69b96', '#f3d5a2', '#b3a280', '#ad8c66', '#8c6e4c'],
+      ['#5d879c', '#e2eddf', '#aec8cf', '#8faab7', '#6f8b9a'],
+    ];
+    const colors = palettes[region];
+    const sky = ctx.createLinearGradient(0, 0, 0, 125); sky.addColorStop(0, colors[0]); sky.addColorStop(1, colors[1]);
     rect(ctx, 0, 0, 960, 600, '#46372f'); rect(ctx, 0, 0, 960, 125, sky); ellipse(ctx, 760, 38, 24, 24, '#ffecbc');
     for (let layer = 0; layer < 3; layer++) {
       ctx.beginPath(); ctx.moveTo(0, 125);
       for (let x = 0; x <= 960; x += 20) ctx.lineTo(x, 80 + layer * 12 + Math.sin(x / (100 - layer * 15) + layer) * 15);
-      ctx.lineTo(960, 125); ctx.fillStyle = ['#99a08a', '#7e9078', '#546d5b'][layer]; ctx.fill();
+      ctx.lineTo(960, 125); ctx.fillStyle = colors[layer + 2]; ctx.fill();
+    }
+    if (region === 1) for (let x = 75; x < 920; x += 85) {
+      rect(ctx, x - 2, 87, 4, 30, '#3c5646');
+      ctx.beginPath(); ctx.moveTo(x, 60); ctx.lineTo(x - 16, 103); ctx.lineTo(x + 16, 103); ctx.closePath(); ctx.fillStyle = '#456653'; ctx.fill();
+    }
+    if (region === 2 || region === 4) for (let x = 80; x < 960; x += 190) {
+      ctx.beginPath(); ctx.moveTo(x - 70, 118); ctx.lineTo(x, 42); ctx.lineTo(x + 85, 118); ctx.closePath(); ctx.fillStyle = colors[3]; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x - 16, 60); ctx.lineTo(x, 42); ctx.lineTo(x + 20, 60); ctx.lineTo(x + 5, 56); ctx.closePath(); ctx.fillStyle = region === 4 ? '#e9f0e8' : '#c9bba2'; ctx.fill();
+    }
+    if (region === 3) for (let x = 120; x < 900; x += 230) {
+      rect(ctx, x, 75, 65, 42, '#a07c56'); rect(ctx, x - 4, 72, 73, 7, '#c4a374');
+      line(ctx, [{ x: x + 90, y: 115 }, { x: x + 90, y: 93 }, { x: x + 86, y: 97 }], '#637057', 3);
     }
     for (let layer = 0; layer < 7; layer++) {
       ctx.beginPath(); ctx.moveTo(0, 120 + layer * 70);
@@ -42,6 +69,7 @@ export class EnterpriseRenderer {
     for (let i = 0; i < 500; i++) rect(ctx, i * 97.13 % 960, 125 + i * 67.31 % 475, 2, 1, '#f1ca8d22');
     rect(ctx, 0, 113, 960, 7, '#746c54'); rect(ctx, 0, 120, 960, 3, '#eac993');
     for (let x = 0; x < 960; x += 30) rect(ctx, x, 116, 13, 1, '#ddc79c80');
+    if (region === 4) rect(ctx, 0, 120, 960, 3, '#e0ece5');
   }
   draw(operation, view) {
     const ctx = this.ctx;
@@ -71,9 +99,11 @@ export class EnterpriseRenderer {
       const path = pathToRig(operation, node.id);
       if (path?.every(e => e.open && e.progress >= 1)) for (const edge of path) flowing.add(edge.id);
     }
+    const bottlenecks = new Set(networkDiagnostics(operation).limited);
     for (const edge of operation.edges) {
       const from = operation.nodes[edge.from], to = operation.nodes[edge.to], end = { x: from.x + (to.x - from.x) * edge.progress, y: from.y + (to.y - from.y) * edge.progress };
-      line(ctx, [from, end], '#293a31', 6 + edge.level * 3); line(ctx, [from, end], edge.open ? '#d9c79e' : '#8d8070', 2 + edge.level * 2);
+      line(ctx, [from, end], bottlenecks.has(edge.id) ? '#d87e45' : '#293a31', 6 + edge.level * 3); line(ctx, [from, end], edge.open ? '#d9c79e' : '#8d8070', 2 + edge.level * 2);
+      if (bottlenecks.has(edge.id)) label('!', (from.x + end.x) / 2 + 10, (from.y + end.y) / 2, '#ffd09e', 16);
       if (flowing.has(edge.id)) {
         const phase = (operation.elapsed * .55 + edge.id * .17) % 1;
         ellipse(ctx, end.x + (from.x - end.x) * phase, end.y + (from.y - end.y) * phase, 2.5, 2.5, '#ffe6a4');
@@ -123,7 +153,11 @@ export class EnterpriseRenderer {
       const p = view.preview;
       ctx.setLineDash([6 / this.scale, 4 / this.scale]);
       if (p.tool === 'scan') { ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.strokeStyle = '#fff0be'; ctx.lineWidth = 2 / this.scale; ctx.stroke(); }
-      else if (p.tool === 'pipe' && operation.nodes[p.source]) line(ctx, [operation.nodes[p.source], p], p.ok ? '#fff0be' : '#ffa88a', 2 / this.scale);
+      else if (p.tool === 'pipe' && operation.nodes[p.source]) {
+        const points = [operation.nodes[p.source], ...(p.route ? view.route : [p])];
+        line(ctx, points, p.ok ? '#fff0be' : '#ffa88a', 2 / this.scale);
+        for (const [i, point] of points.entries()) if (i) { ellipse(ctx, point.x, point.y, 4 / this.scale, 4 / this.scale, '#ffe2a0'); label(String(i), point.x + 9 / this.scale, point.y - 8 / this.scale); }
+      }
       else { ctx.beginPath(); ctx.arc(p.x, p.y, 14, 0, Math.PI * 2); ctx.strokeStyle = '#fff0be'; ctx.stroke(); }
       ctx.setLineDash([]);
     }

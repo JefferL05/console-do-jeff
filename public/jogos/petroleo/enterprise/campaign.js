@@ -17,7 +17,7 @@ export function createCampaign(seed = 2026, legacyResearch = null) {
   if (legacyResearch) for (const [oldKey, newKey] of [['scan', 'survey'], ['cargo', 'cargo'], ['tank', 'tank']]) {
     const value = legacyResearch[oldKey]; if (Number.isInteger(value) && value >= 0 && value <= 3) tech[newKey] = value;
   }
-  return { seed: seed >>> 0, season: 0, region: 0, cash: RULES.initialWealth, debt: 0, shares: 0, tech, rivals: createRivals(), plots: seasonPlots(seed, 0), auction: null, shareAuctionDone: false, leased: null, history: [], finished: false, difficulty: 'relaxed', legacyImported: !!legacyResearch };
+  return { seed: seed >>> 0, rules: 2, guide: true, season: 0, region: 0, cash: RULES.initialWealth, debt: 0, shares: 0, tech, rivals: createRivals(), plots: seasonPlots(seed, 0), auction: null, shareAuctionDone: false, leased: null, history: [], finished: false, difficulty: 'relaxed', legacyImported: !!legacyResearch };
 }
 export function researchCost(campaign, key) { const item = TECHNOLOGIES[key]; return item ? item.base * (campaign.tech[key] + 1) : Infinity; }
 export function buyTechnology(campaign, key) {
@@ -81,7 +81,7 @@ export function launchOperation(campaign) {
   if (plot.owner !== 'player' || plot.launched) return null;
   plot.launched = true;
   campaign.cash -= RULES.operationBudget;
-  return createOperation({ seed: plot.seed, region: campaign.region, tech: campaign.tech, difficulty: campaign.difficulty, season: campaign.season });
+  return createOperation({ seed: plot.seed, region: campaign.region, tech: campaign.tech, difficulty: campaign.difficulty, season: campaign.season, rules: campaign.rules ?? 1, guide: campaign.guide ?? false });
 }
 export function finishSeason(campaign, operation) {
   if (!operation?.ended || operation.settled || campaign.finished || operation.season !== campaign.season || campaign.leased === null || operation.seed !== campaign.plots[campaign.leased].seed) return false;

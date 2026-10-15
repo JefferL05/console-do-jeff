@@ -2,6 +2,7 @@ import { RULES, TECHNOLOGIES } from './config.js';
 import { generateField, blocked } from './exploration.js';
 import { seasonPlots } from './campaign.js';
 import { storedOil, transitOil } from './logistics.js';
+import { contractTerms, productiveReserves } from './progression.js';
 
 export const KEY = 'ouro-subsolo-enterprise-v3';
 export const VERSION = 3;
@@ -15,6 +16,7 @@ const techValid = tech => tech && Object.entries(TECHNOLOGIES).every(([k, v]) =>
 const ownerValid = owner => owner === null || owner === 'player' || integer(owner, 0, 2);
 
 export function validateCampaign(c) {
+  if (c && (c.rules !== undefined && !integer(c.rules, 1, 2) || c.guide !== undefined && !bool(c.guide))) return false;
   if (!c || !integer(c.seed, 0, 4294967295) || !integer(c.season, 0, RULES.seasons) || c.region !== Math.min(4, Math.floor(c.season / 2)) || !finite(c.cash, -1e7) || !finite(c.debt, 0, 1e7) || !integer(c.shares, 0, 50) || c.shares % 5 || !techValid(c.tech)) return false;
   if (!bool(c.finished) || c.finished !== (c.season === RULES.seasons) || !bool(c.shareAuctionDone) || !bool(c.legacyImported) || !['relaxed', 'enterprise'].includes(c.difficulty) || !(c.leased === null || integer(c.leased, 0, 3))) return false;
   if (!list(c.rivals, 3) || c.rivals.length !== 3 || !c.rivals.every(r => r && typeof r.name === 'string' && r.name.length < 80 && ['careful', 'expansion', 'speculator'].includes(r.style) && finite(r.cash) && finite(r.equipment) && finite(r.lastProfit, -1e7) && integer(r.shares, 0, 50) && r.shares % 5 === 0)) return false;
@@ -31,6 +33,7 @@ export function validateCampaign(c) {
   return list(c.history, RULES.seasons) && c.history.length === c.season && c.history.every((h, i) => h && h.season === i && h.region === Math.floor(i / 2) && integer(h.seed, 0, 4294967295) && finite(h.profit, -1e8) && integer(h.medals, 0, 3) && ['spilled', 'sold', 'bonus'].every(k => finite(h[k])));
 }
 export function validateOperation(o) {
+  if (o && (o.rules !== undefined && !integer(o.rules, 1, 2) || o.guide !== undefined && !bool(o.guide) || o.guideDismissed !== undefined && !bool(o.guideDismissed))) return false;
   if (!o || !integer(o.seed, 0, 4294967295) || !integer(o.region, 0, 4) || !integer(o.season, 0, RULES.seasons - 1) || !techValid(o.tech) || !['relaxed', 'enterprise'].includes(o.difficulty)) return false;
   if (o.duration !== RULES.duration || o.initialCash !== RULES.operationBudget || !finite(o.time, 0, o.duration) || !finite(o.elapsed, 0, o.duration) || !near(o.time + o.elapsed, o.duration) || !['paused', 'ended', 'settled'].every(k => bool(o[k])) || o.ended !== (o.time === 0) || (o.settled && !o.ended)) return false;
   if (!['expenses', 'revenue', 'bonuses', 'fines', 'extracted', 'sold', 'spilled', 'gasUsed'].every(k => finite(o[k])) || !finite(o.cash, -1e8) || !near(o.cash, o.initialCash + o.revenue + o.bonuses - o.expenses - o.fines) || !near(o.fines, o.spilled * RULES.finePerBarrel)) return false;
@@ -43,6 +46,7 @@ export function validateOperation(o) {
   if (!o.nodes.every((n, i) => point(n) && n.id === i && integer(n.rigId, 0, o.rigs.length - 1) && (n.pocketId === null || integer(n.pocketId, 0, o.pockets.length - 1) && o.pockets[n.pocketId].kind === 'oil' && o.pockets[n.pocketId].revealed && n.x === o.pockets[n.pocketId].x && n.y === o.pockets[n.pocketId].y))) return false;
   if (!o.edges.every((e, i) => e && e.id === i && integer(e.from, 0, o.nodes.length - 1) && integer(e.to, e.from + 1, o.nodes.length - 1) && o.nodes[e.from].rigId === o.nodes[e.to].rigId && finite(e.length, 12, 700) && near(e.length, Math.hypot(o.nodes[e.from].x - o.nodes[e.to].x, o.nodes[e.from].y - o.nodes[e.to].y)) && finite(e.progress, 0, 1) && integer(e.level, 0, 2) && bool(e.open) && !blocked(o, o.nodes[e.from], o.nodes[e.to]))) return false;
   const connected = new Set(), roots = new Set();
+  if (o.edges.some(e => e.flow !== undefined && !finite(e.flow, 0, RULES.pipeCapacity * (e.level + 1) + .002))) return false;
   for (const node of o.nodes) {
     const parents = o.edges.filter(e => e.to === node.id);
     if (parents.length > 1) return false;
@@ -64,8 +68,10 @@ export function validateOperation(o) {
   if (!o.prices || !o.gasBoost || !['west', 'east'].every(k => finite(o.prices[k], 3, 17) && finite(o.gasBoost[k], 0, 4)) || !integer(o.marketSecond, 0, 300) || !list(o.history, 30) || !o.history.every(h => h && ['west', 'east'].every(k => finite(h[k], 3, 17)))) return false;
   if (!list(o.surveys, 250) || !o.surveys.every(s => point(s) && finite(s.radius, 24, 130)) || !list(o.explorers, 24) || !o.explorers.every(e => point(e) && ['probe', 'prospector'].includes(e.tool) && finite(e.startY, 120, 580) && finite(e.age, 0, 12) && finite(e.duration, 1, 12) && finite(e.travelled, 0, 12))) return false;
   if (!list(o.markers, 20) || !o.markers.every(m => m && finite(m.x, 0, 960) && integer(m.pocketId, 0, o.pockets.length - 1) && o.pockets[m.pocketId].kind === 'oil')) return false;
-  if (!list(o.contracts, 2) || o.contracts.length !== 2 || !o.contracts.every((c, i) => c && c.id === i && c.side === ['west', 'east'][i] && c.volume === 100 + o.region * 20 && c.bonus === 300 + o.region * 70 && c.deadline === 180 && finite(c.delivered, 0, o.sold + .002) && ['offered', 'active', 'completed', 'expired'].includes(c.status) && (c.status !== 'completed' || c.delivered + 1e-8 >= c.volume))) return false;
+  const terms = contractTerms(o.region, o.rules);
+  if (!list(o.contracts, 2) || o.contracts.length !== 2 || !o.contracts.every((c, i) => c && c.id === i && c.side === ['west', 'east'][i] && c.volume === terms.volume && c.bonus === terms.bonus && c.deadline === 180 && finite(c.delivered, 0, o.sold + .002) && ['offered', 'active', 'completed', 'expired'].includes(c.status) && (c.status !== 'completed' || c.delivered + 1e-8 >= c.volume))) return false;
   if (!near(o.bonuses, o.contracts.filter(c => c.status === 'completed').reduce((n, c) => n + c.bonus, 0))) return false;
+  if (o.contracts.some(c => c.status === 'completed') && productiveReserves(o) < terms.wells) return false;
   if (!list(o.notices, 6) || !o.notices.every(s => typeof s === 'string' && s.length <= 500)) return false;
   const oil = o.pockets.filter(p => p.kind === 'oil').reduce((n, p) => n + p.amount, 0);
   const gas = o.pockets.filter(p => p.kind === 'gas').reduce((n, p) => n + p.initial - p.amount, 0);
@@ -78,6 +84,7 @@ export function decode(raw) {
     const data = JSON.parse(raw);
     if (data.version !== VERSION || !validateCampaign(data.campaign) || data.operation !== null && !validateOperation(data.operation)) return null;
     const o = data.operation, c = data.campaign;
+    if (o && !o.settled && (o.rules ?? 1) !== (c.rules ?? 1)) return null;
     if (o && !o.settled && (c.leased === null || !c.plots[c.leased].launched || o.seed !== c.plots[c.leased].seed || o.season !== c.season || o.region !== c.region || JSON.stringify(o.tech) !== JSON.stringify(c.tech) || o.difficulty !== c.difficulty)) return null;
     if (o?.settled && (!c.history.length || c.history.at(-1).seed !== o.seed || c.season !== o.season + 1)) return null;
     if (!o && c.plots.some(p => p.launched)) return null;

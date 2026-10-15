@@ -1,4 +1,5 @@
 import { notice } from './config.js';
+import { contractTerms, productiveReserves } from './progression.js';
 
 export function updateMarket(operation) {
   const t = operation.elapsed, phase = (operation.seed % 997) / 101;
@@ -27,7 +28,7 @@ export function deliver(operation, side, barrels) {
   operation.sold += barrels; operation.revenue += income; operation.cash += income;
   for (const c of operation.contracts) if (c.status === 'active' && c.side === side && operation.elapsed <= c.deadline + 1e-8) {
     c.delivered += barrels;
-    if (c.delivered + 1e-8 >= c.volume) {
+    if (c.delivered + 1e-8 >= c.volume && productiveReserves(operation) >= contractTerms(operation.region, operation.rules).wells) {
       c.status = 'completed'; operation.bonuses += c.bonus; operation.cash += c.bonus;
       notice(operation, `Contrato cumprido: +$ ${c.bonus}.`);
     }

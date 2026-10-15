@@ -14,6 +14,19 @@ Abra **Campanha empresarial** no menu do jogo, ou `/jogos/petroleo/campanha/`. A
 6. **Recursos avançados:** rocha, gelo, brocas especializadas, bolsas de gás e amostras raras. Linhas de gás exclusivas levam o recurso a um comprador, começam fechadas e levam tempo para construir. Uma bolsa aceita uma única linha; consumo finito, bônus limitado a $ 4/b e decaimento de $ 0,50/s após fechar. Amostras reveladas rendem $ 350 de patrimônio no balanço.
 7. **Competição:** três rivais determinísticos com prioridades diferentes, reservas financeiras, investimentos e resultados econômicos. Participações de 5% são disputadas uma vez por temporada; leilões ignorados ocorrem entre os rivais. Ao fim, maior participação vence; patrimônio líquido desempata. Os resultados dos rivais são modelados economicamente, não por operações simultâneas no campo.
 
+## Revisão de experiência e balanceamento
+
+- **Novas campanhas (`rules: 2`):** rivais aumentam suas valorações ao longo das temporadas e reagem à diferença de participações, respeitando seu caixa. Metas de lucro por região: $ 800, $ 1.800, $ 2.600, $ 3.400 e $ 4.200. Contratos pedem 100/320/420/500/560 barris e produção de pelo menos 1 barril em 1/2/2/3/3 reservas; bônus de $ 300/$ 650/$ 900/$ 1.150/$ 1.400. Saves antigos sem `rules` mantêm seus contratos, metas e valorações anteriores.
+- **Guia interativo:** acompanha descoberta, torre, tubo, perfuração e primeira entrega. O botão de orientação destaca o próximo controle e centraliza o campo sem comprar nada. Depois da primeira venda, explica metas no Vale, tanques/contratos na Bacia, gargalos na Serra, gás no Planalto e rotas no gelo. Pode ser dispensado por operação ou desativado para futuras operações na cidade.
+- **Diagnóstico:** tubos mostram vazão do último passo, capacidade e demanda conectada; trechos abaixo da demanda são destacados em laranja. Bombas mostram sua demanda e torres próximas de encher têm aviso. Veículos apresentam estimativa de entrega, espera por espaço e risco de ultrapassar o prazo. A estimativa não garante disponibilidade futura de carga ou espaço.
+- **Construção mobile:** opção de pré-visualizar até 16 segmentos, desfazer pontos e confirmar a rota inteira. A validação é atômica: rota inválida não cobra nem constrói parcialmente. A perfuração ocorre na sequência. A seleção de reservas pela lista amplia/centraliza a câmera; a confirmação fica próxima ao campo durante a rolagem no celular.
+- **Identidade:** cinco paletas e cenários com cedros, montanhas de cobre, mesetas e neve; cidade ganha construções a cada temporada. Rivais têm retratos vetoriais, comentários coerentes com sua estratégia e resultados anteriores. O balanço explica preço médio, perdas, capital investido e petróleo não entregue.
+- **Campanhas e saves:** três espaços independentes, exportação JSON, importação validada com confirmação do destino, horário do último salvamento e cópia válida anterior por espaço. Importações inválidas não alteram saves; corrupção do principal permite recuperar a cópia ou abrir outro espaço.
+
+### Comparação automatizada
+
+`check:campaign:balance` compara 20 sementes distribuídas pelo espaço uint32, duas políticas e dez temporadas por campanha: **400 temporadas**. A política inicial usa apenas a reserva indicada; a de expansão sonda uma grade fixa e constrói apenas em reservas reveladas. Na medição desta revisão, a inicial venceu 0/20 campanhas, com mediana de 20% das participações e 3.000 barris vendidos na campanha; a expansão venceu 20/20, com mediana de 50% e 27.575 barris. A expansão produziu uma vantagem material, mas ainda é muito forte sob execução automatizada: estes números não substituem testes com jogadores. Relatório em `artifacts/ouro-campaign-balance.json`.
+
 ## Modos de risco
 
 - **Tranquilo:** a torre cheia interrompe a extração.
@@ -41,6 +54,8 @@ Pausa permite planejar e construir sem avançar o tempo. Abrir ajuda ou confirma
 
 Envelope **versão 3**, chave `ouro-subsolo-enterprise-v3`. Campanha e operação são gravadas juntas em uma única string após decisões, a cada cinco segundos e na saída. Validação inclui terreno original, topologia, referências, capacidades, preços, contratos, leilões, limites tecnológicos e conservação de petróleo/gás/dinheiro. Saves retomam pausados. Corrupção abre recuperação e bloqueia sobrescrita automática; começar outra campanha exige confirmação. Falha de leitura permite sessão temporária com gravação bloqueada, preservando dados possivelmente existentes.
 
+O primeiro espaço conserva a chave original; os seguintes usam os sufixos `-slot-2` e `-slot-3`. Cada chave tem uma cópia `:backup`, substituída somente por um predecessor válido e diferente. Preferência de espaço ativo em `ouro-subsolo-enterprise-v3-active-slot`. Campos novos de regras, guia e vazão são opcionais na leitura, permitindo retomar o formato publicado anteriormente. Previews de rotas não entram no save.
+
 Na primeira campanha, pesquisas válidas de tanque, carga e sondagem do envelope v2 da partida rápida são importadas para tecnologias equivalentes. O save v2 original permanece intacto. A campanha tem armazenamento e progresso próprios; não converte uma operação rápida em uma rede empresarial no meio da partida.
 
 O pacote YouTube Playables permanece com a entrada de operações rápidas e seu armazenamento pelo SDK. O link web da campanha é removido no empacotamento; esta campanha usa armazenamento local no site.
@@ -63,6 +78,9 @@ Código em `public/jogos/petroleo/enterprise/`:
 | `persistence.js` | Envelope v3 e validação sem dependência do DOM |
 | `renderer.js` | Canvas, câmera, animação e cache |
 | `app.js` | Navegação, controles, ciclo de vida e apresentação |
+| `progression.js` | Metas/contratos por versão de regras e passos do guia |
+| `diagnostics.js` | Gargalos, tempo estimado de entrega e recomendações do balanço |
+| `storage.js` | Espaços independentes, cópias válidas e importação/exportação |
 
 Página: `src/pages/jogos/petroleo/campanha.astro`.
 
@@ -70,6 +88,8 @@ Página: `src/pages/jogos/petroleo/campanha.astro`.
 
 ```powershell
 npm.cmd run check:campaign
+npm.cmd run check:improvements
+npm.cmd run check:campaign:balance
 npm.cmd run check:game
 npm.cmd run check:playables
 npm.cmd run lint
@@ -85,6 +105,7 @@ $env:PLAYWRIGHT_MODULE='C:\caminho\playwright\index.mjs'
 $env:BROWSER_EXECUTABLE='C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
 $env:OURO_SCREENSHOTS='C:\caminho\capturas'
 npm.cmd run check:campaign:browser
+npm.cmd run check:improvements:browser
 ```
 
 A suíte pura cobre 500 terrenos, curvas e gargalos, pausas, transporte, contratos, gás, corrupção de saves, campanhas de dez temporadas e 30 operações completas. A suíte de navegador cobre entrada, construção por toque, primeira entrega, recarga, atribuição da frota, zoom, teclado, balanço, retorno à cidade, importação v2 e recuperação de armazenamento. O balanceamento ainda deve ser refinado com partidas humanas; testes determinísticos verificam regras e viabilidade, não diversão.

@@ -36,6 +36,34 @@ export function buildPipe(operation, fromId, x, y) {
   operation.edges.push({ id: operation.edges.length, from: fromId, to: node.id, length: q.length, progress: 0, level: 0, open: true });
   return { ok: true, nodeId: node.id, message: 'Perfuração iniciada. O fluxo dependerá de todos os trechos até a torre.' };
 }
+export function routeQuote(operation, fromId, points) {
+  if (!Array.isArray(points) || !points.length || points.length > 16) return { ok: false, cost: 0, message: 'Trace de 1 a 16 segmentos.' };
+  const draft = structuredClone(operation), segments = [];
+  let source = fromId, cost = 0;
+  for (const point of points) {
+    if (!point) return { ok: false, cost: 0, message: 'Ponto inválido.' };
+    const q = pipeQuote(draft, source, point.x, point.y);
+    if (!q.ok) return { ...q, ok: false, message: `Trecho ${segments.length + 1}: ${q.message}` };
+    segments.push(q); cost += q.cost;
+    const result = buildPipe(draft, source, q.x, q.y); source = result.nodeId;
+    // Preview the next segment as if its parent were finished. No live state
+    // changes, and real construction below still waits for the preceding edge.
+    draft.edges.at(-1).progress = 1;
+  }
+  const seconds = segments.reduce((sum, q) => sum + q.length / (RULES.pipeSpeed * (1 + operation.tech.drill * .25)), 0);
+  return { ok: true, cost, segments, seconds, message: `${segments.length} trecho(s) · ${Math.ceil(seconds)} s de construção sequencial. Desfaça pontos ou confirme a rota inteira.` };
+}
+export function buildRoute(operation, fromId, points) {
+  const q = routeQuote(operation, fromId, points);
+  if (!q.ok || !pay(operation, q.cost)) return { ...q, ok: false };
+  let source = fromId;
+  for (const segment of q.segments) {
+    const node = { id: operation.nodes.length, x: segment.x, y: segment.y, rigId: operation.nodes[source].rigId, pocketId: segment.pocketId };
+    operation.nodes.push(node);
+    operation.edges.push({ id: operation.edges.length, from: source, to: node.id, length: segment.length, progress: 0, level: 0, open: true }); source = node.id;
+  }
+  return { ok: true, nodeId: source, message: 'Rota comprada. Cada trecho será perfurado após o anterior.' };
+}
 export function upgradePipe(operation, edgeId) {
   const edge = operation.edges[edgeId];
   if (!edge || edge.level >= 2 || !pay(operation, 100 * (edge.level + 1))) return false;
@@ -57,7 +85,11 @@ export function pathToRig(operation, nodeId) {
   return null;
 }
 export function stepPipes(operation, dt) {
-  for (const edge of operation.edges) edge.progress = Math.min(1, edge.progress + dt * RULES.pipeSpeed * (1 + operation.tech.drill * .25) / edge.length);
+  for (const edge of operation.edges) {
+    const parent = operation.edges.find(e => e.to === edge.from);
+    if (!parent || parent.progress >= 1) edge.progress = Math.min(1, edge.progress + dt * RULES.pipeSpeed * (1 + operation.tech.drill * .25) / edge.length);
+    edge.flow = 0;
+  }
   const available = operation.edges.map(e => e.progress >= 1 && e.open ? RULES.pipeCapacity * (e.level + 1) * dt : 0);
   const rigBudget = operation.rigs.map(r => (RULES.rigRate + r.level * 2) * dt);
   const connected = operation.nodes.filter(n => n.pocketId !== null);
@@ -72,7 +104,7 @@ export function stepPipes(operation, dt) {
     const room = Math.max(0, rig.capacity - rig.storage);
     if (operation.difficulty === 'relaxed' || rig.fullTime < 3) amount = Math.min(amount, room);
     if (amount <= 0) continue;
-    for (const edge of path) available[edge.id] -= amount;
+    for (const edge of path) { available[edge.id] -= amount; edge.flow += amount / dt; }
     rigBudget[rig.id] -= amount;
     pocket.amount -= amount; operation.extracted += amount;
     const stored = Math.min(room, amount), lost = amount - stored;
