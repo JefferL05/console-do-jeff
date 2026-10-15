@@ -25,6 +25,10 @@ Produção: `npm.cmd run build`. Prévia: `npm.cmd run preview -- --host 0.0.0.0
 
 As ações funcionam com toque, mouse ou teclado. Com o campo focado: setas movem a mira, Enter seleciona, Escape cancela e Espaço pausa. Tab acessa os controles HTML. Pausa também oferece ajuda, som, reinício e concessões.
 
+### Direção visual
+
+O campo usa uma paleta de pôr do sol, montanhas em três planos e camadas de sedimento texturizadas. Depósitos, tanque com visor de nível, torres treliçadas e caminhões-tanque são desenhados localmente no Canvas, sem imagens externas. As torres animam o mecanismo durante perfuração/extração e os veículos em viagem deixam poeira leve. As animações usam o relógio da simulação, param com a pausa e respeitam `prefers-reduced-motion`. O cenário estático permanece em cache; os painéis usam verde-petróleo, detalhes em latão e seleção dourada.
+
 ### Música e efeitos
 
 A trilha original country/folk tem melodia de cordas dedilhadas sintetizadas, baixo alternado e percussão a 120 BPM. O loop de 32 segundos é gerado localmente com Web Audio, sem downloads ou temporizadores de agendamento. Começa ao iniciar/continuar uma partida e para durante pausas e menus. No menu **Ⅱ**, os botões **Música** e **Efeitos sonoros** são independentes e suas preferências ficam salvas. O mute do YouTube sempre prevalece. Saves antigos continuam válidos, com música habilitada por padrão após o primeiro gesto do jogador.
