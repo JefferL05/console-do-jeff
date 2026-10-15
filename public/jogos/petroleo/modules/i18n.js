@@ -2,6 +2,20 @@
 // save data, identifiers, physics and seeds are independent of the locale.
 let language = 'pt-BR';
 export const EN_MESSAGES = {
+  'Ver metas e medalhas': 'View goals and medals', 'Metas': 'Goals',
+  'PLANO DA EXPEDIÇÃO': 'EXPEDITION PLAN', 'Cada meta, uma conquista.': 'Every goal, an achievement.',
+  'As medalhas são calculadas no encerramento. Compras e novas extrações podem mudar seu progresso.': 'Medals are calculated at the end. Purchases and new extraction can change your progress.',
+  'Venda eficiente': 'Efficient sales', 'Meta de lucro': 'Profit goal', 'Meta de vendas': 'Sales goal', 'Meta de extração': 'Extraction goal',
+  'Venda 85% do extraído, com mínimo de 50 barris.': 'Sell 85% of extracted oil, with at least 50 barrels sold.',
+  'Extraia 40% do petróleo do terreno.': 'Extract 40% of the field’s oil.',
+  'Recompensa no ritmo atual:': 'Reward at current progress:', ' fichas. Uma por conclusão e uma por medalha.': ' tokens. One for finishing and one per medal.',
+  'Concluir libera a próxima concessão. Use as fichas na oficina para melhorar suas próximas operações.': 'Finishing unlocks the next concession. Spend tokens in the workshop to improve future operations.',
+  'Todas as reservas foram descobertas.': 'All reserves have been discovered.',
+  'Pista da última sondagem:': 'Last survey clue:', 'à esquerda': 'to the left', 'à direita': 'to the right', 'mais acima': 'higher up', 'mais abaixo': 'deeper down',
+  'Revela a área e indica a direção de reservas ainda ocultas.': 'Reveals the area and points toward hidden reserves.',
+  'Perfuração:': 'Drilling:', 'Equilíbrio:': 'Break-even:', ' b ao preço atual.': ' b at the current price.',
+  'Sem tempo para entregar a nova extração.': 'No time to deliver newly extracted oil.',
+  'A frota limita o escoamento.': 'The fleet limits deliveries.', 'Preço e logística afetam o retorno.': 'Price and logistics affect returns.',
   'Ouro do Subsolo': 'Subsoil Gold',
   'UMA FORTUNA A DESCOBRIR': 'A FORTUNE TO DISCOVER',
   'Pausar e abrir menu': 'Pause and open menu',

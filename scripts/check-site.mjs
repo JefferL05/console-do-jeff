@@ -11,7 +11,10 @@ const failures = [];
 for (const page of pages) {
   const html = read(page);
   const isGame = page.replaceAll('\\', '/') === 'jogos/petroleo/index.html';
-  if (isGame) {
+  const isCampaign = page.replaceAll('\\', '/') === 'jogos/petroleo/campanha/index.html';
+  if (isCampaign) {
+    assert.ok(html.includes('id="enterprise-canvas"') && html.includes(`${base}jogos/petroleo/enterprise/app.js`), `Entrada da campanha ausente: ${page}`);
+  } else if (isGame) {
     assert.ok(html.includes('id="game"') && html.includes(`${base}jogos/petroleo/boot.js`), `Entrada do jogo ausente: ${page}`);
   } else {
     assert.ok(html.includes('id="search-input"'), `Busca ausente: ${page}`);

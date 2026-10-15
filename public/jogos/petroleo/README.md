@@ -1,5 +1,9 @@
 # Ouro do Subsolo — mobile-first
 
+## Campanha empresarial
+
+O menu inicial também abre a campanha em `/jogos/petroleo/campanha/`: dez temporadas, cinco regiões, exploração por scanner/prospector/sonda, rede por segmentos com vazão compartilhada, transporte entre torres e tanques, contratos, gás, leilões, banco e três rivais. Guia completo, arquitetura e salvamento v3 em [`docs/ouro-campanha.md`](../../../docs/ouro-campanha.md). Verificação: `npm.cmd run check:campaign`.
+
 Jogo original de exploração, logística e negociação em JavaScript + Canvas 2D, integrado ao Astro em `/jogos/petroleo/`. Versão do site em português, recursos gráficos e sons gerados localmente. O pacote separado para YouTube Playables inclui o SDK oficial e interfaces em português/inglês, selecionadas pela API de idioma do YouTube.
 
 ## Executar
@@ -33,7 +37,14 @@ O campo usa uma paleta de pôr do sol, montanhas em três planos e camadas de se
 
 A trilha original country/folk tem melodia de cordas dedilhadas sintetizadas, baixo alternado e percussão a 120 BPM. O loop de 32 segundos é gerado localmente com Web Audio, sem downloads ou temporizadores de agendamento. Começa ao iniciar/continuar uma partida e para durante pausas e menus. No menu **Ⅱ**, os botões **Música** e **Efeitos sonoros** são independentes e suas preferências ficam salvas. O mute do YouTube sempre prevalece. Saves antigos continuam válidos, com música habilitada por padrão após o primeiro gesto do jogador.
 
-### Logística e economia
+### Planejamento da operação
+
+- Cada sondagem paga passa a indicar a direção da reserva ainda oculta mais próxima. A pista aparece ao usar Explorar sem uma prévia ativa, persiste ao retomar a partida e não revela coordenadas, volume ou reservas adicionais.
+- A prévia de perfuração mostra duração estimada e quantos barris precisam ser vendidos para cobrir **somente o custo desse tubo**, ao preço atual do comprador selecionado (ou o melhor preço atual ao Guardar). Não é promessa de lucro: sondagens, melhorias, variação de preços e logística também afetam o resultado. Há avisos de frota insuficiente e de prazo curto.
+- Nos últimos instantes, veículos carregando saem com carga parcial para ainda completar a viagem. Veículos ociosos não retiram estoque quando já não há tempo de entrega. Guardar continua impedindo novos carregamentos.
+- O botão **Metas**, no campo, pausa a operação e mostra os três objetivos, o progresso e as fichas projetadas. As medalhas só são concedidas ao terminar: gastar capital ou extrair sem vender pode reduzir o progresso atual.
+
+### Regras econômicas
 
 - Capital inicial de $ 1.500. Custos e taxas centralizados em `modules/config.js`.
 - Sondagem: $ 80. Poço: $ 200 + $ 1,80 por unidade de trajeto. Ramificação: $ 90 + trajeto.
@@ -93,7 +104,7 @@ npm.cmd run check:balance
 npm.cmd run build
 ```
 
-`scripts/check-petroleo.mjs`: 14 suítes, incluindo 3.000 terrenos, prévias gratuitas, custos, primeira entrega do tutorial, preço/destino na entrega, tanque cheio, ramificações, rochas, pausa, persistência corrompida, partidas completas, progressão e transformação de coordenadas após mudança de tamanho.
+`scripts/check-petroleo.mjs`: 20 suítes, incluindo 3.000 terrenos, prévias gratuitas, pistas de sondagem, estimativas de perfuração, últimas entregas, metas dinâmicas, custos, primeira entrega do tutorial, preço/destino na entrega, tanque cheio, ramificações, rochas, pausa, persistência corrompida, partidas completas, progressão, pressão geológica, controle Xbox e transformação de coordenadas após mudança de tamanho.
 
 ### Navegador (opcional)
 
@@ -132,6 +143,6 @@ Os 11 testes de contrato em `scripts/check-petroleo-platform.mjs` e o teste de n
 
 `check:balance` executa 480 partidas com 40 sementes espalhadas pelo espaço de uint32, dois modos, três perfis e duas políticas. A política inicial usa um poço; a de expansão explora somente áreas reveladas e compra ramificações/frota. Ambas recebem a mesma pista inicial do tutorial. Relatório completo: `artifacts/ouro-balance.json`.
 
-Na revisão atual, as políticas concluíram todas as partidas com lucro; primeira entrega em até 10 segundos de simulação. No modo rápido, a mediana de lucro com um poço foi $ 812; expandindo, foi $ 4.779 no Vale, $ 4.386 na Bacia e $ 3.561 na Serra. O modo clássico permite esgotar o terreno com a política de expansão: o próximo ajuste deve ser guiado por jogadores reais, antes de tornar os objetivos mais exigentes. Essas simulações não medem dificuldade humana, retenção ou diversão.
+Na revisão de jogabilidade, as políticas concluíram todas as partidas com lucro; primeira entrega em até 10 segundos de simulação. No modo rápido, a mediana de lucro com um poço foi $ 799; expandindo, foi $ 5.074 no Vale, $ 4.587 na Bacia e $ 3.967 na Serra. O modo clássico permite esgotar o terreno com a política de expansão: o próximo ajuste deve ser guiado por jogadores reais, antes de tornar os objetivos mais exigentes. Essas simulações não medem dificuldade humana, retenção ou diversão.
 
 Validações ainda necessárias: suíte oficial, sessões em Android/iOS reais (áreas seguras e interrupções), bateria/desempenho prolongado, áudio no Safari, leitores de tela e balanceamento com jogadores. A exploração espacial no Canvas ainda depende de visão. O escopo usa logística simplificada e três concessões curtas; não inclui adversários ou multiplayer.

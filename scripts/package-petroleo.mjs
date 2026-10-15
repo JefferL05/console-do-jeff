@@ -6,6 +6,9 @@ const output = resolve('artifacts/ouro-playables');
 await rm(output, { recursive: true, force: true });
 await mkdir(join(output, 'modules'), { recursive: true });
 let html = await readFile('dist/jogos/petroleo/index.html', 'utf8');
+// The browser campaign uses its own local save. It is not part of the hosted
+// single-operation Playables entry, whose SDK remains the only storage backend.
+html = html.replace(/<a\s+data-web-only(?:="[^"]*")?[^>]*>[\s\S]*?<\/a>/g, '');
 html = html.replace('<html ', '<html data-platform="youtube" ')
   .replace('<head>', '<head><script src="https://www.youtube.com/game_api/v1"></script>')
   .replace(/(href|src)="[^"]*\/jogos\/petroleo\/([^"]+)"/g, '$1="./$2"');

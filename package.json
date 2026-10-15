@@ -16,6 +16,8 @@
     "check:game": "node scripts/check-petroleo.mjs",
     "check:playables": "node scripts/check-petroleo-platform.mjs",
     "check:balance": "node scripts/balance-petroleo.mjs",
+    "check:campaign": "node scripts/check-petroleo-campaign.mjs",
+    "check:campaign:browser": "node scripts/check-petroleo-campaign-browser.mjs",
     "build:playables": "npm run build && node scripts/package-petroleo.mjs"
   },
   "dependencies": {

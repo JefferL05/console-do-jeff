@@ -43,6 +43,12 @@ try {
     await page.goto(base); await page.locator('#start').tap();
     await page.waitForFunction(() => !document.getElementById('home').open);
     await layout(page, `${width}×${height}`);
+    await page.locator('#objectives').tap();
+    assert.equal(await page.locator('#objectives-dialog').evaluate(node => node.open), true);
+    const goalSave = await saved(page); assert.equal(goalSave.game.paused, true);
+    assert.match(await page.locator('#goal-sales-detail').textContent(), /50/);
+    await page.locator('#close-objectives').tap();
+    assert.equal((await saved(page)).game.paused, false);
     const original = await saved(page), pocket = original.game.pockets[0];
     if (width === 360) {
       const cdp = await context.newCDPSession(page), p = await fieldPoint(page, pocket);
@@ -62,6 +68,8 @@ try {
     await page.locator('#cancel').tap(); assert.equal(await page.locator('#confirm').isVisible(), false); assert.equal((await saved(page)).game.cash, 1500);
     await tapField(page, pocket); await page.locator('#confirm').tap(); assert.equal((await saved(page)).game.cash, 1420);
     await page.locator('#drill').tap(); await tapField(page, pocket);
+    assert.match(await page.locator('#selection-detail').textContent(), /Equilíbrio:/);
+    await layout(page, `${width}×${height} drilling estimate`);
     await page.locator('#confirm').tap(); assert.equal((await saved(page)).game.wells.length, 1);
     await page.waitForFunction(() => window.ouroDiagnostics?.fps > 0);
     await page.screenshot({ path: resolve(output, `ouro-${width}x${height}.png`) });

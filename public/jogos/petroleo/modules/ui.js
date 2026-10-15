@@ -1,5 +1,5 @@
 import { CONFIG, PROFILES, RESEARCH, money } from './config.js';
-import { inTransit, metrics, pocketExtractionRate, transportRate, upgradeQuote, wellRate } from './simulation.js';
+import { drillEconomics, inTransit, metrics, objectives, pocketExtractionRate, surveyHint, transportRate, upgradeQuote, wellRate } from './simulation.js';
 import { t, number } from './i18n.js';
 
 export const $ = id => document.getElementById(id);
@@ -9,6 +9,15 @@ export function message(value) { text('toast', value); }
 
 export function updateHUD(game, view) {
   text('cash', money(game.cash));
+  const goals = objectives(game), stars = goals.filter(goal => goal.earned).length;
+  text('objectives', `${'★'.repeat(stars)}${'☆'.repeat(3 - stars)} · Metas`);
+  for (const goal of goals) {
+    const bar = $(`goal-${goal.id}`);
+    bar.max = goal.target; bar.value = Math.max(0, goal.current);
+    const format = goal.id === 'profit' ? money : value => `${number(value, 1)} b`;
+    text(`goal-${goal.id}-detail`, `${goal.earned ? '✓' : '○'} ${format(goal.current)} / ${format(goal.target)}`);
+  }
+  text('goal-reward', `Recompensa no ritmo atual: ${1 + stars} fichas. Uma por conclusão e uma por medalha.`);
   const seconds = Math.ceil(game.time);
   text('time', `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`);
   text('storage', `${Math.floor(game.storage)}/${game.capacity}`);
@@ -36,7 +45,9 @@ export function updateHUD(game, view) {
   $('cancel').hidden = (!preview && view.parentId === null && view.selectedPocket === null) || game.ended;
   if (preview) {
     text('selection-title', preview.type === 'scan' ? `Sondagem · ${money(preview.cost)}` : `${preview.parentId === null ? 'Novo poço' : 'Ramificação'} · ${money(preview.cost)}`);
-    text('selection-detail', preview.reason || (preview.type === 'scan' ? 'A área marcada será revelada.' : 'Custo total. Confirme para iniciar a perfuração.'));
+    const estimate = drillEconomics(game, preview);
+    const economics = estimate ? `Perfuração: ${Math.ceil(estimate.drillSeconds)} s · Equilíbrio: ${estimate.breakEvenBarrels} b ao preço atual. ${estimate.tooLate ? '⚠ Sem tempo para entregar a nova extração.' : estimate.fleetLimited ? 'A frota limita o escoamento.' : 'Preço e logística afetam o retorno.'}` : '';
+    text('selection-detail', preview.reason || (preview.type === 'scan' ? 'Revela a área e indica a direção de reservas ainda ocultas.' : economics));
     $('confirm').disabled = !preview.valid; text('confirm', 'Confirmar');
   } else if (view.selectedPocket !== null) {
     const p = game.pockets[view.selectedPocket], well = game.wells.find(w => w.pocketId === p.id);
@@ -48,7 +59,7 @@ export function updateHUD(game, view) {
     text('selection-detail', game.ended ? detail : `${detail} ${depthInfo}`);
   } else {
     text('selection-title', game.ended ? 'O que ficou para a próxima história?' : 'Planeje antes de investir.');
-    text('selection-detail', game.ended ? 'Abra o menu para rever o resultado.' : view.tool === 'scan' ? 'Toque no subsolo. Confira a área e confirme.' : 'Toque no petróleo. Confira o custo e confirme.');
+    text('selection-detail', game.ended ? 'Abra o menu para rever o resultado.' : view.tool === 'scan' ? surveyHint(game) || 'Toque no subsolo. Confira a área e confirme.' : 'Toque no petróleo. Confira o custo e confirme.');
   }
 }
 

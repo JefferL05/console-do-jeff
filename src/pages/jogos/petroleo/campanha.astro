@@ -1,0 +1,62 @@
+---
+const base = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/jogos/petroleo`;
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#102621" />
+    <title>Campanha empresarial — Ouro do Subsolo</title>
+    <meta name="description" content="Construa sua rede petrolífera, negocie terrenos, gerencie a frota e dispute a cidade em dez temporadas." />
+    <link rel="stylesheet" href={`${base}/enterprise/style.css`} />
+  </head>
+  <body>
+    <header class="masthead"><a href={`${base}/`} class="brand">◆ <span>Ouro do Subsolo<small>CAMPANHA EMPRESARIAL</small></span></a><div class="header-actions"><button id="manual-button">Como jogar</button><button id="new-button">Nova campanha</button></div></header>
+    <p id="save-state" class="save-state" role="status">Preparando campanha…</p>
+    <main>
+      <section id="town" aria-labelledby="town-title">
+        <div class="town-hero"><span class="eyebrow" id="season-label">TEMPORADA 01 / 10</span><h1 id="town-title">Uma cidade.<br />Sua próxima conquista.</h1><p id="region-tip"></p><div class="town-sky" aria-hidden="true">◆ ┃ ▰ ┃ ◆</div></div>
+        <div class="ledger"><div><span>PATRIMÔNIO DISPONÍVEL</span><strong id="wealth"></strong></div><div><span>DÍVIDA</span><strong id="debt"></strong></div><div><span>PARTICIPAÇÃO NA CIDADE</span><strong id="shares"></strong></div></div>
+        <p id="town-message" class="callout" role="status">Reserve capital para operar: cada expedição recebe $ 2.400 do seu patrimônio.</p>
+        <div id="final-campaign" class="card" hidden><h2 id="winner"></h2><p>Vence quem tem mais participações. O patrimônio líquido desempata.</p></div>
+        <div class="town-grid">
+          <section class="card"><span class="eyebrow">PREFEITURA</span><h2>Escolha sua concessão</h2><p>Os indícios são aproximados. Lances preservam $ 2.400 para a operação. O lote municipal oferece arrendamento direto por $ 300.</p><div id="plots" class="plots"></div>
+            <div id="auction" class="auction" hidden><h3 id="auction-title"></h3><p id="auction-detail"></p><div class="button-row"><button id="bid" class="primary">Dar lance +$ 100</button><button id="finish-auction">Encerrar / passar</button></div></div>
+            <label class="difficulty">Operação <select id="difficulty"><option value="relaxed">Tranquila — torre cheia para de extrair</option><option value="enterprise">Empresarial — derramamentos e multas</option></select></label>
+            <button id="launch" class="primary wide" disabled>Arrende um terreno para começar</button>
+          </section>
+          <section class="card"><span class="eyebrow">OFICINA</span><h2>Invista na próxima temporada</h2><p>Melhorias permanentes, disponíveis antes de arrendar o terreno.</p><div id="technologies" class="item-list"></div></section>
+          <section class="card"><span class="eyebrow">BOLSA DA CIDADE</span><h2>Uma disputa de longo prazo</h2><p>Um lote de 5% é leiloado a cada temporada. Se você não participar, os rivais disputam esse lote ao final da operação.</p><button id="shares-auction" class="wide">Abrir leilão de 5%</button><div id="rivals" class="item-list"></div></section>
+          <section class="card"><span class="eyebrow">BANCO E HISTÓRICO</span><h2>Mantenha uma reserva</h2><p>Empréstimos em parcelas de $ 1.000, até $ 5.000 de principal disponível. A dívida restante recebe 5% de juros no fim de cada temporada.</p><div class="button-row"><button id="borrow">Emprestar $ 1.000</button><button id="repay">Amortizar até $ 1.000</button></div><div id="season-history" class="item-list"></div></section>
+        </div>
+      </section>
+      <section id="operation" aria-label="Operação petrolífera" hidden>
+        <div class="operation-header"><div><span class="eyebrow" id="operation-region"></span><h1>Campo em operação</h1></div><div class="button-row"><button id="pause-operation">Ⅱ Pausar</button><button id="end-operation">Encerrar operação</button></div></div>
+        <div class="ledger operation-ledger"><div><span>CAPITAL</span><strong id="operation-cash"></strong></div><div><span>PRAZO</span><strong id="operation-time"></strong></div><div><span>VENDIDO / EXTRAÍDO</span><strong id="operation-oil"></strong></div><div><span>DERRAMADO</span><strong id="operation-loss"></strong></div></div>
+        <div class="field-layout">
+          <div class="field-column"><div class="field"><canvas id="enterprise-canvas" tabindex="0" aria-label="Campo de petróleo. Setas movem a mira, Enter seleciona e Escape cancela. Amplie e arraste para navegar. As listas abaixo também permitem selecionar reservas e conexões."></canvas><div class="camera-tools"><button id="zoom-out" aria-label="Reduzir zoom">−</button><span id="zoom-level">1×</span><button id="zoom-in" aria-label="Ampliar zoom">+</button></div><div id="paused-label" class="paused-label" hidden>Ⅱ PAUSADO · planeje sua operação</div></div>
+            <p id="operation-notice" class="callout" role="status"></p>
+            <div class="preview-bar"><div><strong id="preview-title">Explore o marcador inicial.</strong><p id="preview-detail">Escolha uma ferramenta e toque no campo. Use + para ampliar e arraste para navegar.</p></div><button id="confirm-action" class="primary" hidden>Confirmar</button><button id="cancel-action" hidden>Cancelar</button></div>
+          </div>
+          <aside class="operation-controls" aria-label="Painel da operação">
+            <nav class="panel-tabs" aria-label="Sistemas da operação"><button data-panel="explore" aria-pressed="true">Explorar</button><button data-panel="network" aria-pressed="false">Rede</button><button data-panel="fleet" aria-pressed="false">Frota</button><button data-panel="market" aria-pressed="false">Mercado</button><button data-panel="gas" aria-pressed="false">Gás</button><button data-panel="goals" aria-pressed="false">Metas</button></nav>
+            <section id="panel-explore" class="panel"><h2>Encontre sua oportunidade</h2><div class="tool-list"><button data-tool="scan" aria-pressed="true">◎ Scanner</button><button data-tool="prospector" aria-pressed="false">⚑ Prospector · $ 70</button><button data-tool="probe" aria-pressed="false">↓ Sonda · $ 110</button></div><label>Raio do scanner <input id="scan-radius" type="range" min="35" max="130" value="70" step="5" /><span id="scan-price"></span></label><p>Prospector marca uma posição aproximada; sonda revela seu trajeto. O scanner é imediato. Confirme a compra no campo.</p><div id="discoveries" class="item-list"></div></section>
+            <section id="panel-network" class="panel" hidden><h2>Construa uma rede eficiente</h2><div class="tool-list"><button data-tool="rig">Torre · $ 220</button><button data-tool="pipe">Tubo por segmento</button><button data-tool="tank">Tanque · $ 300</button></div><label>Origem do próximo tubo<select id="pipe-source"><option value="">Instale uma torre</option></select></label><p>Selecione a origem e toque no destino. Faça curvas com junções. Cruzes não conectam tubos; todos os trechos até a torre compartilham capacidade.</p><div id="network-list" class="item-list"></div></section>
+            <section id="panel-fleet" class="panel" hidden><h2>Distribua seu transporte</h2><p>Oeste/Leste: buscam petróleo em torres ou tanques. Guardar: leva das torres aos tanques. Uma nova ordem vale para a próxima carga.</p><button id="buy-truck" class="primary wide"></button><div id="fleet-list" class="item-list"></div></section>
+            <section id="panel-market" class="panel" hidden><h2>Venda no momento certo</h2><div id="market-list" class="item-list"></div><p>As tendências refletem preços passados. Você recebe o preço vigente na entrega.</p><h3>Contratos de entrega</h3><p>Um contrato ativo por vez. Sem multa por expiração; apenas entregas após aceitar contam.</p><div id="contract-list" class="item-list"></div></section>
+            <section id="panel-gas" class="panel" hidden><h2>Prepare a janela de venda</h2><p>Instale uma linha exclusiva de gás e abra a válvula quando as cargas estiverem a caminho. O gás é finito, o bônus máximo é $ 4/b e decai após fechar.</p><label>Comprador da linha<select id="gas-side"><option value="west">Oeste</option><option value="east">Leste</option></select></label><button data-tool="gas" class="wide">Selecionar bolsa no campo</button><div id="gas-list" class="item-list"></div></section>
+            <section id="panel-goals" class="panel" hidden><h2>Objetivos da temporada</h2><div id="goals-list" class="item-list"></div><p>Cada medalha vale $ 100 de patrimônio; amostras raras valem $ 350. O cálculo é feito ao encerrar a operação.</p></section>
+          </aside>
+        </div>
+      </section>
+    </main>
+    <dialog id="manual"><span class="eyebrow">MANUAL DO EMPRESÁRIO</span><h2>Da primeira sondagem à prefeitura</h2><ol><li>Na cidade, compre tecnologias antes de arrendar. Reserve $ 2.400 para operar. Você começa com um veículo.</li><li>Pesquise perto da bandeira com Scanner. Prospector e sonda levam tempo e revelam informações diferentes.</li><li>Instale uma torre na superfície. Selecione sua origem e construa segmentos até uma reserva revelada. Confirme cada compra.</li><li>Os tubos de uma ramificação compartilham os trechos anteriores. Amplie o gargalo ou feche válvulas para distribuir vazão.</li><li>Designe veículos em Frota. Vendas chegam ao caixa na entrega. Guardar exige tanque; mudar a ordem preserva a carga iniciada.</li><li>Em modo empresarial, uma torre cheia dá três segundos de aviso antes de derramar. Cada barril perdido custa $ 3 de multa. Feche uma válvula ou reforce a frota.</li><li>Contratos contam apenas novas entregas. Gás usa linhas exclusivas e só é consumido com a válvula aberta.</li><li>No prazo final, estoque e cargas não entregues não rendem dinheiro. Encerrar antes confirma esse mesmo balanço.</li><li>Dez temporadas atravessam cinco regiões. Participe dos leilões de 5% da cidade: vence a maior participação, com patrimônio líquido como desempate.</li></ol><p>Teclado: setas e Enter no campo; Escape cancela a prévia. Tab acessa os painéis. Zoom +/− e arraste ajudam no celular. Pausar permite planejar e construir sem avançar o relógio. O jogo pausa ao sair da aba.</p><button id="close-manual" class="primary wide">Entendi</button></dialog>
+    <dialog id="confirm-end"><h2>Encerrar esta operação?</h2><p>O tempo restante será descartado. Estoque e cargas ainda não entregues ficam sem receita.</p><div class="button-row"><button id="keep-operation">Continuar planejando</button><button id="finish-now" class="primary">Encerrar e ver balanço</button></div></dialog>
+    <dialog id="report"><span class="eyebrow">BALANÇO DA CONCESSÃO</span><h2 id="report-title"></h2><div id="report-stats" class="report-grid"></div><p id="report-summary"></p><button id="inspect-operation" class="wide">Inspecionar terreno revelado</button><button id="return-town" class="primary wide">Receber resultado e voltar à cidade</button></dialog>
+    <dialog id="new-campaign"><h2>Começar outra campanha?</h2><p>A campanha empresarial atual será substituída. A partida rápida e sua oficina continuam disponíveis no modo original.</p><div class="button-row"><button id="cancel-new">Cancelar</button><button id="confirm-new" class="primary">Nova campanha</button></div></dialog>
+    <dialog id="recovery"><h2>Não foi possível retomar</h2><p>O salvamento da campanha está inválido. Ele foi preservado para evitar substituir seus dados automaticamente.</p><button id="retry-save" class="wide">Tentar carregar novamente</button><button id="reset-invalid" class="wide">Abrir confirmação de nova campanha</button></dialog>
+    <noscript>Ative o JavaScript para jogar a campanha.</noscript>
+    <script is:inline type="module" src={`${base}/enterprise/app.js`}></script>
+  </body>
+</html>

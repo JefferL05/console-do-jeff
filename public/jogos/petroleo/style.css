@@ -54,6 +54,13 @@ dialog h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;color:#f6e
 .loading-screen h2{font-family:Georgia,"Times New Roman",serif;color:#f0d39b;font-weight:400}
 @media(min-width:700px) and (min-height:601px){.field-label{font-size:10px}.hud>div{padding-left:14px}.field{border-radius:20px}}
 @media(orientation:landscape) and (max-height:600px){.field-label{top:5px;font-size:8px}.field-label span{padding:3px 6px}.hud{padding-top:2px}.hud>div{padding:2px 6px}}
+.objectives-button{position:absolute;top:36px;left:8px;min-height:48px;padding:6px 10px;font-size:12px;background:#173c32ed;color:#f8dda4;border-color:#d7b46d88}
+.campaign-link{padding:13px;border:1px solid #d8b77899;border-radius:10px;background:#2b4939;color:#f8dba1;text-decoration:none;font-weight:700;min-height:48px}.campaign-link small{display:block;color:#c1cbb8;font-size:11px;font-weight:400;margin-top:5px}.campaign-link:focus-visible{outline:3px solid #ffe3a3;outline-offset:2px}
+.objective-list{display:grid;gap:12px;margin:16px 0}
+.objective-list>div{padding:12px;border:1px solid var(--line);border-radius:10px;background:#10262180}
+.objective-list p{margin:6px 0;font-variant-numeric:tabular-nums}
+.objective-list small{display:block;margin-top:7px;color:var(--muted);line-height:1.4}
+.objective-list progress{display:block;width:100%;height:8px;accent-color:var(--gold)}
 /* The development toolbar would overlap the bottom market on touch screens. */
 astro-dev-toolbar{display:none}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}

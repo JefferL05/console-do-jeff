@@ -12,7 +12,7 @@ let game = saved.game, selected = progress.unlocked, mode = game?.mode || 'quick
 const view = { tool: 'scan', preview: null, selectedPocket: null, parentId: null, keyboardCursor: null, effects: [] };
 const renderer = new Renderer($('game'));
 const backdropGame = createGame({ seed: 2026 });
-const dialogs = ['home', 'menu', 'help-dialog', 'upgrade-dialog', 'result'];
+const dialogs = ['home', 'menu', 'help-dialog', 'upgrade-dialog', 'objectives-dialog', 'result'];
 let helpReturn = null, previous = performance.now(), accumulator = 0, uiClock = 0, saveClock = 0;
 let diagnosticTime = previous, diagnosticFrames = 0, renderTotal = 0;
 let frameId = 0, runningBeforeHostPause = false, saveSequence = 0;
@@ -147,6 +147,8 @@ function refreshPreview() {
   if (view.preview) view.preview = view.preview.type === 'scan' ? scanQuote(game, view.preview.x, view.preview.y) : drillQuote(game, view.preview.pocketId, view.preview.parentId);
 }
 $('pause').addEventListener('click', openMenu);
+$('objectives').addEventListener('click', () => { if (game) { showDialog('objectives-dialog'); save(); } });
+$('close-objectives').addEventListener('click', resume);
 $('gamepad-toggle').addEventListener('click', () => {
   gamepadEnabled = !gamepadEnabled; gamepadPrevious = []; gamepadWasConnected = false;
   try { localStorage.setItem('ouro-subsolo-gamepad-v1', String(gamepadEnabled)); } catch { /* The gamepad remains usable for this session. */ }

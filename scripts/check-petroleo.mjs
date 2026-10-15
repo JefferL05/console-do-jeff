@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { CONFIG } from '../public/jogos/petroleo/modules/config.js';
 import { generateTerrain, validateTerrain } from '../public/jogos/petroleo/modules/terrain.js';
-import { createGame, createProgress, scanQuote, drillQuote, commit, step, inTransit, buyUpgrade, settle, buyResearch, pocketExtractionRate, wellRate } from '../public/jogos/petroleo/modules/simulation.js';
+import { createGame, createProgress, scanQuote, drillQuote, commit, step, inTransit, buyUpgrade, settle, buyResearch, pocketExtractionRate, wellRate, surveyHint, drillEconomics, objectives, metrics } from '../public/jogos/petroleo/modules/simulation.js';
 import { encodeSave, decodeSave, validateGame } from '../public/jogos/petroleo/modules/persistence.js';
 import { createCamera, toWorld, toScreen } from '../public/jogos/petroleo/modules/renderer.js';
 import { normalizeGamepad } from '../public/jogos/petroleo/modules/gamepad.js';
@@ -36,6 +36,61 @@ test('preview and cancellation are free; confirmation charges once; repeated sca
   assert.equal(g.cash, 1500); assert.equal(g.scans.length, 0);
   assert.ok(commit(g, q).ok); assert.equal(g.cash, 1420); assert.ok(g.pockets[0].revealed);
   assert.equal(commit(g, q).ok, false); assert.equal(g.cash, 1420);
+});
+test('survey clues require payment, survive saves and never reveal extra pockets', () => {
+  const g = createGame({ seed: 42 });
+  const before = JSON.stringify(g);
+  scanQuote(g, 10, 340);
+  assert.equal(surveyHint(g), ''); assert.equal(JSON.stringify(g), before);
+  assert.ok(commit(g, scanQuote(g, 10, 340)).ok);
+  assert.equal(g.cash, CONFIG.initialCash - CONFIG.scan.cost);
+  const revealed = g.pockets.filter(p => p.revealed).length;
+  const hint = surveyHint(g); assert.match(hint, /Pista da última sondagem/);
+  assert.equal(g.pockets.filter(p => p.revealed).length, revealed);
+  assert.equal(surveyHint(decodeSave(encodeSave(g, createProgress(), {})).game), hint);
+  g.pockets.forEach(p => { p.revealed = true; });
+  assert.equal(surveyHint(g), 'Todas as reservas foram descobertas.');
+});
+test('drilling estimates use the selected buyer, deadline and existing fleet without mutations', () => {
+  const g = createGame(), p = g.pockets[0]; commit(g, scanQuote(g, p.x, p.y));
+  const quote = drillQuote(g, p.id), snapshot = JSON.stringify(g);
+  const estimate = drillEconomics(g, quote);
+  assert.equal(estimate.breakEvenBarrels, Math.ceil(quote.cost / g.prices.west));
+  assert.equal(estimate.tooLate, false); assert.equal(estimate.fleetLimited, true);
+  assert.equal(JSON.stringify(g), snapshot);
+  g.target = 'east'; assert.equal(drillEconomics(g, quote).breakEvenBarrels, Math.ceil(quote.cost / g.prices.east));
+  g.target = 'hold'; assert.ok(Number.isFinite(drillEconomics(g, quote).breakEvenBarrels));
+  g.time = CONFIG.truck.travelTime; assert.equal(drillEconomics(g, quote).tooLate, true);
+  assert.equal(drillEconomics(g, scanQuote(g, 0, 300)), null);
+});
+test('last departures deliver partial loads, respect hold and leave too-late stock accounted for', () => {
+  for (const target of ['west', 'hold']) {
+    const g = connectedGame(); g.target = 'hold'; advance(g, 20);
+    assert.equal(g.trucks[0].phase, 'idle'); assert.ok(g.storage > 0);
+    g.target = target; g.time = CONFIG.truck.travelTime + CONFIG.step * 3;
+    step(g); step(g);
+    if (target === 'west') {
+      assert.equal(g.trucks[0].phase, 'outbound');
+      assert.ok(g.trucks[0].cargo > 0 && g.trucks[0].cargo < g.trucks[0].capacity);
+    }
+    advance(g, 6); assert.equal(g.ended, true);
+    assert.equal(g.sold > 0, target === 'west'); conserved(g); assert.ok(validateGame(g));
+  }
+  const g = connectedGame(); g.target = 'hold'; advance(g, 20);
+  g.target = 'east'; g.time = 4; advance(g, 5);
+  assert.equal(g.trucks[0].phase, 'idle'); assert.equal(g.sold, 0); conserved(g);
+});
+test('live objectives match settlement and can regress before the deadline', () => {
+  const g = connectedGame(); advance(g, 60);
+  const check = () => assert.equal(objectives(g).filter(goal => goal.earned).length, metrics(g).stars);
+  check();
+  g.cash = CONFIG.initialCash + 500; assert.equal(objectives(g)[0].earned, true);
+  g.cash -= 250; assert.equal(objectives(g)[0].earned, false);
+  g.extracted = 100; g.sold = 85; assert.equal(objectives(g)[1].earned, true);
+  g.extracted = 101; assert.equal(objectives(g)[1].earned, false);
+  g.extracted = 10; g.sold = 10; assert.equal(objectives(g)[1].earned, false);
+  check(); g.ended = true;
+  assert.equal(settle(g, createProgress()), 1 + objectives(g).filter(goal => goal.earned).length);
 });
 test('duplicate well, insufficient funds and paused purchases cannot mutate state', () => {
   const g = connectedGame(); const balance = g.cash;

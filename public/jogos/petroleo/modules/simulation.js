@@ -25,6 +25,31 @@ export function createGame({ seed = 1, profile = 0, mode = 'quick', tutorial = f
 
 export function inTransit(game) { return game.trucks.reduce((sum, truck) => sum + truck.cargo, 0); }
 export function scanRadius(game) { return CONFIG.scan.radius + game.research.scan * 5; }
+// A paid survey provides a bearing, never the position or size of hidden oil.
+// Deriving it from saved scans keeps old saves compatible.
+export function surveyHint(game) {
+  const scan = game.scans.at(-1);
+  if (!scan) return '';
+  const hidden = game.pockets.filter(p => !p.revealed);
+  if (!hidden.length) return 'Todas as reservas foram descobertas.';
+  const nearest = hidden.reduce((a, b) => Math.hypot(a.x - scan.x, a.y - scan.y) <= Math.hypot(b.x - scan.x, b.y - scan.y) ? a : b);
+  const dx = nearest.x - scan.x, dy = nearest.y - scan.y;
+  const direction = Math.abs(dx) > Math.abs(dy) ? dx < 0 ? '← à esquerda' : '→ à direita' : dy < 0 ? '↑ mais acima' : '↓ mais abaixo';
+  return `Pista da última sondagem: ${direction}.`;
+}
+export function drillEconomics(game, quote) {
+  const pocket = game.pockets[quote.pocketId];
+  if (quote.type !== 'drill' || !pocket?.revealed || !Number.isFinite(quote.distance)) return null;
+  const price = game.target === 'hold' ? Math.max(game.prices.west, game.prices.east) : game.prices[game.target];
+  const drillSeconds = quote.distance / CONFIG.drill.speed;
+  return {
+    drillSeconds,
+    breakEvenBarrels: Math.ceil(quote.cost / price),
+    // Earliest useful new production still needs loading and a complete trip.
+    tooLate: game.time <= drillSeconds + CONFIG.truck.travelTime + CONFIG.step,
+    fleetLimited: wellRate(game) + pocketExtractionRate(pocket) > transportRate(game),
+  };
+}
 export function pocketExtractionRate(pocket) {
   const depth = pocket.y - CONFIG.world.surface;
   // Deep deposits carry more pressure, rewarding the extra drilling investment.
@@ -74,7 +99,7 @@ export function commit(game, preview) {
     game.scans.push({ x: quote.x, y: quote.y });
     let found = 0;
     for (const p of game.pockets) if (!p.revealed && Math.hypot(p.x - quote.x, p.y - quote.y) <= scanRadius(game) + p.rx / 2) { p.revealed = true; found++; }
-    event(game, 'scan', found ? `${found} reserva descoberta! Selecione Perfurar.` : 'Área sondada. Procure em outra camada.', { x: quote.x, y: quote.y });
+    event(game, 'scan', found ? `${found} reserva descoberta! Selecione Perfurar.` : surveyHint(game), { x: quote.x, y: quote.y });
     if (game.tutorial === 0 && game.pockets.some(p => p.revealed)) game.tutorial = 1;
   } else {
     game.wells.push({ id: game.wells.length, pocketId: quote.pocketId, parentId: quote.parentId, from: quote.from, distance: quote.distance, progress: 0 });
@@ -118,16 +143,17 @@ export function step(game, dt = CONFIG.step) {
   }
   for (const truck of game.trucks) {
     if (truck.phase === 'idle') {
-      if (game.target === 'hold' || game.storage < 1) continue;
+      if (game.target === 'hold' || game.storage < 1 || game.time < CONFIG.truck.travelTime + CONFIG.step) continue;
       truck.destination = game.target; truck.phase = 'loading'; truck.timer = 0;
     }
     if (truck.phase === 'loading') {
       const load = Math.max(0, Math.min(game.storage, truck.capacity - truck.cargo, CONFIG.truck.loadRate * dt));
       game.storage -= load; truck.cargo += load; truck.timer += dt;
-      if (truck.cargo >= truck.capacity - 1e-8 || (truck.timer >= 2 && truck.cargo > 0)) { truck.phase = 'outbound'; truck.timer = 0; }
+      const lastDeparture = game.time <= CONFIG.truck.travelTime + CONFIG.step * 2;
+      if (truck.cargo > 0 && (truck.cargo >= truck.capacity - 1e-8 || truck.timer >= 2 || lastDeparture)) { truck.phase = 'outbound'; truck.timer = 0; }
     } else if (truck.phase === 'outbound') {
       truck.timer += dt;
-      if (truck.timer >= CONFIG.truck.travelTime) {
+      if (truck.timer >= CONFIG.truck.travelTime - 1e-8) {
         const income = truck.cargo * game.prices[truck.destination];
         game.cash += income; game.revenue += income; game.sold += truck.cargo;
         truck.cargo = 0; truck.phase = 'unloading'; truck.timer = 0;
@@ -153,11 +179,18 @@ export function step(game, dt = CONFIG.step) {
   }
   if (game.time <= 1e-8) { game.time = 0; game.ended = true; event(game, 'end', 'Concessão encerrada. Veja o que ficou no subsolo.'); }
 }
+export function objectives(game) {
+  return [
+    { id: 'profit', current: game.cash - CONFIG.initialCash, target: PROFILES[game.profile].goal },
+    { id: 'sales', current: game.sold, target: Math.max(50, game.extracted * .85) },
+    { id: 'recovery', current: game.extracted, target: game.total * .4 },
+  ].map(item => ({ ...item, earned: item.current >= item.target }));
+}
 export function metrics(game) {
   const profit = game.cash - CONFIG.initialCash;
   const efficiency = game.extracted ? game.sold / game.extracted : 0;
   const recovery = game.extracted / game.total;
-  const stars = Number(profit >= PROFILES[game.profile].goal) + Number(efficiency >= 0.85 && game.sold >= 50) + Number(recovery >= 0.4);
+  const stars = objectives(game).filter(item => item.earned).length;
   const tip = game.wells.length === 0 ? 'Explore perto da indicação inicial e reserve capital para um poço.' : game.fullSeconds > 10 ? 'Seu tanque ficou cheio. Reforce a frota ou venda mais cedo.' : game.storage + inTransit(game) > 20 ? 'Comece a escoar o estoque mais cedo: a receita só chega na entrega.' : profit < 0 ? 'Reduza gastos iniciais e compare o custo de ramificar com o de um novo poço.' : 'Bom trabalho! Explore mais reservas para aumentar o aproveitamento.';
   return { profit, efficiency, recovery, stars, tip };
 }
