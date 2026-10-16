@@ -1,0 +1,103 @@
+---
+title: "Ouro do Subsolo: meu jogo de exploração e gestão de petróleo"
+description: "Explore, perfure e escolha a hora de vender. Conheça o Ouro do Subsolo, suas partidas rápidas, a campanha empresarial e os desafios de construir o jogo."
+pubDate: 2026-10-15
+author: "Jeff"
+category: "Projetos"
+tags: ["jogos", "javascript", "canvas", "astro", "android", "gamedev"]
+image:
+  url: "/images/posts/ouro-do-subsolo/inicio.webp"
+  alt: "Menu real do Ouro do Subsolo: campanha empresarial, duração da expedição, concessões e oficina permanente."
+draft: false
+---
+
+import { url as siteUrl } from '../../utils/index';
+
+**Encontrar petróleo é só o começo.** Depois é preciso extrair, transportar e decidir quando vender — tudo isso com dinheiro e tempo limitados. Essa é a proposta do **Ouro do Subsolo**, o jogo que estou desenvolvendo aqui no Console do Jeff.
+
+O projeto reúne duas experiências: expedições curtas para aprender e experimentar estratégias, e uma campanha empresarial com temporadas, investimentos e disputa pela cidade. Neste post, vou apresentar o que já está implementado e algumas decisões por trás do jogo.
+
+**<a href={siteUrl('/jogos/petroleo/')}>Jogue no navegador</a>** ou veja o [código no GitHub](https://github.com/JefferL05/console-do-jeff/tree/main/public/jogos/petroleo).
+
+## Uma partida começa com uma decisão
+
+Na entrada do jogo, você escolhe uma expedição **rápida, de três minutos**, ou **estratégica, de cinco minutos**. A primeira concessão é o Vale Dourado, e o guia interativo ajuda a dar os primeiros passos.
+
+O ciclo principal é simples de entender:
+
+1. **Explorar:** procurar reservas antes de investir na perfuração.
+2. **Perfurar:** transformar a descoberta em produção.
+3. **Transportar:** fazer o petróleo chegar ao tanque ou ao mercado.
+4. **Vender:** comparar os preços de Oeste e Leste ou guardar a carga para depois.
+5. **Melhorar:** investir na operação sem consumir todo o capital disponível.
+
+Guardar pode parecer uma boa ideia quando o preço está baixo, mas tanque, transporte e prazo impõem limites. Uma reserva descoberta não garante uma boa partida: o resultado depende do caminho inteiro até a venda.
+
+Ao concluir uma concessão, há metas e medalhas. A oficina permanente permite aplicar fichas em melhorias que passam a valer nas próximas partidas.
+
+## A campanha empresarial amplia o desafio
+
+A <a href={siteUrl('/jogos/petroleo/campanha/')}>campanha empresarial</a> tem **dez temporadas em cinco regiões**. Entre as operações, você volta à cidade para avaliar terrenos, tecnologias, crédito e participação nos leilões.
+
+Dentro do campo, a operação fica mais detalhada:
+
+- Torres posicionáveis e tubos construídos por segmentos, com ramificações e válvulas.
+- Tanques e frota de transporte para administrar a produção.
+- Dois mercados, histórico de preços e contratos opcionais de entrega.
+- Obstáculos como rocha e gelo, além de gás e amostras raras.
+- Tecnologias permanentes e disputa por participações na cidade.
+
+Os três rivais têm estratégias e resultados econômicos determinísticos. Eles não são jogadores online nem perfuram campos simultâneos ao seu: a competição é modelada pelo sistema de campanha.
+
+## Extrair mais nem sempre resolve
+
+Um dos desafios mais interessantes foi fazer as partes da operação dependerem umas das outras. Uma bomba mais forte pode não ajudar se o tubo compartilhado já está no limite. Uma torre cheia pode indicar que falta transporte, não capacidade de extração.
+
+Por isso, a campanha mostra diagnósticos de vazão, capacidade, demanda e estimativa de entrega. A ideia é permitir que o jogador entenda **onde está o gargalo**, em vez de comprar melhorias sem saber o efeito delas.
+
+Existem dois modos de risco: no **Tranquilo**, a torre cheia interrompe a extração; no **Empresarial**, a saturação pode causar perda de petróleo e multas. Isso muda o peso de decisões como fechar uma válvula ou ampliar a frota.
+
+## Como começar sem se perder
+
+Para conhecer o jogo, recomendo começar pela expedição rápida com o guia ativado. Na campanha, o caminho inicial é arrendar um lote, pesquisar uma reserva, instalar uma torre, conectar o tubo e acompanhar a primeira entrega.
+
+Depois dessa primeira venda, vale observar o que a operação pede: mais transporte, espaço para guardar ou expansão da rede? Evitar gastar tudo de uma vez ajuda a manter margem para reagir.
+
+No computador, há controles de mouse e teclado. No celular, a campanha oferece toque, zoom e prévia de rotas antes da confirmação. Planejar uma rota não cobra a construção: a compra acontece ao confirmar uma rota válida.
+
+## Por trás da interface: JavaScript e Canvas
+
+O blog usa **Astro**, mas a lógica do jogo fica em módulos JavaScript e a área de exploração é desenhada em **Canvas**. Na campanha, as responsabilidades estão separadas:
+
+| Parte | Responsabilidade |
+| --- | --- |
+| Exploração | Terreno, scanner, sondagem e descobertas |
+| Rede e logística | Tubos, vazão, torres, tanques e veículos |
+| Economia | Preços, entregas, contratos e balanço |
+| Campanha | Temporadas, tecnologias, rivais e leilões |
+| Persistência | Validação, salvamento e recuperação |
+| Apresentação | Canvas, câmera, controles e painéis |
+
+A simulação da campanha usa passos fixos de **1/30 de segundo**. Ao sair da aba, a operação pausa e não acumula tempo em segundo plano. Assim, o jogador pode voltar sem descobrir que a partida terminou enquanto estava em outra página.
+
+## Salvar também faz parte da experiência
+
+A campanha no site tem **três espaços de salvamento**, exportação e importação em JSON e uma cópia válida anterior por espaço. Ao retomar, a operação fica pausada.
+
+Os saves são locais: limpar os dados do navegador ou trocar de aparelho não transfere a campanha automaticamente. Exportar uma cópia é a forma de guardar o progresso fora daquele navegador.
+
+Há validações para referências, rede, recursos e dinheiro, além de recuperação quando o arquivo principal está corrompido. O objetivo é impedir que um erro de leitura sobrescreva um progresso que ainda poderia ser recuperado.
+
+## E a versão Android?
+
+O projeto também tem uma versão Android **de desenvolvimento**, empacotada com **Capacitor**. Ela inclui os arquivos locais do jogo, com partida rápida e campanha disponíveis offline; não é apenas um atalho para abrir o blog.
+
+Essa versão é distribuída como APK de debug, não como uma publicação na Play Store. Os requisitos e as instruções de compilação estão na [documentação Android](https://github.com/JefferL05/console-do-jeff/blob/main/docs/ouro-android.md).
+
+## O jogo continua em evolução
+
+O projeto possui verificações automatizadas de regras e simulações de balanceamento. Elas ajudam a encontrar problemas, mas não substituem observar pessoas jogando: uma estratégia eficiente para um teste automatizado pode ser difícil de descobrir ou executar na interface.
+
+É essa combinação de simulação, experiência e ajustes que torna o projeto interessante para mim. Quero que cada melhoria seja uma escolha compreensível, e que o balanço ajude a entender o que aconteceu na operação.
+
+**<a href={siteUrl('/jogos/petroleo/')}>Experimente o Ouro do Subsolo</a>**. Se encontrar um problema ou tiver uma sugestão, conte na [área de issues do repositório](https://github.com/JefferL05/console-do-jeff/issues), indicando o modo de jogo e o dispositivo usado.

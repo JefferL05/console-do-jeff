@@ -25,10 +25,13 @@ const posts = await getCollection('posts', ({ data }) => !data.draft);
           </div>
         </article>;
       })}
-      <article class="border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+      <article class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+        <img src={url('/images/posts/ouro-do-subsolo/inicio.webp')} alt="Menu do Ouro do Subsolo com expedições e campanha empresarial." loading="lazy" width="1280" height="960" class="w-full aspect-video object-cover object-top" />
+        <div class="p-6">
         <h2 class="text-2xl font-bold">Ouro do Subsolo</h2><p class="text-sm my-3">Disponível · em evolução</p>
-        <p>Jogo com campanha empresarial e gestão de uma operação de petróleo, desenvolvido dentro do próprio blog.</p>
-        <div class="flex flex-wrap gap-4 mt-5 underline text-primary-600 dark:text-primary-400"><a href={url('/jogos/petroleo')}>Jogar no navegador</a><a href="https://github.com/JefferL05/console-do-jeff">Código no GitHub</a></div>
+        <p>Explore reservas, construa sua operação e escolha a hora de vender. Conheça as expedições rápidas, a campanha empresarial e os bastidores do desenvolvimento.</p>
+        <div class="flex flex-wrap gap-4 mt-5 underline text-primary-600 dark:text-primary-400"><a href={url('/jogos/petroleo')}>Jogar no navegador</a><a href="https://github.com/JefferL05/console-do-jeff">Código no GitHub</a><a href={url('/blog/ouro-do-subsolo-jogo-gestao')}>Ler artigo</a></div>
+        </div>
       </article>
     </div>
   </main>
