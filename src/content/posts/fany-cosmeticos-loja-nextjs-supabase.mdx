@@ -6,24 +6,39 @@ author: "Jeff"
 category: "Projetos"
 tags: ["nextjs", "supabase", "postgresql", "ecommerce", "seguranca", "typescript"]
 image:
-  url: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1200"
-  alt: "Produtos de maquiagem e cuidados dispostos sobre uma superfície clara"
+  url: "/images/posts/fany-cosmeticos/hero.png"
+  alt: "Página inicial da Fany Cosméticos com o título Uma rotina que faz você se sentir bem e ilustrações de produtos"
 draft: false
 ---
 
 import Callout from '../../components/Callout.astro';
+import Screenshot from '../../components/Screenshot.astro';
 
 # Fany Cosméticos: uma loja Next.js + Supabase onde o navegador não decide o preço
 
-A **Fany Cosméticos** é a loja que estou construindo para um negócio de cosméticos. Por fora, é um catálogo com carrinho e checkout. Por dentro, o interesse está em outro lugar: garantir que **preço, frete e total nunca dependam do que o navegador envia**.
+Estou construindo a **Fany Cosméticos**, a loja de um negócio de cosméticos com curadoria de K-beauty. Por fora, é uma vitrine calma em tons de rosa: hero convidando a montar uma rotina, filtros por categoria, preço com desconto no Pix e selos como "Mais amado" e "Best-seller". Por dentro, o trabalho que mais me interessa é outro: garantir que **preço, frete e total nunca dependam do que o navegador envia**.
 
-Neste post vou mostrar as decisões de arquitetura e as travas de segurança que fazem a diferença entre um protótipo bonito e uma loja que dá para levar a sério.
+Neste post vou mostrar a loja como ela está hoje e as travas de segurança que fazem a diferença entre um protótipo bonito e uma loja que dá para levar a sério.
 
-Código fonte: [JefferL05/Fany-Cosmeticos](https://github.com/JefferL05/Fany-Cosmeticos).
+Código fonte: [JefferL05/Fany-Cosmeticos](https://github.com/JefferL05/Fany-Cosmeticos). Loja publicada: [fany-cosmeticos.vercel.app](https://fany-cosmeticos.vercel.app).
 
 <Callout type="warning" title="Estado atual">
   O catálogo, os preços e as tarifas de frete ainda são **demonstrativos**. O checkout devolve somente links de teste do Mercado Pago e o webhook rejeita pagamentos em modo de produção. A loja ainda não está liberada para vendas reais.
 </Callout>
+
+## A loja por dentro
+
+A página inicial abre com a proposta da marca — "K-beauty escolhida com calma" — e desce direto para o catálogo, com filtros por Todos, Skincare, Maquiagem, Cabelos e Kits. Cada cartão mostra a marca, o preço parcelado, o valor no Pix e o botão de adicionar à sacola. Mais abaixo, uma seção de ritual em três passos e a newsletter "Cartas da Fany".
+
+<Screenshot
+  src="/images/posts/fany-cosmeticos/catalogo.png"
+  alt="Catálogo da Fany Cosméticos com filtros por categoria e cartões de produto com preço, parcelamento e valor no Pix."
+  caption="Catálogo real da loja em ambiente de demonstração: filtros, etiquetas, parcelamento e desconto no Pix. Preços e estoque são fictícios."
+  width={1280}
+  height={2080}
+/>
+
+Repare na faixa do topo: "Loja em preparação · Catálogo demonstrativo · Nenhuma cobrança será realizada". Prefiro deixar isso explícito na interface do que fingir que a loja já vende. Confiança também se constrói assim.
 
 ## O problema de confiar no carrinho
 
@@ -123,8 +138,8 @@ Nenhum projeto nasce certo, e vale registrar o que apareceu:
 
 ## Próximos passos
 
-Ainda falta o que exige dados reais, não código: produtos completos com peso e dimensões, tarifas de frete verdadeiras, credenciais de produção em Mercado Pago e Resend, SMTP próprio para os e-mails de autenticação e políticas comerciais e de privacidade. E, antes de qualquer venda, **reserva e expiração de estoque transacionais**.
+Ainda falta o que depende de dados reais, não de código: produtos completos com peso e dimensões, tarifas de frete verdadeiras, credenciais de produção no Mercado Pago e no Resend, SMTP próprio para os e-mails de autenticação e as políticas comerciais e de privacidade. E, antes de qualquer venda, **reserva e expiração de estoque transacionais**.
 
-A hospedagem definitiva fica por último, de propósito: primeiro a loja precisa funcionar e ser conferida, depois ela ganha um endereço de verdade.
+Deixei a hospedagem definitiva por último de propósito: primeiro a loja precisa funcionar e ser conferida de ponta a ponta, depois ela ganha um endereço de verdade.
 
-Se quiser acompanhar, o código está aberto em [JefferL05/Fany-Cosmeticos](https://github.com/JefferL05/Fany-Cosmeticos).
+Se quiser acompanhar a evolução, o código está aberto em [JefferL05/Fany-Cosmeticos](https://github.com/JefferL05/Fany-Cosmeticos) — e dá para navegar na loja em [fany-cosmeticos.vercel.app](https://fany-cosmeticos.vercel.app). Feedback é bem-vindo.
