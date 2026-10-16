@@ -120,13 +120,17 @@ const currentPath = Astro.url.pathname;
   @media (min-width: 1400px) { .brand-name { display: inline; } }
   @media (max-width: 900px) { .desktop-links { display: none; } }
   @media (max-width: 600px) {
-    .header-row { flex-wrap: wrap; gap: 0; padding: 8px 0; }
-    .brand-link { margin-right: 8px; }
-    .header-tools { gap: 4px; flex-wrap: wrap; }
-    .header-tools :global(.site-search) { order: 10; flex: 0 0 100%; margin-top: 6px; }
+    .header-row { display: grid; grid-template-columns: 36px minmax(0, 1fr) 58px 44px 44px; gap: 8px 4px; padding: 10px 0; }
+    .brand-link { grid-area: 1 / 1; justify-content: flex-start; margin: 0; height: 44px; }
+    .header-tools { display: contents; }
+    .reading-control { grid-area: 1 / 2; justify-self: end; padding: 0 8px; }
+    .auto-control { grid-area: 1 / 3; justify-content: center; gap: 4px; }
+    #theme-toggle { grid-area: 1 / 4; }
+    #mobile-menu-btn { grid-area: 1 / 5; }
+    .header-tools :global(.site-search) { grid-area: 2 / 1 / 3 / -1; width: 100%; max-width: none; margin: 0; }
     .language-label { display: none; }
     .github-link, .rss-link { display: none; }
-    .toolbar-icon { width: 34px; }
+    .toolbar-icon { width: 44px; }
   }
 </style>
 
