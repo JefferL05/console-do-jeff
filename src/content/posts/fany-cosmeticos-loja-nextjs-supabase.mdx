@@ -1,0 +1,130 @@
+---
+title: "Fany Cosméticos: uma loja Next.js + Supabase onde o navegador não decide o preço"
+description: "Como estou construindo a Fany Cosméticos: catálogo no Supabase, cálculo de frete e total no banco, RLS, pagamento em sandbox e testes automatizados."
+pubDate: 2026-10-15
+author: "Jeff"
+category: "Projetos"
+tags: ["nextjs", "supabase", "postgresql", "ecommerce", "seguranca", "typescript"]
+image:
+  url: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1200"
+  alt: "Produtos de maquiagem e cuidados dispostos sobre uma superfície clara"
+draft: false
+---
+
+import Callout from '../../components/Callout.astro';
+
+# Fany Cosméticos: uma loja Next.js + Supabase onde o navegador não decide o preço
+
+A **Fany Cosméticos** é a loja que estou construindo para um negócio de cosméticos. Por fora, é um catálogo com carrinho e checkout. Por dentro, o interesse está em outro lugar: garantir que **preço, frete e total nunca dependam do que o navegador envia**.
+
+Neste post vou mostrar as decisões de arquitetura e as travas de segurança que fazem a diferença entre um protótipo bonito e uma loja que dá para levar a sério.
+
+Código fonte: [JefferL05/Fany-Cosmeticos](https://github.com/JefferL05/Fany-Cosmeticos).
+
+<Callout type="warning" title="Estado atual">
+  O catálogo, os preços e as tarifas de frete ainda são **demonstrativos**. O checkout devolve somente links de teste do Mercado Pago e o webhook rejeita pagamentos em modo de produção. A loja ainda não está liberada para vendas reais.
+</Callout>
+
+## O problema de confiar no carrinho
+
+Em qualquer loja, o carrinho vive no navegador. Isso é ótimo para a experiência e péssimo para a segurança, porque **todo valor que o cliente controla pode ser alterado**. Um carrinho que guarda `preco` e `total` é um convite para alguém editar o `localStorage` e comprar por R$ 1.
+
+A regra que adotei é simples: **o carrinho guarda apenas identificadores e quantidades**. Nada de preço, nada de total. Quando o pedido é enviado, o banco recalcula tudo a partir do catálogo atual.
+
+```text
+Navegador                          Banco (PostgreSQL)
+---------------------------------  -----------------------------------
+carrinho: [{ id: "p1", qtd: 2 }]   lê products pelo id
+                                   aplica preço Pix ou cartão
+                                   soma o frete pela UF
+                                   grava orders.total calculado
+```
+
+A função que faz esse cálculo fica em um schema **privado** e é chamada só por um gatilho na inserção do pedido. Ela valida o usuário autenticado e **nunca aceita um preço vindo do cliente**. Se algum campo derivado for enviado pelo navegador, a inserção é recusada.
+
+## Stack e divisão de responsabilidades
+
+| Camada | Tecnologia | Papel |
+| --- | --- | --- |
+| Interface | Next.js, React e TypeScript | Catálogo, carrinho, conta e painel administrativo |
+| Dados e regras | Supabase (PostgreSQL) | Preços, frete, estoque, pedidos e políticas de acesso |
+| Autenticação | Supabase Auth | Cadastro, login e recuperação de senha |
+| Pagamento | Mercado Pago (Checkout Pro) | Preferência de pagamento e notificação de status |
+| E-mail | Resend | Confirmação de pedido e de pagamento |
+| CI | GitHub Actions | Testes, tipagem, build e auditoria de dependências |
+
+O front-end nunca fala com o banco usando uma chave privilegiada. Só a URL e a chave **publishable** ficam no navegador; `service_role` existe apenas dentro das funções de servidor.
+
+## Row Level Security em tudo
+
+O Supabase expõe o banco diretamente para o cliente, então **RLS não é opcional**. Cada tabela pública tem políticas próprias:
+
+- O catálogo é leitura pública.
+- Os pedidos só aparecem para o próprio cliente (`user_id`) e para administradores.
+- A escrita de preço e estoque é restrita; o cliente não altera o status de pagamento.
+- O painel administrativo depende de pertencer à tabela `store_admins`, sem autoatribuição.
+
+Um detalhe que vale destacar: **não uso `user_metadata` para decidir permissão**. Esse campo é controlável pelo usuário em muitos fluxos. Permissão vem de uma tabela que o cliente não pode escrever.
+
+Também limitei o abuso na criação de pedidos: no máximo **cinco pedidos por usuário por minuto** e **30 itens distintos** por pedido. O identificador do pedido é gerado no cliente antes do envio, então repetir a submissão por queda de rede **não duplica** o pedido.
+
+## Frete sem confiar no CEP
+
+O checkout consulta a API pública **ViaCEP** apenas para descobrir o estado a partir do CEP — sem chave, sem custo. O valor do frete **não** vem dessa consulta: ele é calculado dentro do mesmo gatilho do pedido, com base em uma tabela `shipping_zones` com uma tarifa por UF.
+
+```text
+CEP -> ViaCEP -> UF -> shipping_zones(uf) -> frete somado no total
+```
+
+Enquanto as tarifas são demonstrativas, o importante é a fronteira: trocar a tabela por uma cotação real dos Correios ou do Melhor Envio depois não muda nada na interface nem abre espaço para o navegador forjar desconto.
+
+## Pagamento: sandbox com verificação de verdade
+
+A função `create-payment-preference` cria uma preferência no Checkout Pro **depois** que o pedido já existe no banco. Ela relê o pedido no servidor para montar os itens, inclui o frete e confere se a soma em centavos bate com o total. Se não bater, recusa.
+
+O webhook é a parte que costuma ser feita errado. Aqui ele:
+
+1. Exige a **assinatura HMAC** da notificação (`x-signature` + `x-request-id`).
+2. Reconsulta o pagamento na API do Mercado Pago — nunca confia no valor do corpo.
+3. Confere **referência externa, moeda e valor** contra o pedido gravado.
+4. Atualiza o status de forma **idempotente**, repetindo a condição de estado na cláusula `where`.
+5. Rejeita pagamentos em modo de produção enquanto a loja for demonstrativa.
+
+Repetir a mesma notificação não regride um pedido já pago, e tentar quitar outro pedido com um valor diferente é recusado.
+
+## E-mail transacional com cuidado
+
+A função de e-mail verifica se o chamador é o **dono do pedido** ou um serviço interno, e só envia confirmação de pagamento se o pedido estiver realmente pago. O nome do cliente é escapado antes de entrar no HTML, para não virar injeção de markup. Reprocessar a mesma confirmação usa uma `Idempotency-Key` por pedido e modelo, evitando e-mails duplicados.
+
+## Testes que rodam sem quebrar o catálogo
+
+Duas frentes de teste:
+
+**Testes de lógica em Node**, para as partes puras do servidor: correspondência de valor/moeda/referência do pagamento, rejeição de assinatura forjada e escape de HTML.
+
+```bash
+npm test          # node --test tests/*.test.mjs
+npm run typecheck # tsc --noEmit
+npm run build
+```
+
+**Testes transacionais em SQL**, executados no Supabase e sempre revertidos com `ROLLBACK`. Eles criam os próprios produtos e usuários, então **não dependem do estoque real** e não deixam rastro. Cobrem: acesso anônimo negado, total com frete, limite de estoque, proteção do campo de pagamento, rejeição de total enviado pelo cliente e isolamento entre clientes.
+
+Tudo isso roda também no **GitHub Actions** a cada push: instalação, testes, tipagem, build, auditoria de dependências e checagem das funções com o Deno.
+
+## Erros que corrigi no caminho
+
+Nenhum projeto nasce certo, e vale registrar o que apareceu:
+
+- **Migração não aplicada.** O banco tinha só a estrutura inicial, sem pagamento nem frete. O checkout salvava o pedido, mas o resto falhava em silêncio. Comparei as migrações esperadas com o histórico real antes de aplicar.
+- **`npm audit` com vulnerabilidade crítica** no Next.js. Atualizei a versão e zerei os avisos.
+- **Frete fora do total** enviado ao gateway. Isso quebra a conferência de valor — exatamente o tipo de divergência que o webhook agora detecta.
+- **Corrida no CEP.** A resposta atrasada de um CEP antigo podia sobrescrever o novo. Passou a usar revisão de requisição e descartar respostas obsoletas.
+
+## Próximos passos
+
+Ainda falta o que exige dados reais, não código: produtos completos com peso e dimensões, tarifas de frete verdadeiras, credenciais de produção em Mercado Pago e Resend, SMTP próprio para os e-mails de autenticação e políticas comerciais e de privacidade. E, antes de qualquer venda, **reserva e expiração de estoque transacionais**.
+
+A hospedagem definitiva fica por último, de propósito: primeiro a loja precisa funcionar e ser conferida, depois ela ganha um endereço de verdade.
+
+Se quiser acompanhar, o código está aberto em [JefferL05/Fany-Cosmeticos](https://github.com/JefferL05/Fany-Cosmeticos).
