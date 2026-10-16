@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Ouro do Subsolo</string>
+    <string name="title_activity_main">Ouro do Subsolo</string>
+    <string name="package_name">com.jefferl05.ourodosubsolo</string>
+    <string name="custom_url_scheme">com.jefferl05.ourodosubsolo</string>
+</resources>

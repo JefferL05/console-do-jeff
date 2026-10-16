@@ -5,12 +5,17 @@ import { Renderer } from './modules/renderer.js';
 import { bindInput } from './modules/input.js';
 import { $, text, message, updateHUD, renderHome, renderUpgrades, renderResult } from './modules/ui.js';
 import { t } from './modules/i18n.js';
+import { isAndroid } from './mobile/native.js';
+import { installExperience } from './mobile/experience.js';
+import { classicCamera } from './mobile/classic-camera.js';
+import { bindFieldGestures } from './mobile/gestures.js';
 
 export function startApp(platform, saved) {
 const progress = saved.progress, settings = saved.settings;
 let game = saved.game, selected = progress.unlocked, mode = game?.mode || 'quick';
 const view = { tool: 'scan', preview: null, selectedPocket: null, parentId: null, keyboardCursor: null, effects: [] };
 const renderer = new Renderer($('game'));
+let experience = null, lastRender = 0;
 const backdropGame = createGame({ seed: 2026 });
 const dialogs = ['home', 'menu', 'help-dialog', 'upgrade-dialog', 'objectives-dialog', 'result'];
 let helpReturn = null, previous = performance.now(), accumulator = 0, uiClock = 0, saveClock = 0;
@@ -64,7 +69,7 @@ async function save(flush = false) {
   return ok;
 }
 function clearSelection() { view.preview = null; view.selectedPocket = null; view.parentId = null; update(); }
-function update() { if (game) updateHUD(game, view); }
+function update() { if (game) updateHUD(game, view); experience?.update(game); }
 function closeDialogs() { for (const id of dialogs) if ($(id).open) $(id).close(); }
 function showDialog(id) {
   platform.pause(game); accumulator = 0; closeDialogs(); $(id).showModal(); update();
@@ -195,7 +200,19 @@ for (const id of dialogs) $(id).addEventListener('cancel', event => {
   if (id === 'menu' || id === 'upgrade-dialog') resume();
   if (id === 'help-dialog') { if (helpReturn) showDialog(helpReturn); else resume(); }
 });
-bindInput($('game'), renderer, { select, cancel: clearSelection, pause: openMenu, cursor: value => { view.keyboardCursor = value; } });
+bindInput($('game'), renderer, { select, cancel: clearSelection, pause: openMenu, cursor: value => { view.keyboardCursor = value; }, pointers: !isAndroid() });
+if (isAndroid()) {
+  experience = installExperience({ getGame: () => game, pause: () => { platform.pause(game); accumulator = 0; void save(true); update(); }, back: () => {
+    if (view.preview) { clearSelection(); return true; }
+    if (game && !game.paused && !game.ended) { openMenu(); return true; }
+    return false;
+  }, quality: value => { renderer.quality = value; renderer.resize(); } });
+  const camera = classicCamera(renderer);
+  bindFieldGestures($('game'), camera, { select, cursor: value => { view.keyboardCursor = value; }, precision: () => experience.settings.precision });
+  const center = document.createElement('button'); center.textContent = 'Centralizar campo'; center.className = 'wide';
+  center.addEventListener('click', () => { camera.pan = { x: 0, y: 0 }; camera.setZoom(1); }); $('menu').append(center);
+  $('music').hidden = true; $('sound').hidden = true;
+}
 platform.onSuspend(() => {
   if (platform.hosted) {
     runningBeforeHostPause = !!game && !game.paused && !game.ended;
@@ -224,7 +241,9 @@ function frame(now) {
   uiClock += elapsed; saveClock += elapsed;
   if (uiClock >= CONFIG.uiInterval) { uiClock = 0; refreshPreview(); update(); }
   if (saveClock >= CONFIG.saveInterval) { saveClock = 0; if (game && !game.paused && !game.ended) save(); }
-  const renderStart = performance.now(); renderer.draw(game || backdropGame, view); renderTotal += performance.now() - renderStart; diagnosticFrames++;
+  if (!isAndroid() || now - lastRender >= 1000 / (game?.paused ? 12 : renderer.quality?.fps || 60)) {
+    const renderStart = performance.now(); renderer.draw(game || backdropGame, view); renderTotal += performance.now() - renderStart; diagnosticFrames++; lastRender = now;
+  }
   if (!game?.paused) view.effects = view.effects.map(effect => ({ ...effect, age: effect.age + elapsed })).filter(effect => effect.age < 1.5);
   if (now - diagnosticTime >= 3000) {
     diagnostics.fps = Math.round(diagnosticFrames * 1000 / (now - diagnosticTime)); diagnostics.averageRenderMs = Number((renderTotal / diagnosticFrames).toFixed(2)); diagnostics.measuredSeconds = Math.round((now - diagnosticTime) / 1000); diagnostics.viewport = `${innerWidth}×${innerHeight}`; diagnostics.dpr = renderer.dpr;

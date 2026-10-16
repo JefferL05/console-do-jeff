@@ -1,9 +1,9 @@
 import { CONFIG, clamp } from './config.js';
 
-export function bindInput(canvas, renderer, { select, cancel, pause, cursor }) {
+export function bindInput(canvas, renderer, { select, cancel, pause, cursor, pointers = true }) {
   let pointer = null, keyboard = { x: 95, y: 130 };
   canvas.addEventListener('pointerdown', event => {
-    if (!event.isPrimary || event.button !== 0) return;
+    if (!pointers || !event.isPrimary || event.button !== 0) return;
     pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
     canvas.setPointerCapture(event.pointerId); canvas.focus({ preventScroll: true }); cursor(null);
   });

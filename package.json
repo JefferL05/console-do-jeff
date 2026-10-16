@@ -21,6 +21,10 @@
     "check:improvements:browser": "node scripts/check-petroleo-improvements-browser.mjs",
     "check:campaign:balance": "node scripts/balance-petroleo-campaign.mjs",
     "check:campaign:browser": "node scripts/check-petroleo-campaign-browser.mjs",
+    "android:assets": "node scripts/package-android.mjs",
+    "android:debug": "node scripts/build-android.mjs",
+    "check:android": "node scripts/check-android.mjs",
+    "check:android:browser": "node scripts/check-android-browser.mjs",
     "build:playables": "npm run build && node scripts/package-petroleo.mjs"
   },
   "dependencies": {

@@ -1,5 +1,6 @@
 {
   "extends": "astro/tsconfigs/strict",
+  "exclude": ["dist", "artifacts", "node_modules", "mobile/node_modules", "mobile/www", "mobile/android"],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {

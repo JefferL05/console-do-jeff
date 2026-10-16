@@ -13,6 +13,11 @@ export function createPlatform({ sdk = Reflect.get(globalThis, 'ytgame'), storag
   const warn = () => { if (hosted && !suspended) { try { sdk.health.logWarning(); } catch { /* Best effort. */ } } };
   async function syncAudio() {
     try {
+      if (!hosted && win?.ouroExperience && win?.Capacitor?.getPlatform?.() === 'android') {
+        win.ouroExperience.audio.setRunning(!userPaused && !suspended);
+        if (!userPaused && !suspended) await win.ouroExperience.audio.unlock();
+        return;
+      }
       if (!audio && activated && hostAudio && !suspended && (preferred || musicPreferred) && win?.AudioContext) audio = new win.AudioContext();
       if (!audio) return;
       const playable = hostAudio && !suspended && !userPaused;
@@ -111,6 +116,7 @@ export function createPlatform({ sdk = Reflect.get(globalThis, 'ytgame'), storag
       await syncAudio();
     },
     sound(kind) {
+      if (!hosted && win?.ouroExperience && win?.Capacitor?.getPlatform?.() === 'android') { win.ouroExperience.audio.effect(kind); return; }
       if (!preferred || !hostAudio || suspended || userPaused || !audio || audio.state !== 'running' || audio.currentTime - lastTone < .12) return;
       lastTone = audio.currentTime;
       try {

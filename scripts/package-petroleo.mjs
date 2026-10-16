@@ -16,6 +16,8 @@ if (!html.includes('./boot.js') || /(?:href|src)="\//.test(html)) throw new Erro
 await writeFile(join(output, 'index.html'), html);
 for (const file of ['boot.js', 'game.js', 'style.css']) await copyFile(join('public/jogos/petroleo', file), join(output, file));
 for (const file of await readdir('public/jogos/petroleo/modules')) if (file.endsWith('.js')) await copyFile(join('public/jogos/petroleo/modules', file), join(output, 'modules', file));
+await mkdir(join(output, 'mobile'), { recursive: true });
+for (const file of await readdir('public/jogos/petroleo/mobile')) if (/\.(js|css)$/.test(file)) await copyFile(join('public/jogos/petroleo/mobile', file), join(output, 'mobile', file));
 
 // Small deterministic ZIP writer using standard DEFLATE, no packaging dependency.
 const table = Array.from({ length: 256 }, (_, value) => {

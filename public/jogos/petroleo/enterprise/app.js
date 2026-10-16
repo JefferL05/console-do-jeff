@@ -13,6 +13,9 @@ import { networkDiagnostics, deliveryEstimate, debrief } from './diagnostics.js'
 import { rivalComment } from './rivals.js';
 import { decodeSave } from '../modules/persistence.js';
 import { EnterpriseRenderer } from './renderer.js';
+import { installExperience } from '../mobile/experience.js';
+import { bindFieldGestures } from '../mobile/gestures.js';
+import { isAndroid, nativeCall } from '../mobile/native.js';
 
 const $ = id => document.getElementById(id);
 const text = (id, value) => { if ($(id).textContent !== String(value)) $(id).textContent = value; };
@@ -28,6 +31,7 @@ let view = { tool: 'scan', panel: 'explore', source: null, preview: null, route:
 let activeSlot = 0, pendingImport = null;
 try { const slot = Number(localStorage.getItem(ACTIVE_SLOT)); if (Number.isInteger(slot) && slot >= 0 && slot < SLOTS.length) activeSlot = slot; } catch { /* Main load reports unavailable storage. */ }
 let reportShown = false;
+let experience = null, lastRender = 0;
 const renderer = new EnterpriseRenderer($('enterprise-canvas'));
 function freshCampaign() {
   let legacy = null;
@@ -182,13 +186,16 @@ function confirmAction() {
   if (result.nodeId !== undefined) view.source = result.nodeId;
   if (result.ok) {
     view.preview = null; view.route = [];
+    experience?.audio.effect(p.tool === 'scan' ? 'scan' : ['pipe', 'rig'].includes(p.tool) ? 'drill' : 'upgrade');
     if (p.tool === 'rig') { selectTool('pipe'); setPanel('network'); }
     save(); renderPanels(true);
   }
+  if (!result.ok) experience?.audio.effect('invalid');
   tell(result.message || 'Ação indisponível.'); updatePreview(); updateHUD();
 }
 function updateHUD() {
   const o = operation; if (!o) return;
+  experience?.update(o);
   text('operation-region', `${REGIONS[o.region].name.toUpperCase()} · TEMPORADA ${o.season + 1} · ${o.difficulty === 'enterprise' ? 'EMPRESARIAL' : 'TRANQUILA'}`);
   text('operation-cash', money(o.cash)); const time = Math.ceil(o.time); text('operation-time', `${Math.floor(time / 60)}:${String(time % 60).padStart(2, '0')}`);
   text('operation-oil', `${Math.floor(o.sold)} / ${Math.floor(o.extracted)} b`); text('operation-loss', `${o.spilled.toFixed(1)} b`);
@@ -333,10 +340,15 @@ $('save-slots').addEventListener('click', event => {
     if (!locked && !storageBlocked) save();
   } catch { text('slot-message', 'Não foi possível trocar de espaço.'); }
 });
-$('export-save').addEventListener('click', () => {
+$('export-save').addEventListener('click', async () => {
   if (locked) return;
   const raw = encode(campaign, operation);
   if (!decode(raw)) { text('slot-message', 'O estado atual não passou na validação para exportação.'); return; }
+  if (isAndroid()) {
+    try { const result = await nativeCall('exportSave', { raw, name: `ouro-campanha-${activeSlot + 1}.json` }); text('slot-message', result.cancelled ? 'Exportação cancelada.' : 'Campanha exportada para o arquivo escolhido.'); }
+    catch (error) { text('slot-message', error.message); }
+    return;
+  }
   const url = URL.createObjectURL(new Blob([raw], { type: 'application/json' })), link = document.createElement('a');
   link.href = url; link.download = `ouro-campanha-${activeSlot + 1}-temporada-${campaign.season + 1}.json`; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000); text('slot-message', 'Exportação preparada. Guarde o JSON para importar em outro navegador.');
@@ -380,23 +392,12 @@ $('reset-invalid').addEventListener('click', () => { $('recovery').close(); $('n
 $('recovery').addEventListener('cancel', event => event.preventDefault());
 $('new-campaign').addEventListener('cancel', event => { if (locked) { event.preventDefault(); $('cancel-new').click(); } });
 for (const [id, delta] of [['zoom-in', .5], ['zoom-out', -.5]]) $(id).addEventListener('click', () => { renderer.setZoom(renderer.zoom + delta); text('zoom-level', `${renderer.zoom}×`); });
-let pointer = null;
-$('enterprise-canvas').addEventListener('pointerdown', event => {
-  if (pointer || event.button !== 0) return;
-  pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, startX: event.clientX, startY: event.clientY, dragged: false };
-  event.currentTarget.setPointerCapture(event.pointerId);
+bindFieldGestures($('enterprise-canvas'), renderer, {
+  select: selectPoint,
+  cursor: point => { view.touchCursor = point; },
+  precision: () => experience?.settings.precision ?? false,
+  change: () => text('zoom-level', `${renderer.zoom.toFixed(1)}×`),
 });
-$('enterprise-canvas').addEventListener('pointermove', event => {
-  if (!pointer || pointer.id !== event.pointerId) return;
-  if (Math.hypot(event.clientX - pointer.startX, event.clientY - pointer.startY) > 8) pointer.dragged = true;
-  if (pointer.dragged) { renderer.pan.x += event.clientX - pointer.x; renderer.pan.y += event.clientY - pointer.y; renderer.camera(); }
-  pointer.x = event.clientX; pointer.y = event.clientY;
-});
-$('enterprise-canvas').addEventListener('pointerup', event => {
-  if (!pointer || pointer.id !== event.pointerId) return;
-  if (!pointer.dragged) selectPoint(renderer.world(event.clientX, event.clientY)); pointer = null;
-});
-for (const name of ['pointercancel', 'lostpointercapture']) $('enterprise-canvas').addEventListener(name, () => { pointer = null; });
 $('enterprise-canvas').addEventListener('keydown', event => {
   if (event.key === 'Escape') { view.preview = null; view.route = []; updatePreview(); return; }
   const direction = { ArrowLeft: [-10, 0], ArrowRight: [10, 0], ArrowUp: [0, -10], ArrowDown: [0, 10] }[event.key];
@@ -413,12 +414,37 @@ function frame(now) {
       accumulator += elapsed;
       while (accumulator >= RULES.step) { stepOperation(operation); accumulator -= RULES.step; }
     } else accumulator = 0;
-    renderer.draw(operation, view);
+    if (now - lastRender >= 1000 / (operation.paused ? 12 : renderer.quality?.fps || 60)) { renderer.draw(operation, view); lastRender = now; }
     if (now - lastUI > 150) { updateHUD(); lastUI = now; }
     if (now - lastPanels > 900) { renderPanels(); lastPanels = now; }
     if (now - lastSave > 5000) { save(); lastSave = now; }
     if (operation.ended && !reportShown) { view.preview = null; updatePreview(); renderReport(); }
   }
+  if (!operation) experience?.update(null);
   requestAnimationFrame(frame);
+}
+// Som, preferências e ferramentas de toque do aplicativo Android. A página
+// web publicada mantém exatamente o comportamento anterior.
+if (isAndroid()) {
+  experience = installExperience({
+    getGame: () => operation,
+    pause: () => pause(),
+    back: () => {
+      if (view.preview) { view.preview = null; view.route = []; updatePreview(); return true; }
+      if (document.body.classList.contains('mobile-controls-open')) { document.body.classList.remove('mobile-controls-open'); document.body.classList.add('mobile-controls-collapsed'); return true; }
+      if (operation && !operation.paused && !operation.ended) { pause(); return true; }
+      return false;
+    },
+    quality: value => { renderer.quality = value; renderer.resize(); },
+  });
+  const toolbar = document.createElement('div'); toolbar.className = 'mobile-field-toolbar';
+  toolbar.innerHTML = '<button id="center-field">Centralizar campo</button><button id="toggle-controls" aria-expanded="true">Ferramentas ▾</button>';
+  document.querySelector('.field-column').append(toolbar);
+  $('center-field').addEventListener('click', () => { renderer.pan = { x: 0, y: 0 }; renderer.setZoom(1); text('zoom-level', '1×'); });
+  $('toggle-controls').addEventListener('click', () => {
+    const collapsed = document.body.classList.toggle('mobile-controls-collapsed'); document.body.classList.toggle('mobile-controls-open', !collapsed);
+    $('toggle-controls').setAttribute('aria-expanded', String(!collapsed));
+    if (!collapsed) document.querySelector('.operation-controls').scrollIntoView({ block: 'nearest' });
+  });
 }
 load(); showScreen(); requestAnimationFrame(frame);

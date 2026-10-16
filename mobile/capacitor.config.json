@@ -1,0 +1,15 @@
+{
+  "appId": "com.jefferl05.ourodosubsolo",
+  "appName": "Ouro do Subsolo",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": true,
+    "backgroundColor": "#102621",
+    "minWebViewVersion": 105
+  },
+  "server": {
+    "androidScheme": "https",
+    "errorPath": "unsupported.html"
+  }
+}

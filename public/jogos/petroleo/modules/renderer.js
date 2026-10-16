@@ -19,7 +19,7 @@ export class Renderer {
   resize() {
     if (this.suspended) return;
     const box = this.canvas.getBoundingClientRect();
-    const dpr = Math.min(CONFIG.maxDpr, window.devicePixelRatio || 1);
+    const dpr = Math.min(this.quality?.dpr || CONFIG.maxDpr, window.devicePixelRatio || 1);
     this.dpr = dpr;
     this.canvas.width = Math.max(1, Math.round(box.width * dpr));
     this.canvas.height = Math.max(1, Math.round(box.height * dpr));

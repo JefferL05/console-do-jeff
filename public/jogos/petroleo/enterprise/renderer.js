@@ -14,7 +14,7 @@ export class EnterpriseRenderer {
   }
   resize() {
     const box = this.canvas.getBoundingClientRect();
-    this.width = Math.max(1, box.width); this.height = Math.max(1, box.height); this.dpr = Math.min(2, devicePixelRatio || 1);
+    this.width = Math.max(1, box.width); this.height = Math.max(1, box.height); this.dpr = Math.min(this.quality?.dpr || 2, devicePixelRatio || 1);
     this.canvas.width = Math.round(this.width * this.dpr); this.canvas.height = Math.round(this.height * this.dpr); this.camera();
   }
   camera() {
@@ -94,7 +94,7 @@ export class EnterpriseRenderer {
       label(p.kind === 'gas' ? `G${p.id + 1}` : `R${p.id + 1}`, p.x, p.y - p.ry - 7, '#f7e6bd', 11);
     }
     const flowing = new Set();
-    if (!this.reduced.matches && !operation.ended) for (const node of operation.nodes) {
+    if (!this.reduced.matches && this.quality?.effects !== false && !operation.ended) for (const node of operation.nodes) {
       if (node.pocketId === null || operation.pockets[node.pocketId].amount <= 0 || operation.rigs[node.rigId].storage >= operation.rigs[node.rigId].capacity) continue;
       const path = pathToRig(operation, node.id);
       if (path?.every(e => e.open && e.progress >= 1)) for (const edge of path) flowing.add(edge.id);
@@ -123,7 +123,7 @@ export class EnterpriseRenderer {
     }
     for (const rig of operation.rigs) {
       const x = rig.x, active = operation.nodes.some(n => n.rigId === rig.id && n.pocketId !== null && operation.pockets[n.pocketId].amount > 0);
-      const motion = this.reduced.matches || !active ? 0 : Math.sin(operation.elapsed * 4 + x) * 4;
+      const motion = this.reduced.matches || this.quality?.effects === false || !active ? 0 : Math.sin(operation.elapsed * 4 + x) * 4;
       line(ctx, [{ x: x - 15, y: 118 }, { x: x - 5, y: 54 }, { x: x + 5, y: 54 }, { x: x + 15, y: 118 }], '#294438', 4);
       for (let y = 65; y < 110; y += 13) line(ctx, [{ x: x - 10, y: y + 12 }, { x: x + 9, y }, { x: x - 9, y }], '#c6af77', 2);
       line(ctx, [{ x, y: 55 }, { x, y: 103 + motion }], '#e7d3a0', 2); rect(ctx, x - 8, 51, 16, 5, '#e1b565');
@@ -161,6 +161,6 @@ export class EnterpriseRenderer {
       else { ctx.beginPath(); ctx.arc(p.x, p.y, 14, 0, Math.PI * 2); ctx.strokeStyle = '#fff0be'; ctx.stroke(); }
       ctx.setLineDash([]);
     }
-    if (view.cursor) { const p = view.cursor; line(ctx, [{ x: p.x - 8, y: p.y }, { x: p.x + 8, y: p.y }], '#fff5c8', 2 / this.scale); line(ctx, [{ x: p.x, y: p.y - 8 }, { x: p.x, y: p.y + 8 }], '#fff5c8', 2 / this.scale); }
+    if (view.touchCursor || view.cursor) { const p = view.touchCursor || view.cursor; line(ctx, [{ x: p.x - 8, y: p.y }, { x: p.x + 8, y: p.y }], '#fff5c8', 2 / this.scale); line(ctx, [{ x: p.x, y: p.y - 8 }, { x: p.x, y: p.y + 8 }], '#fff5c8', 2 / this.scale); if (view.touchCursor) { ctx.beginPath(); ctx.arc(p.x, p.y, 12 / this.scale, 0, Math.PI * 2); ctx.strokeStyle = '#ffe2a5'; ctx.lineWidth = 1 / this.scale; ctx.stroke(); } }
   }
 }
