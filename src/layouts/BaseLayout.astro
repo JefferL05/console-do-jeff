@@ -70,6 +70,9 @@ const siteImage = image.startsWith('http') ? image : url(image);
       (function() {
         var theme;
         try { theme = localStorage.getItem('theme'); } catch {}
+        try {
+          document.documentElement.dataset.reading = localStorage.getItem('reading-mode') === 'illustrated' ? 'illustrated' : 'text';
+        } catch { document.documentElement.dataset.reading = 'text'; }
         if (!theme) {
           theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }

@@ -1,0 +1,55 @@
+---
+import type { VisualGuide } from '../data/visual-guides';
+interface Props { guide: VisualGuide }
+const { guide } = Astro.props;
+const icons = {
+  code: 'm22 24-12 12 12 12m28-24 12 12-12 12M41 16 31 56',
+  database: 'M14 20c0-12 44-12 44 0s-44 12-44 0v32c0 12 44 12 44 0V20M14 36c0 12 44 12 44 0',
+  check: 'M36 8 60 18v20c0 14-24 26-24 26S12 52 12 38V18ZM24 35l9 9 17-19',
+  chart: 'M12 10v50h50M22 48V36m14 12V24m14 24V14',
+  compass: 'M36 6a30 30 0 1 0 0 60 30 30 0 0 0 0-60ZM46 25l-6 15-15 6 6-15Z',
+  cloud: 'M20 54h34a12 12 0 0 0 2-24 20 20 0 0 0-39-2A13 13 0 0 0 20 54ZM36 46V26m-8 8 8-8 8 8',
+  layers: 'm36 8 28 15-28 15L8 23ZM8 36l28 15 28-15M8 49l28 15 28-15',
+  truck: 'M6 16h36v34H6ZM42 29h13l11 13v8H42M14 50a7 7 0 1 0 14 0m21 0a7 7 0 1 0 14 0'
+};
+---
+<section class="visual-guide" aria-label="Resumo ilustrado do artigo">
+  <span class="visual-eyebrow">O artigo em um mapa</span>
+  <h2>{guide.title}</h2>
+  <p class="visual-caption">{guide.caption}</p>
+  <ol class="visual-flow" aria-label="Etapas do diagrama">
+    {guide.steps.map((step, index) => <li style={`--step-color: ${['#0f766e', '#6d28d9', '#b45309', '#be185d'][index]}`}>
+      <div class="step-art" aria-hidden="true"><span class="step-number">0{index + 1}</span><svg viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d={icons[step.icon]} /></svg></div>
+      <h3>{step.label}</h3><p>{step.detail}</p>
+    </li>)}
+  </ol>
+  <h3 class="takeaway-title">O que levar desta leitura</h3>
+  <ol class="visual-takeaways">
+    {guide.takeaways.map((text, index) => <li><span aria-hidden="true">{index + 1}</span><p>{text}</p></li>)}
+  </ol>
+  <p class="visual-note">Mapa de apoio à leitura. O artigo completo continua abaixo.</p>
+</section>
+<style>
+  .visual-guide { display: none; --paper: #f6f3ee; --ink: #282a33; --muted: #555967; --line: #dcd8d0; }
+  :global(.dark) .visual-guide { --paper: #20212a; --ink: #f2efe8; --muted: #b7bdcc; --line: #41434e; }
+  :global([data-reading='illustrated']) .visual-guide { display: block; background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 24px; padding: clamp(20px,4vw,44px); margin: 24px 0 48px; }
+  .visual-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); }
+  h2 { font-size: clamp(26px,4vw,40px); font-weight: 800; line-height: 1.15; letter-spacing: -.035em; margin: 14px 0; }
+  .visual-caption { max-width: 65ch; color: var(--muted); line-height: 1.7; }
+  .visual-flow { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 22px; margin: 32px 0; padding: 0; list-style: none; }
+  .visual-flow li { position: relative; }
+  .visual-flow li:not(:last-child)::after { content: '→'; position: absolute; right: -20px; top: 48px; font-size: 20px; color: var(--muted); }
+  .step-art { height: 124px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 18px; background: color-mix(in srgb, var(--step-color) 9%, var(--paper)); position: relative; }
+  svg { width: 64px; height: 64px; color: var(--step-color); }
+  :global(.dark) svg { color: color-mix(in srgb, var(--step-color) 50%, white); }
+  .step-number { position: absolute; top: 8px; left: 10px; font: 11px monospace; color: var(--muted); }
+  h3 { font-weight: 700; font-size: 16px; margin: 14px 0 6px; }
+  .visual-flow p { font-size: 13px; line-height: 1.6; color: var(--muted); }
+  .takeaway-title { border-top: 1px solid var(--line); padding-top: 24px; }
+  .visual-takeaways { list-style: none; padding: 0; margin: 16px 0; display: grid; gap: 14px; }
+  .visual-takeaways li { display: flex; align-items: baseline; gap: 14px; line-height: 1.6; }
+  .visual-takeaways span { font: 700 13px monospace; border: 1px solid var(--line); padding: 4px 10px; border-radius: 8px; }
+  .visual-note { color: var(--muted); font-size: 12px; margin-top: 24px; }
+  @media(max-width:640px) { .visual-flow { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; } .visual-flow li:nth-child(2)::after { display: none; } }
+  @media(max-width:360px) { .visual-flow { grid-template-columns: 1fr; } .visual-flow li::after { display: none; } }
+</style>

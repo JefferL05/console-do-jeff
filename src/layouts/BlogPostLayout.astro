@@ -4,6 +4,8 @@ import TableOfContents from '@components/TableOfContents.astro';
 import { formatDate, slugify, url } from '@utils/index';
 import CopyCode from '@components/CopyCode.astro';
 import { getCollection } from 'astro:content';
+import VisualGuide from '@components/VisualGuide.astro';
+import { visualGuides } from '../data/visual-guides';
 
 interface Heading {
   depth: number;
@@ -39,6 +41,8 @@ const {
 
 const formattedPubDate = formatDate(pubDate);
 const formattedUpdatedDate = updatedDate && formatDate(updatedDate);
+const slug = Astro.url.pathname.replace(/\/$/, '').split('/').pop() ?? '';
+const visualGuide = visualGuides[slug];
 const related = (await getCollection('posts', ({ data }) => !data.draft))
   .filter(post => url(`/blog/${post.id}`).replace(/\/$/, '') !== Astro.url.pathname.replace(/\/$/, ''))
   .map(post => ({ post, score: (post.data.category === category ? 2 : 0) + post.data.tags.filter(tag => tags.includes(tag)).length }))
@@ -48,7 +52,7 @@ const related = (await getCollection('posts', ({ data }) => !data.draft))
 ---
 
 <BaseLayout title={`${title} | Console do Jeff`} description={description} image={image?.url} article pubDate={pubDate}>
-  <article class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <article class="blog-article max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-8">
       <a href={url('/blog')} class="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mb-6">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,13 +129,14 @@ const related = (await getCollection('posts', ({ data }) => !data.draft))
       </figure>
     )}
     
+    {visualGuide && <VisualGuide guide={visualGuide} />}
     <div class="lg:flex lg:gap-12">
       <aside class="hidden lg:block">
         <TableOfContents headings={headings} />
       </aside>
       
       <div class="flex-1 min-w-0">
-        <div class="prose prose-lg dark:prose-invert max-w-none">
+        <div class="article-body prose prose-lg dark:prose-invert max-w-none">
           <slot />
         </div>
         {related.length > 0 && <section class="mt-10" aria-labelledby="related-title">
@@ -162,3 +167,24 @@ const related = (await getCollection('posts', ({ data }) => !data.draft))
   </article>
   <CopyCode />
 </BaseLayout>
+
+<style is:global>
+  [data-reading='illustrated'] .blog-article { counter-reset: visual-section; }
+  [data-reading='illustrated'] .article-body > h2 {
+    counter-increment: visual-section;
+    border-top: 1px solid #92939b55;
+    padding-top: 2rem;
+    margin-top: 3rem;
+    letter-spacing: -.025em;
+    scroll-margin-top: 160px;
+  }
+  [data-reading='illustrated'] .article-body > h2::before {
+    content: counter(visual-section, decimal-leading-zero) ' /';
+    display: block; font: 600 13px monospace; letter-spacing: .1em;
+    color: #0f766e; margin-bottom: .8rem;
+  }
+  .dark[data-reading='illustrated'] .article-body > h2::before { color: #7ad6c9; }
+  [data-reading='illustrated'] .article-body blockquote { border-radius: 0 16px 16px 0; background: #0f766e0c; padding: 1rem 1.5rem; }
+  [data-reading='illustrated'] .article-body img { border: 1px solid #92939b44; border-radius: 16px; }
+  [data-reading='illustrated'] .article-body > ul { padding: 1.3rem 1.3rem 1.3rem 2.7rem; background: #8585900a; border: 1px solid #92939b33; border-radius: 16px; }
+</style>

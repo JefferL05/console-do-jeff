@@ -43,6 +43,10 @@ const currentPath = Astro.url.pathname;
           <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .8a11.2 11.2 0 0 0-3.54 21.83c.56.1.77-.24.77-.54v-2.1c-3.13.68-3.79-1.33-3.79-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.73 1.16 1.73 1.16 1 1.72 2.62 1.22 3.26.93.1-.72.39-1.22.71-1.5-2.5-.28-5.13-1.25-5.13-5.57 0-1.23.44-2.23 1.16-3.02-.12-.28-.5-1.43.11-2.98 0 0 .95-.3 3.08 1.15a10.7 10.7 0 0 1 5.6 0c2.14-1.45 3.08-1.15 3.08-1.15.61 1.55.23 2.7.11 2.98.73.79 1.16 1.79 1.16 3.02 0 4.33-2.64 5.28-5.15 5.56.4.35.76 1.03.76 2.08v3.11c0 .3.2.65.78.54A11.2 11.2 0 0 0 12 .8Z"/></svg>
         </a>
         <Search />
+        <button id="reading-toggle" class="reading-control" type="button" aria-label="Modo ilustrado" aria-pressed="false" title="Alternar entre leitura em texto e ilustrada">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m4 18 5-5 4 3 4-6 4 8"/></svg>
+          <span id="reading-label">Texto</span>
+        </button>
         <a class="toolbar-icon rss-link" href={url('/rss.xml')} aria-label="Acompanhar pelo RSS" title="RSS">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4a16 16 0 0 1 16 16M4 11a9 9 0 0 1 9 9"/><circle cx="5" cy="19" r="1" fill="currentColor"/></svg>
         </a>
@@ -102,6 +106,8 @@ const currentPath = Astro.url.pathname;
   .header-tools { flex: 1; justify-content: flex-end; min-width: 0; gap: 12px; }
   .brand-link { display: flex; align-items: center; gap: 8px; font-weight: 700; white-space: nowrap; }
   .brand-name { display: none; }
+  .reading-control { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 9px; border: 1px solid #8885; border-radius: 8px; font-size: 12px; white-space: nowrap; }
+  .reading-control[aria-pressed='true'] { background: #567c6926; border-color: #719981; }
   .toolbar-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 44px; flex-shrink: 0; border-radius: 8px; }
   .toolbar-icon:hover { background: #8882; }
   .language-label { font-size: 13px; font-weight: 700; padding: 7px 2px; border-bottom: 1px solid currentColor; }
@@ -111,7 +117,7 @@ const currentPath = Astro.url.pathname;
   .auto-control[aria-checked='true'] .switch-track { background: #567c69; }
   .auto-control[aria-checked='true'] .switch-track::before { transform: translateX(12px); }
   a:focus-visible, button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
-  @media (min-width: 1200px) { .brand-name { display: inline; } }
+  @media (min-width: 1400px) { .brand-name { display: inline; } }
   @media (max-width: 900px) { .desktop-links { display: none; } }
   @media (max-width: 600px) {
     .header-row { flex-wrap: wrap; gap: 0; padding: 8px 0; }
@@ -119,12 +125,27 @@ const currentPath = Astro.url.pathname;
     .header-tools { gap: 4px; flex-wrap: wrap; }
     .header-tools :global(.site-search) { order: 10; flex: 0 0 100%; margin-top: 6px; }
     .language-label { display: none; }
+    .github-link, .rss-link { display: none; }
     .toolbar-icon { width: 34px; }
   }
 </style>
 
 <script>
   const themeToggle = document.getElementById('theme-toggle');
+  const readingToggle = document.getElementById('reading-toggle');
+  const readingLabel = document.getElementById('reading-label');
+  function syncReading() {
+    const illustrated = document.documentElement.dataset.reading === 'illustrated';
+    readingToggle?.setAttribute('aria-pressed', String(illustrated));
+    if (readingLabel) readingLabel.textContent = illustrated ? 'Ilustrado' : 'Texto';
+  }
+  syncReading();
+  readingToggle?.addEventListener('click', () => {
+    const mode = document.documentElement.dataset.reading === 'illustrated' ? 'text' : 'illustrated';
+    document.documentElement.dataset.reading = mode;
+    try { localStorage.setItem('reading-mode', mode); } catch {}
+    syncReading();
+  });
   const sunIcon = document.getElementById('sun-icon');
   const moonIcon = document.getElementById('moon-icon');
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
