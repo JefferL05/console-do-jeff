@@ -1,16 +1,26 @@
-<div class="relative min-w-0">
+<div class="site-search relative min-w-0">
   <label for="search-input" class="sr-only">Pesquisar artigos</label>
   <input
     type="search"
     id="search-input"
-    placeholder="Pesquisar..."
+    placeholder="Buscar no blog…"
     autocomplete="off"
     aria-controls="search-results"
-    class="w-32 sm:w-48 lg:w-64 px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+    class="search-field"
   />
+  <kbd aria-hidden="true">Ctrl K</kbd>
   <div id="search-results" hidden class="absolute top-full right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl max-h-96 overflow-y-auto z-50"></div>
   <span id="search-status" role="status" class="sr-only"></span>
 </div>
+
+<style>
+  .site-search { flex: 1; max-width: 340px; }
+  .search-field { width: 100%; min-width: 0; height: 44px; border: 1px solid #d9d5cc; border-radius: 10px; background: #eeece6; padding: 0 66px 0 14px; font-size: 14px; color: inherit; }
+  :global(.dark) .search-field { background: #302e2a; border-color: #302e2a; }
+  .search-field:focus-visible { outline: 2px solid #8b9eaa; outline-offset: 2px; }
+  kbd { position: absolute; right: 8px; top: 11px; font-size: 10px; padding: 2px 5px; border: 1px solid #8886; border-radius: 4px; pointer-events: none; text-transform: uppercase; }
+  @media (max-width: 600px) { .site-search { max-width: none; } }
+</style>
 
 <script>
   import type Fuse from 'fuse.js';
@@ -24,6 +34,11 @@
   }
 
   const input = document.querySelector<HTMLInputElement>('#search-input');
+  document.addEventListener('keydown', event => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault(); input?.focus(); input?.select();
+    }
+  });
   const results = document.querySelector<HTMLDivElement>('#search-results');
   const status = document.querySelector<HTMLElement>('#search-status');
   let loading: Promise<Fuse<Post>> | undefined;

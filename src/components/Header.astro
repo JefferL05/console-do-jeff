@@ -14,16 +14,16 @@ const navItems = [
 const currentPath = Astro.url.pathname;
 ---
 
-<header class="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
-  <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
-      <a href={navItems[0].href} class="flex items-center gap-2 font-bold text-xl text-primary-600 dark:text-primary-400">
+<header class="site-header sticky top-0 z-50">
+  <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Navegação principal">
+    <div class="header-row">
+      <a href={navItems[0].href} class="brand-link" aria-label="Console do Jeff — início">
         <span class="text-2xl">&lt;/&gt;</span>
-        <span class="hidden sm:inline">Console do Jeff</span>
+        <span class="brand-name">Console do Jeff</span>
       </a>
       
-      <div class="hidden md:flex items-center gap-6">
-        {navItems.map(item => (
+      <div class="desktop-links">
+        {navItems.filter(item => ['Sobre', 'Arquivo', 'Projetos'].includes(item.label)).map(item => (
           <a
             href={item.href}
             class:list={[
@@ -38,11 +38,19 @@ const currentPath = Astro.url.pathname;
         ))}
       </div>
       
-      <div class="flex items-center gap-3">
+      <div class="header-tools">
+        <a class="toolbar-icon github-link" href="https://github.com/JefferL05" aria-label="GitHub de Jefferson Lopes" title="GitHub">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .8a11.2 11.2 0 0 0-3.54 21.83c.56.1.77-.24.77-.54v-2.1c-3.13.68-3.79-1.33-3.79-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.73 1.16 1.73 1.16 1 1.72 2.62 1.22 3.26.93.1-.72.39-1.22.71-1.5-2.5-.28-5.13-1.25-5.13-5.57 0-1.23.44-2.23 1.16-3.02-.12-.28-.5-1.43.11-2.98 0 0 .95-.3 3.08 1.15a10.7 10.7 0 0 1 5.6 0c2.14-1.45 3.08-1.15 3.08-1.15.61 1.55.23 2.7.11 2.98.73.79 1.16 1.79 1.16 3.02 0 4.33-2.64 5.28-5.15 5.56.4.35.76 1.03.76 2.08v3.11c0 .3.2.65.78.54A11.2 11.2 0 0 0 12 .8Z"/></svg>
+        </a>
         <Search />
+        <a class="toolbar-icon rss-link" href={url('/rss.xml')} aria-label="Acompanhar pelo RSS" title="RSS">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4a16 16 0 0 1 16 16M4 11a9 9 0 0 1 9 9"/><circle cx="5" cy="19" r="1" fill="currentColor"/></svg>
+        </a>
+        <span class="language-label" title="Conteúdo em português" lang="pt-BR">PT</span>
+        <button id="theme-auto" class="auto-control" type="button" role="switch" aria-checked="false" aria-label="Seguir tema do sistema"><span class="switch-track" aria-hidden="true"></span><span>auto</span></button>
         <button
           id="theme-toggle"
-          class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          class="toolbar-icon"
           aria-label="Alternar tema"
         >
           <svg id="sun-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,7 +64,7 @@ const currentPath = Astro.url.pathname;
         
         <button 
           id="mobile-menu-btn" 
-          class="md:hidden p-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
+          class="toolbar-icon"
           aria-label="Abrir menu"
           aria-expanded="false"
           aria-controls="mobile-menu"
@@ -68,7 +76,7 @@ const currentPath = Astro.url.pathname;
       </div>
     </div>
     
-    <div id="mobile-menu" class="hidden md:hidden pb-4">
+    <div id="mobile-menu" class="hidden pb-4">
       {navItems.map(item => (
         <a
           href={item.href}
@@ -86,12 +94,46 @@ const currentPath = Astro.url.pathname;
   </nav>
 </header>
 
+<style>
+  .site-header { background: #faf9f6; color: #34312d; border-bottom: 1px solid #dedbd4; }
+  :global(.dark) .site-header { background: #1b1916; color: #e7e2d6; border-color: #36332d; }
+  .header-row, .header-tools, .desktop-links { display: flex; align-items: center; gap: 16px; }
+  .header-row { min-height: 78px; }
+  .header-tools { flex: 1; justify-content: flex-end; min-width: 0; gap: 12px; }
+  .brand-link { display: flex; align-items: center; gap: 8px; font-weight: 700; white-space: nowrap; }
+  .brand-name { display: none; }
+  .toolbar-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 44px; flex-shrink: 0; border-radius: 8px; }
+  .toolbar-icon:hover { background: #8882; }
+  .language-label { font-size: 13px; font-weight: 700; padding: 7px 2px; border-bottom: 1px solid currentColor; }
+  .auto-control { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 12px; }
+  .switch-track { width: 29px; height: 17px; border-radius: 20px; background: #7778; padding: 2px; }
+  .switch-track::before { content: ''; display: block; width: 13px; height: 13px; background: white; border-radius: 50%; transition: transform .15s; }
+  .auto-control[aria-checked='true'] .switch-track { background: #567c69; }
+  .auto-control[aria-checked='true'] .switch-track::before { transform: translateX(12px); }
+  a:focus-visible, button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+  @media (min-width: 1200px) { .brand-name { display: inline; } }
+  @media (max-width: 900px) { .desktop-links { display: none; } }
+  @media (max-width: 600px) {
+    .header-row { flex-wrap: wrap; gap: 0; padding: 8px 0; }
+    .brand-link { margin-right: 8px; }
+    .header-tools { gap: 4px; flex-wrap: wrap; }
+    .header-tools :global(.site-search) { order: 10; flex: 0 0 100%; margin-top: 6px; }
+    .language-label { display: none; }
+    .toolbar-icon { width: 34px; }
+  }
+</style>
+
 <script>
   const themeToggle = document.getElementById('theme-toggle');
   const sunIcon = document.getElementById('sun-icon');
   const moonIcon = document.getElementById('moon-icon');
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
+  const autoToggle = document.getElementById('theme-auto');
+  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+  let automatic = true;
+  try { automatic = !['light', 'dark'].includes(localStorage.getItem('theme') ?? ''); } catch {}
+  function syncAutomatic() { autoToggle?.setAttribute('aria-checked', String(automatic)); }
   
   function syncThemeIcon() {
     const isDark = document.documentElement.classList.contains('dark');
@@ -105,7 +147,22 @@ const currentPath = Astro.url.pathname;
   }
 
   syncThemeIcon();
+  syncAutomatic();
+  systemTheme.addEventListener('change', () => {
+    if (automatic) { document.documentElement.classList.toggle('dark', systemTheme.matches); syncThemeIcon(); }
+  });
+  autoToggle?.addEventListener('click', () => {
+    automatic = !automatic;
+    if (automatic) document.documentElement.classList.toggle('dark', systemTheme.matches);
+    try {
+      if (automatic) localStorage.removeItem('theme');
+      else localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    } catch {}
+    syncAutomatic(); syncThemeIcon();
+  });
   themeToggle?.addEventListener('click', () => {
+    automatic = false;
+    syncAutomatic();
     const isDark = document.documentElement.classList.toggle('dark');
     try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch {}
     syncThemeIcon();
