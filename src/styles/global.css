@@ -83,6 +83,20 @@ html {
   scroll-behavior: smooth;
 }
 
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid #0e7490; outline-offset: 4px; }
+.dark :focus-visible { outline-color: #67e8f9; }
+.skip-link { position: fixed; left: 12px; top: -100px; z-index: 100; background: #fff; color: #111; border: 2px solid #0e7490; border-radius: 8px; padding: 12px 18px; }
+.skip-link:focus { top: 12px; }
+.article-body { font-size: calc(1.125rem * var(--reading-scale, 1)); overflow-wrap: anywhere; }
+.blog-article h1, .article-body h2, .article-body h3 { scroll-margin-top: 150px; }
+.article-body pre { max-width: 100%; overflow-x: auto; }
+.article-body table { display: block; max-width: 100%; overflow-x: auto; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

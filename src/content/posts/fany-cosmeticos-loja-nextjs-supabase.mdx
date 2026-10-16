@@ -2,6 +2,7 @@
 title: "Fany Cosméticos: uma loja Next.js + Supabase onde o navegador não decide o preço"
 description: "Como estou construindo a Fany Cosméticos: catálogo no Supabase, cálculo de frete e total no banco, RLS, pagamento em sandbox e testes automatizados."
 pubDate: 2026-10-15
+sameDayOrder: 2
 author: "Jeff"
 category: "Projetos"
 tags: ["nextjs", "supabase", "postgresql", "ecommerce", "seguranca", "typescript"]
@@ -12,6 +13,7 @@ draft: false
 ---
 
 import Callout from '../../components/Callout.astro';
+import SectionDiagram from '../../components/SectionDiagram.astro';
 import Screenshot from '../../components/Screenshot.astro';
 
 
@@ -83,6 +85,7 @@ Um detalhe que vale destacar: **não uso `user_metadata` para decidir permissão
 Também limitei o abuso na criação de pedidos: no máximo **cinco pedidos por usuário por minuto** e **30 itens distintos** por pedido. O identificador do pedido é gerado no cliente antes do envio, então repetir a submissão por queda de rede **não duplica** o pedido.
 
 ## Frete sem confiar no CEP
+<SectionDiagram topic="fany" index={0} />
 
 O checkout consulta a API pública **ViaCEP** apenas para descobrir o estado a partir do CEP — sem chave, sem custo. O valor do frete **não** vem dessa consulta: ele é calculado dentro do mesmo gatilho do pedido, com base em uma tabela `shipping_zones` com uma tarifa por UF.
 
@@ -93,6 +96,7 @@ CEP -> ViaCEP -> UF -> shipping_zones(uf) -> frete somado no total
 As tarifas atuais são demonstrativas. Integrar Correios ou Melhor Envio exigirá peso e dimensões dos produtos, CEP de origem, cotação no servidor e escolha do serviço na interface. O valor escolhido também precisará ser validado ao criar o pedido; não basta substituir a tabela por uma API.
 
 ## Pagamento: sandbox com verificação de verdade
+<SectionDiagram topic="fany" index={1} />
 
 A função `create-payment-preference` cria uma preferência no Checkout Pro **depois** que o pedido já existe no banco. Ela relê o pedido no servidor para montar os itens, inclui o frete e confere se a soma em centavos bate com o total. Se não bater, recusa.
 

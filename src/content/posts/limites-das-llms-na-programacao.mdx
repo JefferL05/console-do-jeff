@@ -13,6 +13,7 @@ readingTime: 12
 ---
 
 import Callout from '../../components/Callout.astro';
+import SectionDiagram from '../../components/SectionDiagram.astro';
 
 Você pede a uma IA para adicionar recuperação de senha a uma aplicação. Em segundos, ela cria a rota, o formulário, o envio de e-mail e até uma explicação elegante sobre segurança. Os nomes são bons. O código usa padrões conhecidos. A resposta termina com a tranquilidade de quem já resolveu aquilo cem vezes.
 
@@ -60,6 +61,7 @@ Isso também explica por que "percentual de código escrito por IA" é uma métr
 Código produzido mede volume. Engenharia precisa medir resultado, risco e custo ao longo do tempo.
 
 ## A dívida de verificação
+<SectionDiagram topic="limits" index={0} />
 
 Quando gerar fica muito barato, verificar pode virar o novo gargalo. Chamo esse acúmulo de **dívida de verificação**: soluções chegam mais rápido do que a equipe consegue compreender, testar e sustentar.
 
@@ -110,6 +112,7 @@ Um estudo com 47 participantes apresentado na [ACM CCS 2023](https://arxiv.org/a
 Quanto maior a autonomia, mais fortes devem ser os controles: permissões mínimas, ambiente isolado, comandos permitidos, limites de custo, logs auditáveis, testes obrigatórios e aprovação humana para ações críticas. "Autônomo" não pode significar "sem freios".
 
 ## Um método responsável de uso
+<SectionDiagram topic="limits" index={1} />
 
 Usar IA com rigor não exige burocracia infinita. Exige transformar uma resposta probabilística em evidência verificável:
 

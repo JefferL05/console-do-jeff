@@ -2,6 +2,7 @@
 title: "Ouro do Subsolo: meu jogo de exploração e gestão de petróleo"
 description: "Explore, perfure e escolha a hora de vender. Conheça o Ouro do Subsolo, suas partidas rápidas, a campanha empresarial e os desafios de construir o jogo."
 pubDate: 2026-10-15
+sameDayOrder: 3
 author: "Jeff"
 category: "Projetos"
 tags: ["jogos", "javascript", "canvas", "astro", "android", "gamedev"]
@@ -12,6 +13,7 @@ draft: false
 ---
 
 import { url as siteUrl } from '../../utils/index';
+import SectionDiagram from '../../components/SectionDiagram.astro';
 
 **Encontrar petróleo é só o começo.** Depois é preciso extrair, transportar e decidir quando vender — tudo isso com dinheiro e tempo limitados. Essa é a proposta do **Ouro do Subsolo**, o jogo que estou desenvolvendo aqui no Console do Jeff.
 
@@ -36,6 +38,7 @@ Guardar pode parecer uma boa ideia quando o preço está baixo, mas tanque, tran
 Ao concluir uma concessão, há metas e medalhas. A oficina permanente permite aplicar fichas em melhorias que passam a valer nas próximas partidas.
 
 ## A campanha empresarial amplia o desafio
+<SectionDiagram topic="ouro" index={0} />
 
 A <a href={siteUrl('/jogos/petroleo/campanha/')}>campanha empresarial</a> tem **dez temporadas em cinco regiões**. Entre as operações, você volta à cidade para avaliar terrenos, tecnologias, crédito e participação nos leilões.
 
@@ -50,6 +53,7 @@ Dentro do campo, a operação fica mais detalhada:
 Os três rivais têm estratégias e resultados econômicos determinísticos. Eles não são jogadores online nem perfuram campos simultâneos ao seu: a competição é modelada pelo sistema de campanha.
 
 ## Extrair mais nem sempre resolve
+<SectionDiagram topic="ouro" index={1} />
 
 Um dos desafios mais interessantes foi fazer as partes da operação dependerem umas das outras. Uma bomba mais forte pode não ajudar se o tubo compartilhado já está no limite. Uma torre cheia pode indicar que falta transporte, não capacidade de extração.
 

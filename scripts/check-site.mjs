@@ -39,6 +39,14 @@ for (const page of pages) {
 assert.deepEqual(failures, [], 'Links internos inválidos');
 for (const post of posts) {
   const html = read(`blog/${post.slug}/index.html`);
+  assert.equal((html.match(/<main\b/g) ?? []).length, 1, `Mais de um conteúdo principal: ${post.slug}`);
+  assert.ok(html.includes('id="copy-article"') && html.includes('id="copy-fallback"'), `Compartilhamento sem alternativa manual: ${post.slug}`);
+  for (const [, srcset] of html.matchAll(/srcset="([^"]+)"/g)) {
+    for (const candidate of srcset.split(',')) {
+      const source = candidate.trim().split(/\s+/)[0];
+      if (source.startsWith(base)) assert.ok(existsSync(join('dist', source.slice(base.length))), `Imagem responsiva inexistente: ${source}`);
+    }
+  }
   const time = html.match(/<time datetime="([^"]+)">([^<]+)<\/time>/);
   assert.ok(time, `Data ausente: ${post.slug}`);
   const expected = new Date(time[1]).toLocaleDateString('pt-BR', {

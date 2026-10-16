@@ -12,6 +12,7 @@ draft: false
 ---
 
 import Callout from '../../components/Callout.astro';
+import SectionDiagram from '../../components/SectionDiagram.astro';
 
 
 React é uma biblioteca para construir interfaces com componentes, publicada pelo Facebook em 2013. Neste guia, vamos explorar seus conceitos e montar uma base de desenvolvimento com TypeScript.
@@ -143,6 +144,7 @@ export default App;
 ```
 
 ## Props: Comunicação entre Componentes
+<SectionDiagram topic="react" index={0} />
 
 **Props** são parâmetros que passas para componentes. São read-only e permitem criar componentes reutilizáveis.
 
@@ -178,6 +180,7 @@ export function Card({ titulo, descricao, imagemUrl, tags }: CardProps) {
 ```
 
 ## State: Gerindo Dados Mutáveis
+<SectionDiagram topic="react" index={1} />
 
 O **state** é usado para guardar dados que mudam ao longo do tempo e fazem a UI re-renderizar.
 

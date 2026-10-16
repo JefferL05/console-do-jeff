@@ -1,0 +1,41 @@
+---
+interface Props { title: string }
+const { title } = Astro.props;
+const permalink = new URL(Astro.url.pathname, Astro.site).href;
+const issue = new URL('https://github.com/JefferL05/console-do-jeff/issues/new');
+issue.searchParams.set('title', `Sugestão: ${title}`);
+issue.searchParams.set('body', `Artigo: ${permalink}\n\nMinha sugestão ou correção:\n`);
+---
+<section class="article-actions" aria-labelledby="participate-title">
+  <h2 id="participate-title">Compartilhe ou participe</h2>
+  <p>Encontrou algo para melhorar? Envie uma sugestão ou correção pelo GitHub. É necessário entrar na sua conta para publicar.</p>
+  <div class="action-buttons"><button type="button" id="copy-article" data-url={permalink} hidden>Copiar link</button><a href={issue.href}>Enviar sugestão no GitHub ↗</a></div>
+  <p id="copy-status" role="status"></p>
+  <label id="copy-fallback" hidden>Link do artigo<input readonly value={permalink} aria-label="Link do artigo para copiar manualmente" /></label>
+</section>
+<style>
+  .article-actions { border: 1px solid #8885; border-radius: 16px; margin-top: 36px; padding: 24px; }
+  h2 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+  p { font-size: 14px; line-height: 1.7; }
+  .action-buttons { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0 8px; }
+  button, a { min-height: 44px; padding: 10px 14px; border: 1px solid #8885; border-radius: 8px; font-size: 14px; }
+  input { display: block; width: 100%; padding: 10px; background: transparent; border: 1px solid #8885; border-radius: 8px; }
+</style>
+<script>
+  const button = document.querySelector<HTMLButtonElement>('#copy-article');
+  if (button) {
+    button.hidden = false;
+    button.addEventListener('click', async () => {
+      const status = document.getElementById('copy-status');
+      try {
+        await navigator.clipboard.writeText(button.dataset.url ?? location.href);
+        if (status) status.textContent = 'Link copiado!';
+      } catch {
+        if (status) status.textContent = 'Selecione e copie o endereço abaixo.';
+        const fallback = document.getElementById('copy-fallback');
+        if (fallback) fallback.hidden = false;
+        const input = fallback?.querySelector('input'); input?.focus(); input?.select();
+      }
+    });
+  }
+</script>

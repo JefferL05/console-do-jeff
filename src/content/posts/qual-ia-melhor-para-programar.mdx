@@ -12,6 +12,7 @@ draft: false
 ---
 
 import Callout from '../../components/Callout.astro';
+import SectionDiagram from '../../components/SectionDiagram.astro';
 
 
 A promessa do **vibe coding** é sedutora: você descreve o que quer em linguagem natural, a IA devolve um projeto inteiro, e a tela se enche de código que parece funcionar. Se você não sabe programar, basta escolher a melhor IA, escrever bons prompts e ela vai entregar um software profissional — certo?
@@ -88,6 +89,7 @@ O que separa esses dois mundos não é a linguagem, o framework ou o modelo de I
 A IA é extraordinária no primeiro caso. No segundo, ela depende de alguém que entenda o que é "pronto para produção" — e que saiba cobrar isso dela.
 
 ## A IA revisando a IA
+<SectionDiagram topic="models" index={0} />
 
 Aqui vem a parte mais tentadora: se uma IA é boa, por que não montar uma linha de produção onde **uma IA revisa o trabalho da outra**? Um "russian doll" de modelos: IA 1 implementa, IA 2 revisa, IA 3 caça vulnerabilidades, IA 4 avalia os testes, IA 5 questiona a arquitetura.
 
@@ -167,6 +169,7 @@ A última pergunta é a mais importante. A IA produz código que parece correto 
 Exemplo rápido: a IA esconde o botão de admin quando o usuário não é admin. Visualmente, perfeito. Mas esconder um botão no frontend não é autorização — a rota no backend continua aceitando qualquer um que chame a API direto. Uma pessoa sem experiência vê a interface e acha que está tudo certo. Uma pessoa com experiência vai direto na rota. **A mesma IA, o mesmo código, dois resultados completamente diferentes — dependendo de quem está no volante.**
 
 ## Então, qual IA é a melhor?
+<SectionDiagram topic="models" index={1} />
 
 Depois de toda essa desconstrução, a pergunta merece uma resposta honesta: **depende** — e a resposta curta não é uma marca, é uma condição.
 

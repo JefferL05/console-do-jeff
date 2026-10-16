@@ -19,7 +19,7 @@ const { category } = Astro.props;
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
 const posts = allPosts
   .filter(post => slugify(post.data.category) === slugify(category))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || b.data.sameDayOrder - a.data.sameDayOrder);
 
 ---
 

@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 const { tag } = Astro.props;
 const posts = (await getCollection('posts', ({ data }) =>
   !data.draft && data.tags.some(value => slugify(value) === slugify(tag))
-)).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+)).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || b.data.sameDayOrder - a.data.sameDayOrder);
 ---
 
 <BaseLayout title={`#${tag} | Console do Jeff`} description={`Artigos com a tag ${tag}`}>

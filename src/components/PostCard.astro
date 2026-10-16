@@ -1,0 +1,25 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ArticleImage from './ArticleImage.astro';
+import { url, formatDate } from '../utils/index';
+interface Props { post: CollectionEntry<'posts'> }
+const { post } = Astro.props;
+---
+<article class="post-card">
+  {post.data.image && <ArticleImage src={post.data.image.url} alt={post.data.image.alt} class="card-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px" />}
+  <div class="card-content">
+    <p class="card-meta">{post.data.category} · <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate, { month: 'short', day: 'numeric' })}</time></p>
+    <h3><a href={url(`/blog/${post.id}`)}>{post.data.title}</a></h3>
+    <p>{post.data.description}</p>
+  </div>
+</article>
+<style>
+  .post-card { border: 1px solid #8884; border-radius: 16px; overflow: hidden; height: 100%; }
+  .post-card :global(.card-cover) { width: 100%; aspect-ratio: 16/9; object-fit: cover; object-position: top; }
+  .card-content { padding: 24px; }
+  h3 { font-size: 19px; line-height: 1.4; font-weight: 700; margin: 10px 0; }
+  a:hover { text-decoration: underline; }
+  p { font-size: 14px; line-height: 1.65; }
+  .card-meta { font-size: 12px; color: #4b5563; }
+  :global(.dark) .card-meta { color: #c4cad4; }
+</style>

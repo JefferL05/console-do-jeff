@@ -1,0 +1,87 @@
+---
+interface Props { headings: { depth: number; slug: string; text: string }[] }
+const { headings } = Astro.props;
+---
+<div class="reading-tools">
+  <details class="mobile-index"><summary>Índice deste artigo</summary><nav aria-label="Índice do artigo no celular"><ol>{headings.filter(h => h.depth === 2).map(h => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol></nav></details>
+  <div id="font-tools" hidden role="group" aria-label="Tamanho do texto">
+    <span>Texto</span><button type="button" id="font-smaller" aria-label="Diminuir tamanho do texto">A−</button><button type="button" id="font-reset" aria-label="Restaurar tamanho do texto">100%</button><button type="button" id="font-larger" aria-label="Aumentar tamanho do texto">A+</button>
+    <span id="font-status" class="sr-only" role="status"></span>
+  </div>
+</div>
+<div class="reading-progress" hidden id="reading-progress" aria-hidden="true"><div></div></div>
+<button id="back-to-top" class="back-to-top" type="button" hidden aria-label="Voltar ao início do artigo">↑ Topo</button>
+<style>
+  .reading-tools { display: flex; flex-wrap: wrap; align-items: start; gap: 14px; margin: 24px 0; }
+  .mobile-index { flex: 1; min-width: 200px; border: 1px solid #8885; border-radius: 12px; }
+  summary { padding: 12px 16px; cursor: pointer; font-weight: 600; }
+  nav { padding: 0 16px 14px; max-height: 50vh; overflow: auto; }
+  li a { display: block; padding: 10px 0; line-height: 1.5; text-decoration: underline; }
+  #font-tools:not([hidden]) { display: flex; align-items: center; gap: 4px; }
+  #font-tools > span:first-child { font-size: 13px; margin-right: 8px; }
+  button { min-width: 44px; min-height: 44px; border: 1px solid #8885; border-radius: 9px; padding: 6px 10px; }
+  button:disabled { opacity: .45; cursor: default; }
+  .reading-progress { position: fixed; bottom: 0; left: 0; width: 100%; height: 4px; z-index: 60; background: #8883; }
+  .reading-progress div { height: 100%; background: #0f766e; transform-origin: left; transform: scaleX(0); }
+  :global(.dark) .reading-progress div { background: #7ad6c9; }
+  .back-to-top { position: fixed; bottom: 20px; right: 16px; background: #faf9f6; color: #262626; z-index: 40; box-shadow: 0 2px 12px #0002; }
+  :global(.dark) .back-to-top { background: #242630; color: #f5f5f5; }
+  @media(min-width:1024px) { .mobile-index { display: none; } }
+</style>
+<script>
+  const root = document.documentElement;
+  const smaller = document.querySelector<HTMLButtonElement>('#font-smaller');
+  const larger = document.querySelector<HTMLButtonElement>('#font-larger');
+  const reset = document.querySelector<HTMLButtonElement>('#font-reset');
+  const status = document.getElementById('font-status');
+  let scale = 100;
+  try { const saved = Number(localStorage.getItem('reading-size')); if ([90,100,110,120,130].includes(saved)) scale = saved; } catch {}
+  function applySize(announce = false) {
+    root.style.setProperty('--reading-scale', String(scale / 100));
+    if (reset) reset.textContent = `${scale}%`;
+    if (smaller) smaller.disabled = scale === 90;
+    if (larger) larger.disabled = scale === 130;
+    if (announce && status) status.textContent = `Tamanho do texto: ${scale}%`;
+    try { localStorage.setItem('reading-size', String(scale)); } catch {}
+  }
+  applySize();
+  const fontTools = document.getElementById('font-tools');
+  if (fontTools) fontTools.hidden = false;
+  smaller?.addEventListener('click', () => { scale = Math.max(90, scale - 10); applySize(true); });
+  larger?.addEventListener('click', () => { scale = Math.min(130, scale + 10); applySize(true); });
+  reset?.addEventListener('click', () => { scale = 100; applySize(true); });
+  const progress = document.getElementById('reading-progress');
+  const fill = progress?.firstElementChild as HTMLElement | null;
+  const top = document.querySelector<HTMLButtonElement>('#back-to-top');
+  const article = document.querySelector<HTMLElement>('.blog-article');
+  if (progress) progress.hidden = false;
+  let queued = false;
+  function update() {
+    queued = false;
+    if (!article) return;
+    const rect = article.getBoundingClientRect();
+    const range = Math.max(1, rect.height - innerHeight);
+    const fraction = Math.max(0, Math.min(1, -rect.top / range));
+    if (fill) fill.style.transform = `scaleX(${fraction})`;
+    if (top) top.hidden = rect.top > -600;
+  }
+  function schedule() { if (!queued) { queued = true; requestAnimationFrame(update); } }
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  if (article) new ResizeObserver(schedule).observe(article);
+  update();
+  top?.addEventListener('click', () => {
+    const title = document.querySelector<HTMLElement>('.blog-article h1');
+    title?.setAttribute('tabindex', '-1');
+    title?.focus({ preventScroll: true });
+    title?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
+  });
+  document.querySelectorAll('.mobile-index a').forEach(link => link.addEventListener('click', () => {
+    const details = link.closest('details');
+    if (details) details.open = false;
+    const id = (link as HTMLAnchorElement).hash.slice(1);
+    const heading = document.getElementById(decodeURIComponent(id));
+    heading?.setAttribute('tabindex', '-1');
+    heading?.focus({ preventScroll: true });
+  }));
+</script>

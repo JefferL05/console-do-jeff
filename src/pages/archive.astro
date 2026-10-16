@@ -14,7 +14,7 @@ const postsByYear = allPosts.reduce((acc, post) => {
 
 const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
 
-Object.values(postsByYear).forEach(posts => posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()));
+Object.values(postsByYear).forEach(posts => posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || b.data.sameDayOrder - a.data.sameDayOrder));
 ---
 
 <BaseLayout title="Arquivo | Console do Jeff" description="Arquivo de todos os artigos por ano">

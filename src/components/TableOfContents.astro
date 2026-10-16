@@ -14,7 +14,7 @@ const filteredHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
 ---
 
 {filteredHeadings.length > 0 && (
-  <nav id="toc" class="hidden lg:block sticky top-24 w-64 max-h-[calc(100vh-8rem)] overflow-y-auto">
+  <nav id="toc" aria-label="Índice do artigo" class="hidden lg:block sticky top-24 w-64 max-h-[calc(100vh-8rem)] overflow-y-auto">
     <div class="flex items-center gap-2 mb-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <line x1="8" y1="6" x2="21" y2="6"></line>
@@ -48,7 +48,7 @@ const filteredHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
 <script>
   function initTOC() {
     const tocLinks = document.querySelectorAll('[data-toc-link]');
-    const headings = Array.from(document.querySelectorAll('article h2, article h3'));
+    const headings = Array.from(document.querySelectorAll('.article-body h2[id], .article-body h3[id]'));
     
     if (tocLinks.length === 0 || headings.length === 0) return;
     

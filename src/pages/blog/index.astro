@@ -4,7 +4,7 @@ import { getCollection } from 'astro:content';
 import { formatDate, url } from '@utils/index';
 
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
-const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || b.data.sameDayOrder - a.data.sameDayOrder);
 
 ---
 

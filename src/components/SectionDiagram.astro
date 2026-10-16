@@ -1,0 +1,27 @@
+---
+import { sectionDiagrams } from '../data/section-diagrams';
+interface Props { topic: string; index: number }
+const { topic, index } = Astro.props;
+const diagram = sectionDiagrams[topic]?.[index];
+if (!diagram) throw new Error(`Diagrama ausente: ${topic}/${index}`);
+---
+<figure class="section-diagram not-prose">
+  <figcaption>{diagram.title}</figcaption>
+  <ol aria-label={diagram.title}>{diagram.nodes.map((node, index) => <li>
+    <svg viewBox="0 0 64 48" aria-hidden="true"><rect x="8" y="6" width="48" height="36" rx="8" fill="currentColor" opacity=".12"/><path d={index === 0 ? 'M20 24h24m-9-9 9 9-9 9' : index === 1 ? 'M20 17h24M20 24h16M20 31h24' : 'm20 24 8 8 16-17'} fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>{node}</span>
+  </li>)}</ol>
+  <p>{diagram.note}</p>
+</figure>
+<style>
+  .section-diagram { display: none; }
+  :global([data-reading='illustrated']) .section-diagram { display: block; padding: clamp(16px,3vw,28px); margin: 24px 0 32px; border: 1px solid #0f766e55; border-radius: 16px; background: #0f766e08; }
+  figcaption { font-size: 17px; font-weight: 700; margin-bottom: 18px; }
+  ol { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); list-style: none; padding: 0; gap: 22px; }
+  li { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid #8884; border-radius: 12px; padding: 14px 8px; font-size: 14px; line-height: 1.5; }
+  li:not(:last-child)::after { content: '→'; position: absolute; right: -19px; top: 38px; }
+  svg { width: 64px; height: 48px; color: #0f766e; margin-bottom: 10px; }
+  :global(.dark) svg { color: #7ad6c9; }
+  p { font-size: 13px; line-height: 1.7; margin-top: 18px; }
+  @media(max-width:520px) { ol { grid-template-columns: 1fr; } li { flex-direction: row; text-align: left; gap: 12px; } svg { flex-shrink: 0; margin: 0; } li:not(:last-child)::after { content: '↓'; top: auto; bottom: -22px; right: 50%; } }
+</style>

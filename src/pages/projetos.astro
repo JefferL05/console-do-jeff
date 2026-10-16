@@ -1,38 +1,60 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import ArticleImage from '../components/ArticleImage.astro';
 import { url } from '../utils/index';
 const projects = [
-  { id: 'meu-ponto-3-controle-jornada', name: 'Meu Ponto', status: 'Disponível · em evolução', description: 'Controle pessoal de jornada, histórico e relatórios, com uso offline e sincronização opcional.', demo: 'https://jefferl05.github.io/meu-ponto/', repo: 'https://github.com/JefferL05/meu-ponto' },
-  { id: 'fany-cosmeticos-loja-nextjs-supabase', name: 'Fany Cosméticos', status: 'Em desenvolvimento · demonstração', description: 'Loja com catálogo, carrinho e pedidos de teste. Produtos e tarifas demonstrativos; ainda sem vendas reais.', demo: 'https://fany-cosmeticos.vercel.app/', repo: 'https://github.com/JefferL05/Fany-Cosmeticos' },
-  { id: 'ml-supplier-hub-arquitetura', name: 'ML Supplier Hub', status: 'Em desenvolvimento', description: 'Projeto de gestão de produtos, fornecedores, estoque e margens para vendedores do Mercado Livre.', demo: 'https://meusprojetos-production.up.railway.app/' }
+  { id: 'meu-ponto-3-controle-jornada', name: 'Meu Ponto', status: 'Disponível · em evolução', description: 'Controle pessoal de jornada, histórico e relatórios, com uso offline e sincronização opcional.', demo: 'https://jefferl05.github.io/meu-ponto/', action: 'Experimentar Meu Ponto', repo: 'https://github.com/JefferL05/meu-ponto', stack: ['Astro', 'JavaScript', 'Supabase'], news: 'Versão 3.0: múltiplos empregos, turnos noturnos e revisão por conta na sincronização.', images: [
+    { src: '/images/posts/meu-ponto/inicio.webp', alt: 'Tela inicial do Meu Ponto, sem jornada registrada.' },
+    { src: '/images/posts/meu-ponto/historico.webp', alt: 'Histórico mensal e formulário de férias, folgas e faltas, sem dados pessoais.' }
+  ] },
+  { id: 'fany-cosmeticos-loja-nextjs-supabase', name: 'Fany Cosméticos', status: 'Em desenvolvimento · demonstração', description: 'Loja com catálogo, carrinho e pedidos de teste. Produtos e tarifas demonstrativos; ainda sem vendas reais.', demo: 'https://fany-cosmeticos.vercel.app/', action: 'Explorar a demonstração', repo: 'https://github.com/JefferL05/Fany-Cosmeticos', stack: ['Next.js', 'TypeScript', 'Supabase'], news: 'Checkout de teste com total calculado no banco, histórico de pedidos e validação das notificações de pagamento.', images: [
+    { src: '/images/posts/fany-cosmeticos/hero.webp', alt: 'Página inicial da Fany Cosméticos em preparação.' },
+    { src: '/images/posts/fany-cosmeticos/catalogo.webp', alt: 'Catálogo demonstrativo com produtos e preços fictícios.' }
+  ] },
+  { id: 'ml-supplier-hub-arquitetura', name: 'ML Supplier Hub', status: 'Em desenvolvimento', description: 'Gestão de produtos, fornecedores, estoque e margens para vendedores do Mercado Livre. As telas abaixo usam dados de demonstração.', demo: 'https://meusprojetos-production.up.railway.app/', action: 'Conhecer a plataforma', repo: '', stack: ['Next.js', 'Prisma', 'PostgreSQL'], news: 'Arquitetura documentada com separação por organização, controle de estoque e margem por pedido. Código de acesso restrito.', images: [
+    { src: '/images/posts/ml-supplier-hub/dashboard-demo.webp', alt: 'Dashboard local do ML Supplier Hub com indicadores demonstrativos.' },
+    { src: '/images/posts/ml-supplier-hub/financeiro-demo.webp', alt: 'Painel financeiro do sandbox com valores fictícios.' }
+  ] },
+  { id: 'ouro-do-subsolo-jogo-gestao', name: 'Ouro do Subsolo', status: 'Disponível · em evolução', description: 'Explore reservas, construa sua operação e escolha a hora de vender. Partidas rápidas e campanha empresarial.', demo: url('/jogos/petroleo/'), action: 'Jogar no navegador', repo: 'https://github.com/JefferL05/console-do-jeff/tree/main/public/jogos/petroleo', stack: ['JavaScript', 'Canvas', 'Capacitor'], news: 'Campanha em dez temporadas e versão Android de desenvolvimento, com partida rápida e campanha offline.', images: [
+    { src: '/images/posts/ouro-do-subsolo/inicio.webp', alt: 'Menu do Ouro do Subsolo com modos de jogo e oficina.' },
+    { src: '/images/posts/ouro-do-subsolo/campo.webp', alt: 'Início de uma expedição no Vale Dourado, antes da exploração.' }
+  ] }
 ];
-const posts = await getCollection('posts', ({ data }) => !data.draft);
 ---
-<BaseLayout title="Projetos | Console do Jeff" description="Aplicações e jogos de Jefferson Lopes: demonstrações, código e artigos sobre o desenvolvimento.">
-  <main class="max-w-6xl mx-auto px-4 py-12">
-    <h1 class="text-4xl font-bold mb-4">Meus projetos</h1>
-    <p class="text-gray-600 dark:text-gray-400 mb-8">Aplicações que estou construindo e os aprendizados por trás delas.</p>
-    <div class="grid md:grid-cols-2 gap-8">
-      {projects.map(project => {
-        const post = posts.find(p => p.id === project.id);
-        return <article class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
-          {post?.data.image && <img src={post.data.image.url.startsWith('http') ? post.data.image.url : url(post.data.image.url)} alt={post.data.image.alt} loading="lazy" class="w-full aspect-video object-cover object-top" />}
-          <div class="p-6"><h2 class="text-2xl font-bold">{project.name}</h2><p class="text-sm my-3">{project.status}</p><p>{project.description}</p>
-            <div class="flex flex-wrap gap-4 mt-5 text-primary-600 dark:text-primary-400 underline">
-              <a href={project.demo}>Ver projeto</a>{project.repo && <a href={project.repo}>Código no GitHub</a>}{post && <a href={url(`/blog/${post.id}`)}>Ler artigo</a>}
-            </div>
-          </div>
-        </article>;
-      })}
-      <article class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
-        <img src={url('/images/posts/ouro-do-subsolo/inicio.webp')} alt="Menu do Ouro do Subsolo com expedições e campanha empresarial." loading="lazy" width="1280" height="960" class="w-full aspect-video object-cover object-top" />
-        <div class="p-6">
-        <h2 class="text-2xl font-bold">Ouro do Subsolo</h2><p class="text-sm my-3">Disponível · em evolução</p>
-        <p>Explore reservas, construa sua operação e escolha a hora de vender. Conheça as expedições rápidas, a campanha empresarial e os bastidores do desenvolvimento.</p>
-        <div class="flex flex-wrap gap-4 mt-5 underline text-primary-600 dark:text-primary-400"><a href={url('/jogos/petroleo')}>Jogar no navegador</a><a href="https://github.com/JefferL05/console-do-jeff">Código no GitHub</a><a href={url('/blog/ouro-do-subsolo-jogo-gestao')}>Ler artigo</a></div>
-        </div>
-      </article>
-    </div>
-  </main>
+<BaseLayout title="Projetos | Console do Jeff" description="Aplicações e jogos de Jefferson Lopes: capturas, tecnologias, novidades, demonstrações e código.">
+  <div class="projects-shell">
+    <h1>Meus projetos</h1><p class="intro">Aplicações e jogos que estou construindo. Veja as telas, conheça as tecnologias e acompanhe a evolução.</p>
+    <nav class="project-nav" aria-label="Escolher projeto">{projects.map(p => <a href={`#${p.id}`}>{p.name}</a>)}</nav>
+    {projects.map(project => <article id={project.id} class="project">
+      <div class="project-header"><div><p class="project-status">{project.status}</p><h2>{project.name}</h2></div><a class="project-cta" href={project.demo}>{project.action} ↗</a></div>
+      <p>{project.description}</p>
+      <ul class="stack" aria-label={`Tecnologias de ${project.name}`}>{project.stack.map(tech => <li>{tech}</li>)}</ul>
+      <div class="gallery">{project.images.map(image => <figure><a href={url(image.src)} aria-label={`Ampliar captura: ${image.alt}`}><ArticleImage src={image.src} alt={image.alt} class="gallery-image" sizes="(max-width: 640px) 100vw, 500px" /></a><figcaption>{image.alt} Clique para ampliar.</figcaption></figure>)}</div>
+      <div class="project-news"><h3>O que há nesta versão</h3><p>{project.news}</p></div>
+      <div class="project-links"><a href={url(`/blog/${project.id}`)}>Ler o artigo completo →</a>{project.repo && <a href={project.repo}>Ver código no GitHub ↗</a>}</div>
+    </article>)}
+  </div>
 </BaseLayout>
+<style>
+  .projects-shell { max-width: 1100px; margin: auto; padding: 40px 24px; }
+  h1 { font-size: clamp(32px,5vw,48px); font-weight: 800; margin-bottom: 16px; }
+  p { line-height: 1.7; }
+  .intro { max-width: 720px; }
+  .project-nav, .project-links, .stack { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
+  .project-nav a, .project-cta, .project-links a { min-height: 44px; display: inline-flex; align-items: center; padding: 10px 14px; border: 1px solid #8885; border-radius: 10px; font-weight: 600; }
+  .project { border: 1px solid #8884; border-radius: 20px; margin-top: 32px; padding: clamp(18px,4vw,32px); scroll-margin-top: 150px; }
+  .project-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 14px; }
+  h2 { font-size: 28px; font-weight: 750; }
+  .project-status { font-size: 12px; margin-bottom: 8px; }
+  .project-cta { background: #0f766e; color: white; }
+  .stack { list-style: none; padding: 0; gap: 8px; }
+  .stack li { border-radius: 20px; padding: 4px 12px; background: #8882; font-size: 12px; }
+  .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .gallery :global(.gallery-image) { width: 100%; aspect-ratio: 16/10; object-fit: cover; object-position: top; border-radius: 12px; border: 1px solid #8884; }
+  figcaption { font-size: 12px; line-height: 1.6; margin-top: 8px; }
+  .project-news { margin-top: 24px; padding-left: 16px; border-left: 3px solid #0f766e; }
+  h3 { font-weight: 700; margin-bottom: 8px; }
+  .project-links { margin-bottom: 0; }
+  a:hover { text-decoration: underline; }
+  @media(max-width:640px) { .gallery { grid-template-columns: 1fr; } .projects-shell { padding: 28px 16px; } }
+</style>

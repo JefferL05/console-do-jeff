@@ -12,6 +12,7 @@ draft: false
 ---
 
 import Callout from '../../components/Callout.astro';
+import SectionDiagram from '../../components/SectionDiagram.astro';
 import Screenshot from '../../components/Screenshot.astro';
 
 Vender em um marketplace é só uma parte do trabalho. Depois da venda, aparecem perguntas que uma lista de pedidos não responde sozinha: **quem fornece o produto, quanto realmente está disponível, qual é o custo da operação e quanto sobra no final?**
@@ -156,6 +157,7 @@ Outro detalhe é o acesso de fornecedores. O papel `SUPPLIER` é combinado com v
 />
 
 ## Estoque: disponível não significa publicável
+<SectionDiagram topic="hub" index={0} />
 
 Uma das regras centrais está em `lib/domain/inventory.ts`. O módulo calcula quanto estoque pode ser publicado, considerando a origem do saldo e a reserva de segurança.
 
@@ -187,6 +189,7 @@ Essa distinção evita tratar “saldo recebido” e “quantidade anunciável�
 />
 
 ## Financeiro: olhar além do faturamento
+<SectionDiagram topic="hub" index={1} />
 
 Em `lib/domain/profitability.ts`, o cálculo considera preço de venda, custo do fornecedor, taxa do marketplace, frete, impostos, publicidade, outros custos e reembolsos.
 

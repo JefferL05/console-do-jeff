@@ -2,6 +2,7 @@
 title: "Meu Ponto 3.0: controle de jornada offline com Astro"
 description: "Como construí o Meu Ponto 3.0: múltiplos empregos, turnos noturnos, banco de horas e sincronização opcional com Supabase em um app estático e offline."
 pubDate: 2026-10-15
+sameDayOrder: 1
 author: "Jeff"
 category: "Projetos"
 tags: ["meu-ponto", "astro", "javascript", "pwa", "supabase", "produtividade"]
@@ -12,6 +13,7 @@ draft: false
 ---
 
 import Callout from '../../components/Callout.astro';
+import SectionDiagram from '../../components/SectionDiagram.astro';
 
 
 O [Meu Ponto](https://jefferl05.github.io/meu-ponto/) chegou à versão 3.0 como um controle pessoal de jornada em Astro estático + JavaScript. Funciona offline com pré-cache e usa a nuvem Supabase apenas como opção, com revisão por conta.
@@ -32,6 +34,7 @@ Código fonte: [JefferL05/meu-ponto](https://github.com/JefferL05/meu-ponto).
 - Lixeira com restauração que preserva conflitos; backup JSON versionado com validação e cópia anterior guardada.
 
 ## Como a sincronização funciona
+<SectionDiagram topic="ponto" index={0} />
 
 Cada perfil de conta tem sua revisão na nuvem. A escrita só avança se a revisão esperada coincidir, através da função `salvar_meu_ponto` em `supabase.sql`.
 
@@ -42,6 +45,7 @@ Se outro aparelho gravou antes, a tela pede escolha explícita entre "usar este 
 </Callout>
 
 ## Stack técnica
+<SectionDiagram topic="ponto" index={1} />
 
 - **Astro 7** estático + JavaScript, sem framework pesado no cliente.
 - **Service Worker** gerado no build para pré-cache offline.

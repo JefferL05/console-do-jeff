@@ -3,7 +3,6 @@ import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
 import { url } from '@utils/index';
 import '@/styles/global.css';
-import SpeedInsights from "@vercel/speed-insights/astro";
 
 interface Props {
   title: string;
@@ -15,7 +14,7 @@ interface Props {
 
 const {
   title,
-  description = 'Blog técnico de alta performance',
+   description = 'Projetos, código e aprendizados de Jefferson Lopes no desenvolvimento de software.',
   image = '/og-default.png',
   article = false,
   pubDate
@@ -73,6 +72,10 @@ const siteImage = image.startsWith('http') ? image : url(image);
         try {
           document.documentElement.dataset.reading = localStorage.getItem('reading-mode') === 'illustrated' ? 'illustrated' : 'text';
         } catch { document.documentElement.dataset.reading = 'text'; }
+        try {
+          var size = Number(localStorage.getItem('reading-size'));
+          if ([90, 100, 110, 120, 130].includes(size)) document.documentElement.style.setProperty('--reading-scale', String(size / 100));
+        } catch {}
         if (!theme) {
           theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
@@ -83,11 +86,11 @@ const siteImage = image.startsWith('http') ? image : url(image);
     </script>
   </head>
   <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200 min-h-screen flex flex-col">
+    <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
     <Header />
-    <main class="flex-1">
+    <main id="main-content" tabindex="-1" class="flex-1">
       <slot />
     </main>
     <Footer />
-    <SpeedInsights />
   </body>
 </html>

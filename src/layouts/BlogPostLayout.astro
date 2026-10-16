@@ -6,6 +6,9 @@ import CopyCode from '@components/CopyCode.astro';
 import { getCollection } from 'astro:content';
 import VisualGuide from '@components/VisualGuide.astro';
 import { visualGuides } from '../data/visual-guides';
+import ReadingTools from '@components/ReadingTools.astro';
+import ArticleActions from '@components/ArticleActions.astro';
+import ArticleImage from '@components/ArticleImage.astro';
 
 interface Heading {
   depth: number;
@@ -117,11 +120,12 @@ const related = (await getCollection('posts', ({ data }) => !data.draft))
     
     {image && (
       <figure class="mb-8">
-        <img
-          src={image.url.startsWith('http') ? image.url : url(image.url)}
+        <ArticleImage
+          src={image.url}
           alt={image.alt}
           class="w-full h-auto rounded-xl shadow-lg"
-          loading="lazy"
+          priority
+          sizes="(max-width: 1152px) 100vw, 1088px"
         />
         <figcaption class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2">
           {image.alt}
@@ -129,6 +133,7 @@ const related = (await getCollection('posts', ({ data }) => !data.draft))
       </figure>
     )}
     
+    <ReadingTools headings={headings} />
     {visualGuide && <VisualGuide guide={visualGuide} />}
     <div class="lg:flex lg:gap-12">
       <aside class="hidden lg:block">
@@ -139,6 +144,7 @@ const related = (await getCollection('posts', ({ data }) => !data.draft))
         <div class="article-body prose prose-lg dark:prose-invert max-w-none">
           <slot />
         </div>
+        <ArticleActions title={title} />
         {related.length > 0 && <section class="mt-10" aria-labelledby="related-title">
           <h2 id="related-title" class="text-2xl font-bold mb-4">Continue a leitura</h2>
           <ul class="grid gap-4">

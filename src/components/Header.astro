@@ -199,4 +199,12 @@ const currentPath = Astro.url.pathname;
     mobileMenuBtn.setAttribute('aria-expanded', String(expanded));
     mobileMenuBtn.setAttribute('aria-label', expanded ? 'Fechar menu' : 'Abrir menu');
   });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && mobileMenu && !mobileMenu.classList.contains('hidden')) {
+      mobileMenu.classList.add('hidden');
+      mobileMenuBtn?.setAttribute('aria-expanded', 'false');
+      mobileMenuBtn?.setAttribute('aria-label', 'Abrir menu');
+      mobileMenuBtn?.focus();
+    }
+  });
 </script>
