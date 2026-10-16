@@ -3,6 +3,7 @@ import BaseLayout from './BaseLayout.astro';
 import TableOfContents from '@components/TableOfContents.astro';
 import { formatDate, slugify, url } from '@utils/index';
 import CopyCode from '@components/CopyCode.astro';
+import { getCollection } from 'astro:content';
 
 interface Heading {
   depth: number;
@@ -38,6 +39,12 @@ const {
 
 const formattedPubDate = formatDate(pubDate);
 const formattedUpdatedDate = updatedDate && formatDate(updatedDate);
+const related = (await getCollection('posts', ({ data }) => !data.draft))
+  .filter(post => url(`/blog/${post.id}`).replace(/\/$/, '') !== Astro.url.pathname.replace(/\/$/, ''))
+  .map(post => ({ post, score: (post.data.category === category ? 2 : 0) + post.data.tags.filter(tag => tags.includes(tag)).length }))
+  .filter(item => item.score > 0)
+  .sort((a, b) => b.score - a.score || b.post.data.pubDate.getTime() - a.post.data.pubDate.getTime() || a.post.id.localeCompare(b.post.id))
+  .slice(0, 3);
 ---
 
 <BaseLayout title={`${title} | Console do Jeff`} description={description} image={image?.url} article pubDate={pubDate}>
@@ -127,6 +134,16 @@ const formattedUpdatedDate = updatedDate && formatDate(updatedDate);
         <div class="prose prose-lg dark:prose-invert max-w-none">
           <slot />
         </div>
+        {related.length > 0 && <section class="mt-10" aria-labelledby="related-title">
+          <h2 id="related-title" class="text-2xl font-bold mb-4">Continue a leitura</h2>
+          <ul class="grid gap-4">
+            {related.map(({ post }) => <li class="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+              <a class="font-semibold text-primary-600 dark:text-primary-400 hover:underline" href={url(`/blog/${post.id}`)}>{post.data.title}</a>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">{post.data.description}</p>
+            </li>)}
+          </ul>
+        </section>}
+        <p class="mt-6"><a class="underline" href={url('/rss.xml')}>Acompanhe novos artigos pelo RSS</a></p>
         
         <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
           <div class="flex flex-wrap gap-2">

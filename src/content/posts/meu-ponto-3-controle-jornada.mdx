@@ -6,14 +6,13 @@ author: "Jeff"
 category: "Projetos"
 tags: ["meu-ponto", "astro", "javascript", "pwa", "supabase", "produtividade"]
 image:
-  url: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200"
-  alt: "Caderno e relógio para controle de jornada de trabalho"
+  url: "/images/posts/meu-ponto/inicio.webp"
+  alt: "Tela inicial do Meu Ponto 3.0, sem registros: jornada, banco de horas e navegação para histórico e relatórios."
 draft: false
 ---
 
 import Callout from '../../components/Callout.astro';
 
-# Meu Ponto 3.0: controle de jornada offline com Astro
 
 O [Meu Ponto](https://jefferl05.github.io/meu-ponto/) chegou à versão 3.0 como um controle pessoal de jornada em Astro estático + JavaScript. Funciona offline com pré-cache e usa a nuvem Supabase apenas como opção, com revisão por conta.
 
@@ -46,7 +45,7 @@ Se outro aparelho gravou antes, a tela pede escolha explícita entre "usar este 
 
 - **Astro 7** estático + JavaScript, sem framework pesado no cliente.
 - **Service Worker** gerado no build para pré-cache offline.
-- **Supabase** opcional: Auth por e-mail + tabela `revisao`.
+- **Supabase** opcional: autenticação por e-mail e controle de revisão para sincronizar os registros.
 - **GitHub Pages** com workflow em Node 24: `npm ci`, `npm test`, `npm run build` e publicação de `dist/`.
 - Testes em Node com `node --test tests/*.test.mjs`.
 

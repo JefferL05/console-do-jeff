@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { url } from '../utils/index';
+---
+<BaseLayout title="Sobre | Console do Jeff" description="Conheça Jefferson Lopes e os projetos e aprendizados compartilhados no Console do Jeff.">
+  <main class="max-w-3xl mx-auto px-4 py-12 prose dark:prose-invert">
+    <h1>Olá, sou Jefferson Lopes</h1>
+    <p>Este é o Console do Jeff, meu espaço para compartilhar projetos, código e aprendizados de desenvolvimento de software.</p>
+    <p>Por aqui mostro aplicações web que estou construindo, problemas que encontro e decisões que tomo ao trabalhar com JavaScript, TypeScript, Astro, React, Next.js e Supabase.</p>
+    <h2>Aprender construindo</h2>
+    <p>Do controle pessoal de jornada do Meu Ponto à loja Fany Cosméticos, cada projeto traz desafios diferentes. Os artigos registram o que já funciona e o que ainda está em desenvolvimento, incluindo o uso de IA e a revisão do código gerado.</p>
+    <p><a href={url('/projetos')}>Explore meus projetos</a> ou <a href={url('/blog')}>leia os artigos</a>.</p>
+    <h2>Onde me encontrar</h2>
+    <ul>
+      <li><a href="https://github.com/JefferL05">GitHub — JefferL05</a></li>
+      <li><a href="https://www.instagram.com/jefferson_lopes05/">Instagram — jefferson_lopes05</a></li>
+      <li><a href={url('/rss.xml')}>Acompanhe as publicações pelo RSS</a></li>
+    </ul>
+  </main>
+</BaseLayout>

@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { url } from '../utils/index';
+const projects = [
+  { id: 'meu-ponto-3-controle-jornada', name: 'Meu Ponto', status: 'Disponível · em evolução', description: 'Controle pessoal de jornada, histórico e relatórios, com uso offline e sincronização opcional.', demo: 'https://jefferl05.github.io/meu-ponto/', repo: 'https://github.com/JefferL05/meu-ponto' },
+  { id: 'fany-cosmeticos-loja-nextjs-supabase', name: 'Fany Cosméticos', status: 'Em desenvolvimento · demonstração', description: 'Loja com catálogo, carrinho e pedidos de teste. Produtos e tarifas demonstrativos; ainda sem vendas reais.', demo: 'https://fany-cosmeticos.vercel.app/', repo: 'https://github.com/JefferL05/Fany-Cosmeticos' },
+  { id: 'ml-supplier-hub-arquitetura', name: 'ML Supplier Hub', status: 'Em desenvolvimento', description: 'Projeto de gestão de produtos, fornecedores, estoque e margens para vendedores do Mercado Livre.', demo: 'https://meusprojetos-production.up.railway.app/' }
+];
+const posts = await getCollection('posts', ({ data }) => !data.draft);
+---
+<BaseLayout title="Projetos | Console do Jeff" description="Aplicações e jogos de Jefferson Lopes: demonstrações, código e artigos sobre o desenvolvimento.">
+  <main class="max-w-6xl mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold mb-4">Meus projetos</h1>
+    <p class="text-gray-600 dark:text-gray-400 mb-8">Aplicações que estou construindo e os aprendizados por trás delas.</p>
+    <div class="grid md:grid-cols-2 gap-8">
+      {projects.map(project => {
+        const post = posts.find(p => p.id === project.id);
+        return <article class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+          {post?.data.image && <img src={post.data.image.url.startsWith('http') ? post.data.image.url : url(post.data.image.url)} alt={post.data.image.alt} loading="lazy" class="w-full aspect-video object-cover object-top" />}
+          <div class="p-6"><h2 class="text-2xl font-bold">{project.name}</h2><p class="text-sm my-3">{project.status}</p><p>{project.description}</p>
+            <div class="flex flex-wrap gap-4 mt-5 text-primary-600 dark:text-primary-400 underline">
+              <a href={project.demo}>Ver projeto</a>{project.repo && <a href={project.repo}>Código no GitHub</a>}{post && <a href={url(`/blog/${post.id}`)}>Ler artigo</a>}
+            </div>
+          </div>
+        </article>;
+      })}
+      <article class="border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+        <h2 class="text-2xl font-bold">Ouro do Subsolo</h2><p class="text-sm my-3">Disponível · em evolução</p>
+        <p>Jogo com campanha empresarial e gestão de uma operação de petróleo, desenvolvido dentro do próprio blog.</p>
+        <div class="flex flex-wrap gap-4 mt-5 underline text-primary-600 dark:text-primary-400"><a href={url('/jogos/petroleo')}>Jogar no navegador</a><a href="https://github.com/JefferL05/console-do-jeff">Código no GitHub</a></div>
+      </article>
+    </div>
+  </main>
+</BaseLayout>

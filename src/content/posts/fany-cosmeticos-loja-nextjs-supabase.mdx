@@ -6,7 +6,7 @@ author: "Jeff"
 category: "Projetos"
 tags: ["nextjs", "supabase", "postgresql", "ecommerce", "seguranca", "typescript"]
 image:
-  url: "/images/posts/fany-cosmeticos/hero.png"
+  url: "/images/posts/fany-cosmeticos/hero.webp"
   alt: "Página inicial da Fany Cosméticos com o título Uma rotina que faz você se sentir bem e ilustrações de produtos"
 draft: false
 ---
@@ -14,7 +14,6 @@ draft: false
 import Callout from '../../components/Callout.astro';
 import Screenshot from '../../components/Screenshot.astro';
 
-# Fany Cosméticos: uma loja Next.js + Supabase onde o navegador não decide o preço
 
 Estou construindo a **Fany Cosméticos**, a loja de um negócio de cosméticos com curadoria de K-beauty. Por fora, é uma vitrine calma em tons de rosa: hero convidando a montar uma rotina, filtros por categoria, preço com desconto no Pix e selos como "Mais amado" e "Best-seller". Por dentro, o trabalho que mais me interessa é outro: garantir que **preço, frete e total nunca dependam do que o navegador envia**.
 
@@ -31,7 +30,7 @@ Código fonte: [JefferL05/Fany-Cosmeticos](https://github.com/JefferL05/Fany-Cos
 A página inicial abre com a proposta da marca — "K-beauty escolhida com calma" — e desce direto para o catálogo, com filtros por Todos, Skincare, Maquiagem, Cabelos e Kits. Cada cartão mostra a marca, o preço parcelado, o valor no Pix e o botão de adicionar à sacola. Mais abaixo, uma seção de ritual em três passos e a newsletter "Cartas da Fany".
 
 <Screenshot
-  src="/images/posts/fany-cosmeticos/catalogo.png"
+  src="/images/posts/fany-cosmeticos/catalogo.webp"
   alt="Catálogo da Fany Cosméticos com filtros por categoria e cartões de produto com preço, parcelamento e valor no Pix."
   caption="Catálogo real da loja em ambiente de demonstração: filtros, etiquetas, parcelamento e desconto no Pix. Preços e estoque são fictícios."
   width={1280}
@@ -42,7 +41,7 @@ Repare na faixa do topo: "Loja em preparação · Catálogo demonstrativo · Nen
 
 ## O problema de confiar no carrinho
 
-Em qualquer loja, o carrinho vive no navegador. Isso é ótimo para a experiência e péssimo para a segurança, porque **todo valor que o cliente controla pode ser alterado**. Um carrinho que guarda `preco` e `total` é um convite para alguém editar o `localStorage` e comprar por R$ 1.
+O carrinho pode guardar informações no navegador para facilitar a experiência, mas **dados controlados pelo cliente podem ser alterados**. Guardar um preço localmente não é, por si só, uma falha: o problema é aceitar esse valor como definitivo no servidor. Na Fany, o banco calcula o total com os preços do catálogo.
 
 A regra que adotei é simples: **o carrinho guarda apenas identificadores e quantidades**. Nada de preço, nada de total. Quando o pedido é enviado, o banco recalcula tudo a partir do catálogo atual.
 
@@ -91,7 +90,7 @@ O checkout consulta a API pública **ViaCEP** apenas para descobrir o estado a p
 CEP -> ViaCEP -> UF -> shipping_zones(uf) -> frete somado no total
 ```
 
-Enquanto as tarifas são demonstrativas, o importante é a fronteira: trocar a tabela por uma cotação real dos Correios ou do Melhor Envio depois não muda nada na interface nem abre espaço para o navegador forjar desconto.
+As tarifas atuais são demonstrativas. Integrar Correios ou Melhor Envio exigirá peso e dimensões dos produtos, CEP de origem, cotação no servidor e escolha do serviço na interface. O valor escolhido também precisará ser validado ao criar o pedido; não basta substituir a tabela por uma API.
 
 ## Pagamento: sandbox com verificação de verdade
 
@@ -125,7 +124,7 @@ npm run build
 
 **Testes transacionais em SQL**, executados no Supabase e sempre revertidos com `ROLLBACK`. Eles criam os próprios produtos e usuários, então **não dependem do estoque real** e não deixam rastro. Cobrem: acesso anônimo negado, total com frete, limite de estoque, proteção do campo de pagamento, rejeição de total enviado pelo cliente e isolamento entre clientes.
 
-Tudo isso roda também no **GitHub Actions** a cada push: instalação, testes, tipagem, build, auditoria de dependências e checagem das funções com o Deno.
+O **GitHub Actions** executa a instalação, os testes de lógica em Node, a verificação de tipos, o build, a auditoria de dependências e a checagem das funções com Deno. Os testes SQL foram executados separadamente no Supabase; ainda não fazem parte desse workflow.
 
 ## Erros que corrigi no caminho
 
@@ -140,6 +139,6 @@ Nenhum projeto nasce certo, e vale registrar o que apareceu:
 
 Ainda falta o que depende de dados reais, não de código: produtos completos com peso e dimensões, tarifas de frete verdadeiras, credenciais de produção no Mercado Pago e no Resend, SMTP próprio para os e-mails de autenticação e as políticas comerciais e de privacidade. E, antes de qualquer venda, **reserva e expiração de estoque transacionais**.
 
-Deixei a hospedagem definitiva por último de propósito: primeiro a loja precisa funcionar e ser conferida de ponta a ponta, depois ela ganha um endereço de verdade.
+Deixei a hospedagem definitiva por último: a demonstração já tem um endereço público, mas a configuração comercial e a validação de ponta a ponta ainda precisam ser concluídas.
 
 Se quiser acompanhar a evolução, o código está aberto em [JefferL05/Fany-Cosmeticos](https://github.com/JefferL05/Fany-Cosmeticos) — e dá para navegar na loja em [fany-cosmeticos.vercel.app](https://fany-cosmeticos.vercel.app). Feedback é bem-vindo.
