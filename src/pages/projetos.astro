@@ -3,6 +3,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleImage from '../components/ArticleImage.astro';
 import { url } from '../utils/index';
 const projects = [
+  { id: 'projeto-financas-gestao-local', name: 'Projeto Finanças', status: 'Disponível · em evolução', description: 'Gestão financeira multi-moeda (BRL e PYG), local-first com IndexedDB, PWA offline e assistente com IA opcional.', demo: 'https://jefferl05.github.io/Projeto-financas/', action: 'Abrir o Projeto Finanças', repo: 'https://github.com/JefferL05/Projeto-financas', stack: ['HTML', 'JavaScript', 'IndexedDB', 'PWA'], news: 'Bloqueio local de privacidade, transferências atômicas, backup com migração e CSV protegido contra fórmulas.', images: [
+    { src: '/images/posts/projeto-financas/dashboard.webp', alt: 'Dashboard do Projeto Finanças com patrimônio, fluxo de caixa e categorias.' },
+    { src: '/images/posts/projeto-financas/gestao.webp', alt: 'Contas BRL e PYG, patrimônio e criação de conta manual.' },
+    { src: '/images/posts/projeto-financas/inteligencia.webp', alt: 'Assistente financeiro com análise local e insights vazios.' }
+  ] },
   { id: 'meu-ponto-3-controle-jornada', name: 'Meu Ponto', status: 'Disponível · em evolução', description: 'Controle pessoal de jornada, histórico e relatórios, com uso offline e sincronização opcional.', demo: 'https://jefferl05.github.io/meu-ponto/', action: 'Experimentar Meu Ponto', repo: 'https://github.com/JefferL05/meu-ponto', stack: ['Astro', 'JavaScript', 'Supabase'], news: 'Versão 3.0: múltiplos empregos, turnos noturnos e revisão por conta na sincronização.', images: [
     { src: '/images/posts/meu-ponto/inicio.webp', alt: 'Tela inicial do Meu Ponto, sem jornada registrada.' },
     { src: '/images/posts/meu-ponto/historico.webp', alt: 'Histórico mensal e formulário de férias, folgas e faltas, sem dados pessoais.' }

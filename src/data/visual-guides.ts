@@ -105,5 +105,15 @@ export const visualGuides: Record<string, VisualGuide> = {
       { label: 'Verificar', detail: 'Execute o verificador de tipos.', icon: 'check' },
       { label: 'Executar', detail: 'Teste a aplicação no Node.js.', icon: 'compass' }
     ]
+  },
+  'projeto-financas-gestao-local': {
+    title: 'Seus dados, no seu dispositivo', caption: 'A fonte verdadeira é o IndexedDB local. A interface lê, o domínio calcula e o Service Worker mantém o app disponível offline.',
+    takeaways: ['Sem backend obrigatório: os dados ficam no navegador.', 'Transferências gravam as duas movimentações na mesma transação.', 'A IA é opcional e nunca substitui os cálculos locais.'],
+    steps: [
+      { label: 'Interface', detail: 'Dashboard, contas e assistente.', icon: 'code' },
+      { label: 'Domínio', detail: 'Cálculos determinísticos locais.', icon: 'database' },
+      { label: 'IndexedDB', detail: 'Transações atômicas e índices.', icon: 'layers' },
+      { label: 'PWA', detail: 'Cache offline e backup manual.', icon: 'cloud' }
+    ]
   }
 };

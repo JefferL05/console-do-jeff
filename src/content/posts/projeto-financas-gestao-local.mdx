@@ -1,0 +1,142 @@
+---
+title: "Projeto Finanças: gestão financeira local-first, sem backend obrigatório"
+description: "Controle financeiro multi-moeda (BRL e PYG) com dados no dispositivo, PWA offline, transferências atômicas e assistente com IA opcional."
+pubDate: 2026-10-17
+sameDayOrder: 4
+author: "Jeff"
+category: "Projetos"
+tags: ["projeto-financas", "javascript", "pwa", "indexeddb", "local-first", "privacidade"]
+image:
+  url: "/images/posts/projeto-financas/dashboard.webp"
+  alt: "Dashboard real do Projeto Finanças, com patrimônio, fluxo de caixa e categorias em zero."
+draft: false
+---
+
+import Callout from '../../components/Callout.astro';
+import Screenshot from '../../components/Screenshot.astro';
+import SectionDiagram from '../../components/SectionDiagram.astro';
+import { url as siteUrl } from '../../utils/index';
+
+A maioria dos apps financeiros assume uma coisa: **você está online e seus dados estão em um servidor**. O **Projeto Finanças** foi construído com a premissa oposta: os dados financeiros pertencem ao dispositivo, o app funciona offline e nenhum backend é obrigatório.
+
+Neste post vou mostrar como essa escolha funciona na prática — e por que ela muda decisões que vão do bloqueio de acesso à forma como transferências são gravadas.
+
+Código fonte: [JefferL05/Projeto-financas](https://github.com/JefferL05/Projeto-financas). App publicado: [jefferl05.github.io/Projeto-financas](https://jefferl05.github.io/Projeto-financas/).
+
+<Callout type="info" title="Sobre os dados das imagens">
+  As capturas mostram o app real em ambiente de demonstração, com saldos zerados e sem dados pessoais.
+</Callout>
+
+## O app por dentro
+
+O dashboard reúne patrimônio líquido, dinheiro disponível, fluxo do mês e gastos por categoria. A barra lateral leva a Transações, Analytics, Contas & Planejamento, Gestão Financeira, Assistente e Dados & Backup.
+
+<Screenshot
+  src="/images/posts/projeto-financas/dashboard.webp"
+  alt="Dashboard do Projeto Finanças com patrimônio, fluxo de caixa, categorias e lista de transações vazia."
+  caption="Dashboard real, sem transações. Os valores em Gs. (guaranis) e R$ (reais) aparecem lado a lado porque o app é multi-moeda."
+  width={1280}
+  height={1100}
+/>
+
+## Por que local-first
+
+Um app financeiro carrega dados sensíveis. A pergunta "onde esses dados ficam?" não é detalhe técnico: ela define o que pode falhar, o que pode vazar e o que acontece quando a internet cai.
+
+No Projeto Finanças, o **IndexedDB é a fonte verdadeira**. Não há servidor que possa ser consultado, invadido ou desligado. O app inteiro roda do cache do Service Worker depois do primeiro acesso.
+
+<SectionDiagram topic="financas" index={0} />
+
+## A proteção de acesso é local
+
+O bloqueio por senha ou PIN é explicitamente descrito como **bloqueio de privacidade, não autenticação de servidor**. Ele protege o acesso ao aparelho, mas não substitui uma autenticação real — porque não há servidor para autenticar.
+
+No primeiro acesso, o app gera um código de recuperação único, mostrado uma única vez. Sem esse código, a senha não pode ser redefinida: **a recuperação é responsabilidade de quem usa**, não um serviço remoto.
+
+## Arquitetura: três telas, um domínio
+
+```text
+index.html          Dashboard, transações, dados e configurações
+gestao.html         Contas, transferências, conciliação e compromissos
+inteligencia.html   Assistente, metas, orçamentos e planejamento
+        │
+Controladores   js/app.js · js/gestao.js · js/inteligencia.js
+        │
+Domínio         accounts · ai · data · finance · reports · rules · transactions
+        │
+Persistência    js/db.js → IndexedDB
+```
+
+Os cálculos financeiros ficam no domínio e permanecem **determinísticos e locais**. A IA online, quando habilitada, apenas explica um contexto previamente calculado — ela nunca recalcula números do motor.
+
+<SectionDiagram topic="financas" index={1} />
+
+## IndexedDB: transferências atômicas
+
+Uma transferência entre contas são **duas movimentações ligadas por um `transferId`**, gravadas na mesma transação do IndexedDB. Se uma falha, a outra não acontece — e a transferência nunca aparece como receita ou despesa nos relatórios.
+
+O banco `ProjetoFinancasDB` usa dez stores com índices por data, moeda, tipo, categoria, conta, status, transferência e agendamento. O reset seguro é uma operação atômica que recria os padrões sem duplicar nada.
+
+## Ativos e passivos não são a mesma coisa
+
+O app diferencia os dois lados do patrimônio:
+
+- **Ativos:** receita aumenta o saldo, despesa reduz; transferências saem de uma conta e entram em outra.
+- **Passivos:** compra aumenta a dívida, pagamento reduz; passivos são descontados do patrimônio líquido.
+
+Esse detalhe parece pequeno, mas é o que separa "quanto eu tenho" de "quanto sobra depois das dívidas".
+
+<Screenshot
+  src="/images/posts/projeto-financas/gestao.webp"
+  alt="Tela de Contas & Planejamento com carteiras BRL e PYG, patrimônio, dinheiro disponível e criação de conta manual."
+  caption="Contas manuais em BRL e PYG, com conciliação e criação de conta. Nenhum dado bancário é importado automaticamente."
+  width={1280}
+  height={1100}
+/>
+
+## Backup com migração e validação
+
+O backup é JSON com versão de schema e todas as stores. Ao restaurar:
+
+- backups legados sem contas são migrados antes;
+- transações são vinculadas a carteiras padrão compatíveis com a moeda;
+- settings importados passam por **allowlist** (apenas `BRL`/`PYG`, cotação dentro de intervalo válido);
+- importações têm limite de tamanho.
+
+A exportação CSV **neutraliza valores iniciados com `=`, `+`, `-` ou `@`** para reduzir o risco de CSV Formula Injection em planilhas.
+
+## Assistente com IA opcional
+
+O assistente financeiro calcula tudo localmente. A IA online é usada somente se estiver habilitada e houver consentimento — e existem três níveis de privacidade, desde "somente análise local" até "detalhes selecionados".
+
+Em falha de rede ou backend, o assistente **volta ao modo local**. Nenhuma chave de API fica no HTML, no JavaScript, no IndexedDB ou no repositório.
+
+<Screenshot
+  src="/images/posts/projeto-financas/inteligencia.webp"
+  alt="Assistente financeiro local com exemplos de perguntas e painel de insights vazio."
+  caption="Assistente com análise local. A narrativa online é opcional; os números são calculados no dispositivo."
+  width={1280}
+  height={1100}
+/>
+
+## Moedas e parsing
+
+O app aceita **BRL e PYG** com formatos diferentes: `1.234,56` no Brasil, inteiros com separador de milhar no Paraguai, e `1,234.56` com `localeHint: "en-US"`.
+
+O `parseLooseNumber()` preserva sinal quando ele existe: transações exigem valor positivo, enquanto saldo inicial e conciliação podem usar valores assinados.
+
+## Testes e CI
+
+O projeto usa **Vitest** com `fake-indexeddb` para testes unitários de cálculos, parsing, metas, orçamentos, reset, backup, XSS e CSV injection — e **Playwright** com sete fluxos E2E críticos, incluindo transação, transferência, cartão, backup e navegação offline. O CI roda os dois no GitHub Actions.
+
+## Limitações e próximos passos
+
+O projeto é honesto sobre o que ainda falta:
+
+- os controladores `app.js`, `gestao.js` e `inteligencia.js` ainda devem ser divididos;
+- Chart.js ainda não está vendorizado localmente (há fallback Canvas);
+- faltam fixtures automatizadas de migração v3/v4/v5 → v6;
+- **não existe integração bancária ou Open Finance real**;
+- a IA generativa exige backend separado e continua opcional.
+
+Se quiser experimentar, abra o [app publicado](https://jefferl05.github.io/Projeto-financas/), crie um acesso local com um PIN forte e um lugar seguro para o código de recuperação — ele não aparece de novo.

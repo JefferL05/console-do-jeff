@@ -39,5 +39,9 @@ export const sectionDiagrams: Record<string, Diagram[]> = {
   'typescript': [
     { title: 'Preparar o ambiente', nodes: ['Instalar dependências', 'Definir tsconfig', 'Executar scripts npm'], note: 'Configuração de módulos, alvo e ferramentas precisa combinar com o ambiente onde o código roda.' },
     { title: 'Entrada externa não vem tipada', nodes: ['Dados desconhecidos', 'Validação em execução', 'Valor seguro para o código'], note: 'Uma asserção de tipo não valida JSON. Tipos ajudam no editor; entradas externas exigem verificações reais.' }
+  ],
+  'financas': [
+    { title: 'O ciclo local', nodes: ['Interface registra', 'Domínio calcula', 'IndexedDB persiste'], note: 'Não há servidor no caminho. Se o dispositivo perde a internet, o fluxo continua igual.' },
+    { title: 'O que a IA pode fazer', nodes: ['Motor calcula', 'Contexto validado', 'IA opcional explica'], note: 'A IA online apenas explica o que o motor local já calculou. Sem backend, o assistente funciona localmente.' }
   ]
 };
