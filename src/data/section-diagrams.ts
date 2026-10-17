@@ -43,5 +43,9 @@ export const sectionDiagrams: Record<string, Diagram[]> = {
   'financas': [
     { title: 'O ciclo local', nodes: ['Interface registra', 'Domínio calcula', 'IndexedDB persiste'], note: 'Não há servidor no caminho. Se o dispositivo perde a internet, o fluxo continua igual.' },
     { title: 'O que a IA pode fazer', nodes: ['Motor calcula', 'Contexto validado', 'IA opcional explica'], note: 'A IA online apenas explica o que o motor local já calculou. Sem backend, o assistente funciona localmente.' }
+  ],
+  'onda': [
+    { title: 'Como uma faixa chega ao ouvido', nodes: ['Busca no YouTube', 'Resolução de áudio', 'ExoPlayer ou MediaPlayer'], note: 'Se um arquivo baixado existir, ele tem prioridade. A tela do player mostra qual motor está em uso.' },
+    { title: 'Privacidade em camadas', nodes: ['Dados no aparelho', 'Cache de capas privado', 'Sem analytics'], note: 'O WebView não acessa arquivos locais nem expõe ponte JavaScript nativa. URLs temporárias não são gravadas.' }
   ]
 };

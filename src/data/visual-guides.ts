@@ -115,5 +115,15 @@ export const visualGuides: Record<string, VisualGuide> = {
       { label: 'IndexedDB', detail: 'Transações atômicas e índices.', icon: 'layers' },
       { label: 'PWA', detail: 'Cache offline e backup manual.', icon: 'cloud' }
     ]
+  },
+  'onda-app-android-musica': {
+    title: 'Ouvir online, offline e com a tela bloqueada', caption: 'O arquivo baixado tem prioridade. Se não houver conexão nem arquivo, o fluxo online do YouTube ainda pode tocar.',
+    takeaways: ['Media3/ExoPlayer com fallback para MediaPlayer.', 'Downloads com fila, limite de 50 itens e até 3 tentativas.', 'Armazenamento privado: favoritos, playlists e arquivos ficam no aparelho.'],
+    steps: [
+      { label: 'Buscar', detail: 'YouTube via NewPipeExtractor.', icon: 'compass' },
+      { label: 'Baixar', detail: 'Fila persistente e retentativas.', icon: 'layers' },
+      { label: 'Reproduzir', detail: 'Arquivo local ou fluxo online.', icon: 'code' },
+      { label: 'Biblioteca', detail: 'Favoritos, playlists e letras.', icon: 'database' }
+    ]
   }
 };

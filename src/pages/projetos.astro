@@ -3,6 +3,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleImage from '../components/ArticleImage.astro';
 import { url } from '../utils/index';
 const projects = [
+  { id: 'onda-app-android-musica', name: 'Onda', status: 'Disponível · em evolução', description: 'App Android de música com busca no YouTube, player online/offline, downloads com fila e biblioteca privada.', demo: 'https://github.com/JefferL05/Onda', action: 'Ver repositório e APK', repo: 'https://github.com/JefferL05/Onda', stack: ['Java', 'Android SDK 35', 'Media3', 'Gradle'], news: 'Versão 0.8.1: correção de foco de áudio, testes com ExoPlayer real e fallback MediaPlayer documentado.', images: [
+    { src: '/images/posts/onda/cover.webp', alt: 'Identidade visual do Onda com ondas sonoras em verde-água.' }
+  ] },
   { id: 'projeto-financas-gestao-local', name: 'Projeto Finanças', status: 'Disponível · em evolução', description: 'Gestão financeira multi-moeda (BRL e PYG), local-first com IndexedDB, PWA offline e assistente com IA opcional.', demo: 'https://jefferl05.github.io/Projeto-financas/', action: 'Abrir o Projeto Finanças', repo: 'https://github.com/JefferL05/Projeto-financas', stack: ['HTML', 'JavaScript', 'IndexedDB', 'PWA'], news: 'Bloqueio local de privacidade, transferências atômicas, backup com migração e CSV protegido contra fórmulas.', images: [
     { src: '/images/posts/projeto-financas/dashboard.webp', alt: 'Dashboard do Projeto Finanças com patrimônio, fluxo de caixa e categorias.' },
     { src: '/images/posts/projeto-financas/gestao.webp', alt: 'Contas BRL e PYG, patrimônio e criação de conta manual.' },

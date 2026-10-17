@@ -1,0 +1,123 @@
+---
+title: "Onda: um app Android de música com player online/offline"
+description: "Busca no YouTube, downloads com fila persistente, reprodução offline, letras locais e um player com Media3/ExoPlayer — tudo em Java puro, sem backend próprio."
+pubDate: 2026-10-17
+sameDayOrder: 5
+author: "Jeff"
+category: "Projetos"
+tags: ["onda", "android", "java", "exoplayer", "mediaplayer", "offline", "musica", "youtube"]
+image:
+  url: "/images/posts/onda/cover.webp"
+  alt: "Identidade visual do Onda: ondas sonoras em verde-ágaua sobre fundo escuro."
+draft: false
+---
+
+import Callout from '../../components/Callout.astro';
+import Screenshot from '../../components/Screenshot.astro';
+import SectionDiagram from '../../components/SectionDiagram.astro';
+import { url as siteUrl } from '../../utils/index';
+
+O **Onda** é um aplicativo Android de música construído em Java, sem backend próprio e sem catálogo próprio: ele consulta o YouTube para buscar e resolver vídeos, mas a experiência de reprodução, download, biblioteca e letras foi desenhada para funcionar **antes, durante e depois** da conexão.
+
+Este post documenta a arquitetura do app, as decisões de reprodução e download, o tratamento de privacidade e os limites honestos da versão 0.8.1.
+
+Código fonte: [JefferL05/Onda](https://github.com/JefferL05/Onda).
+
+<Callout type="info" title="Identidade visual">
+  A arte de abertura usa a paleta oficial do app: ondas sonoras em `#75F2BC` sobre fundo `#0C1013`, reproduzindo o ícone do launcher.
+</Callout>
+
+## O problema que o Onda organiza
+
+Aplicativos de música geralmente forçam uma escolha: ou você tem um catálogo licenciado e uma conta, ou você vive no navegador. O Onda assume uma posição diferente — **o usuário traz o catálogo** (via YouTube) e o app cuida da experiência de ouvir:
+
+- Busca com capas, artista, duração, filtros e buscas recentes.
+- Player que usa o arquivo baixado quando disponível e cai para o fluxo online quando não está.
+- Fila automática persistente, com avanço ao fim da faixa e restauração pausada.
+- Fila de downloads com até 50 itens, progresso, cancelar e retentativa de falhas.
+- Favoritos, playlists, histórico e letras locais, tudo em armazenamento privado.
+
+<SectionDiagram topic="onda" index={0} />
+
+## Reprodução: Media3 com fallback
+
+O player usa **Media3/ExoPlayer** como motor principal, com **MediaPlayer** como fallback quando o Media3 não está disponível ou falha. A correção da versão 0.7.1 identificou e removeu um problema clássico de migração: dois controladores de foco de áudio disputando a preparação após seek/rebuffer.
+
+A tela do player mostra explicitamente **qual motor está em uso** — uma decisão de transparência que ajuda a diagnosticar problemas em aparelhos específicos.
+
+<Screenshot
+  src="/images/posts/onda/cover.webp"
+  alt="Identidade visual do Onda com ondas sonoras, representando o player online/offline."
+  caption="Arte oficial do projeto. O app é distribuído como APK de desenvolvimento com assinatura debug."
+  width={1280}
+  height={720}
+/>
+
+## Downloads: fila, limites e privacidade
+
+O download é tratado como **operação de longa duração**, não como um clique e espere:
+
+- Fila com até **50 itens**, com progresso individual e cancelamento.
+- Até **3 tentativas** por item, com retentativa manual em "Tentar".
+- **Modo somente Wi-Fi**: downloads aguardam a rede correta.
+- **Economizar dados**: prefere o menor bitrate compatível.
+- Limite de **512 MB por arquivo**; arquivos parciais não aparecem como prontos.
+- Armazenamento **privado**: M4A ou WebM, sem conversão para MP3.
+
+Desinstalar ou limpar dados apaga tudo — não há sincronização, não há nuvem.
+
+## Letras locais e editáveis
+
+Cada faixa pode ter letras associadas localmente, com duas origens: texto fornecido pelo usuário ou texto licenciado. As letras ficam no armazenamento privado e podem ser editadas.
+
+<SectionDiagram topic="onda" index={1} />
+
+## Privacidade por padrão
+
+O Onda foi desenhado com a premissa de que **dados de escuta são sensíveis**:
+
+- Favoritos, playlists, buscas, histórico, sessão de reprodução e arquivos ficam no armazenamento privado.
+- Capas ficam em cache privado; URLs temporárias de mídia não são gravadas.
+- O **WebView** não acessa arquivos locais nem expõe ponte JavaScript nativa.
+- **Sem analytics**. Buscas, streaming e downloads vão ao YouTube/Google, mas o app não coleta telemetria própria.
+
+## Serviço de mídia e tela bloqueada
+
+O serviço de mídia mantém a notificação ativa com controles de pausar, voltar e avançar — inclusive com a tela bloqueada. O foco de áudio pausa a reprodução ao desconectar fones, e o wake lock mantém o serviço vivo durante a reprodução.
+
+A apresentação na tela bloqueada depende das configurações de privacidade do aparelho. **Não há bloqueio automático da tela nem permissão de administrador.**
+
+## Build, testes e verificação
+
+O projeto usa **JDK 17**, **Android SDK 35** e **Gradle 8.11.1**. O script `build.ps1` localiza as ferramentas, executa verificações e testes, compila, roda lint e verifica a assinatura.
+
+A entrega final 0.8.1 passou por **65 testes JUnit** e **32 verificações independentes**, incluindo busca real, resolução de áudio, download completo de 10.271.496 bytes e ExoPlayer carregando um WAV gerado no Android simulado.
+
+```powershell
+.\gradlew.bat assembleDebug lintDebug
+powershell -ExecutionPolicy Bypass -File .\build.ps1
+```
+
+Para testes reais com o YouTube: `powershell -ExecutionPolicy Bypass -File .\build.ps1 -LiveTests`.
+
+## Dependências e compliance
+
+O app fixa a dependência **NewPipeExtractor `v0.26.5`** (GPL-3.0-or-later). Avisos, licenças e referências de fontes estão em `app/src/main/assets/licenses` e em **Sobre → Licenças**.
+
+O APK de desenvolvimento fica em `app/build/outputs/apk/debug/app-debug.apk` e o histórico de versões é preservado em `dist/`, acompanhado de arquivos `.sha256`.
+
+## Limites desta versão
+
+O projeto é honesto sobre o que ainda não tem:
+
+- **Depende do YouTube**: busca, streaming e downloads podem mudar sem aviso, exigindo atualização do extrator.
+- Sem catálogo próprio, conta, sincronização ou recomendações personalizadas.
+- Sem letras licenciadas — as letras são locais ou fornecidas pelo usuário.
+- Uma faixa online que falha interrompe o avanço até nova tentativa ou próxima.
+- Tela bloqueada física, Bluetooth, chamadas reais e políticas de bateria **ainda precisam de validação em aparelho**.
+
+## Por que esse projeto importa
+
+O Onda mostra que é possível construir um app de música completo em Java, com reprodução offline real, downloads robustos e privacidade por padrão — sem inventar um backend, sem pedir permissão de arquivos e sem transformar o usuário em produto.
+
+É um projeto em evolução, com versionamento claro, relatórios de validação e limites documentados. Se você procura um exemplo de app Android de mídia com decisões técnicas explícitas, o [código está aberto](https://github.com/JefferL05/Onda).
