@@ -1,0 +1,92 @@
+---
+title: "Portfolio: um site estático que consome o GitHub e o blog"
+description: "Astro + Tailwind + TypeScript para reunir projetos do GitHub e posts do Console do Jeff em uma página única, com dados carregados no build."
+pubDate: 2026-10-18
+sameDayOrder: 1
+author: "Jeff"
+category: "Projetos"
+tags: ["portfolio", "astro", "typescript", "tailwind", "github-pages", "rss"]
+image:
+  url: "/images/posts/onda/cover.webp"
+  alt: "Identidade visual do Console do Jeff com ondas sonoras em verde-água."
+draft: false
+---
+
+import Callout from '../../components/Callout.astro';
+import SectionDiagram from '../../components/SectionDiagram.astro';
+import { url as siteUrl } from '../../utils/index';
+
+O **Portfolio** é a página de entrada que construí para reunir, em um só lugar, os projetos do meu GitHub e os posts do **Console do Jeff**. A decisão central foi simples: em vez de manter um site dinâmico com backend, ele é **totalmente estático** — os dados chegam de duas fontes públicas (a API do GitHub e o feed RSS do blog) no momento do build.
+
+O resultado é uma página leve, gratuita para hospedar no GitHub Pages e fácil de manter.
+
+Código fonte: [JefferL05/Portfolio](https://github.com/JefferL05/Portfolio).
+
+## O problema de um portfólio tradicional
+
+Um site de portfólio costuma enfrentar o mesmo dilema: ou ele é estático e desatualizado, ou precisa de um backend para buscar dados. O Portfolio resolve isso com uma troca consciente:
+
+- **Sem backend**: não há servidor para manter, escalar ou pagar.
+- **Dados no build**: a página é gerada uma vez com os dados atuais do GitHub e do RSS.
+- **Deploy gratuito**: basta publicar a pasta `dist/` no GitHub Pages.
+
+<SectionDiagram topic="portfolio" index={0} />
+
+## Stack e decisões
+
+| Camada | Tecnologia | Motivo |
+| --- | --- | --- |
+| Framework | Astro | Gera site estático com ilhas de interatividade |
+| Estilo | Tailwind CSS | Utilitário, rápido de iterar |
+| Tipagem | TypeScript | Contratos claros para os dados externos |
+| Deploy | GitHub Pages | Hospedagem gratuita integrada ao repositório |
+
+O Astro foi escolhido porque o portfólio é **quase todo conteúdo estático**: cards de projeto, posts do blog e seções fixas. Onde há interatividade (como o tema), o padrão de ilhas adiciona JavaScript somente naquele componente.
+
+## De onde vêm os dados
+
+O site consome duas fontes públicas no build:
+
+```text
+GitHub API  ──→  perfil + repositórios (ordenação por atualização)
+Blog RSS    ──→  posts recentes (título, link, categorias)
+```
+
+A função `getGitHubRepos()` filtra forks e repositórios arquivados, então só aparecem projetos de autoria própria. Os posts vêm diretamente do RSS do Console do Jeff, sem duplicar conteúdo.
+
+## O visual como terminal
+
+A identidade do Portfolio usa **terminal como metáfora**: o título de cada seção é um comando (`ls ~/projetos`, `cat ~/blog/recentes.md`), a seção "Sobre" é uma janela de terminal e o cursor pisca no prompt. É uma escolha de design que reforça a personalidade técnica da página sem sacrificar a legibilidade.
+
+<SectionDiagram topic="portfolio" index={1} />
+
+## Estrutura enxuta
+
+O projeto é pequeno por design:
+
+```text
+src/
+├── components/     Hero, ProjectCard, BlogCard
+├── layouts/        BaseLayout (navegação + rodapé)
+├── lib/            github.ts, blog.ts
+├── pages/          index.astro
+└── styles/         global.css
+```
+
+Cada componente tem uma responsabilidade: o Hero carrega o perfil, o ProjectCard renderiza um repositório e o BlogCard renderiza um post. A `index.astro` coordena as três seções com `Promise.all`, então as duas fontes são buscadas em paralelo.
+
+## Build e deploy
+
+```bash
+npm install
+npm run build
+npm run preview
+```
+
+O `build` gera a pasta `dist/` pronta para o GitHub Pages ou para Vercel/Netlify. Como Astro gera site estático, não há servidor em produção: os dados são "congelados" no build e atualizados a cada novo deploy.
+
+## O que aprendi
+
+Projetar o Portfolio reforçou uma lição que aparece em outros projetos meus: **nem todo site precisa de backend**. Quando as fontes de dados já são públicas e a atualização pode esperar o próximo build, um site estático é mais simples, mais barato e mais seguro.
+
+Se quiser comparar com a minha abordagem em projetos dinâmicos, veja o post sobre o [Meu Ponto]({siteUrl('/blog/meu-ponto-3-controle-jornada')}) (dados locais) e sobre a [Fany Cosméticos]({siteUrl('/blog/fany-cosmeticos-loja-nextjs-supabase')}) (backend com Supabase).

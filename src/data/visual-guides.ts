@@ -125,5 +125,15 @@ export const visualGuides: Record<string, VisualGuide> = {
       { label: 'Reproduzir', detail: 'Arquivo local ou fluxo online.', icon: 'code' },
       { label: 'Biblioteca', detail: 'Favoritos, playlists e letras.', icon: 'database' }
     ]
+  },
+  'portfolio-site-estatico': {
+    title: 'Duas fontes públicas, um site estático', caption: 'A API do GitHub e o RSS do blog são lidos no build. A página gerada não precisa de servidor em produção.',
+    takeaways: ['Sem backend para manter: os dados chegam no build.', 'Forks e repositórios arquivados são filtrados.', 'O RSS do blog evita duplicar conteúdo.'],
+    steps: [
+      { label: 'GitHub', detail: 'Perfil e repositórios via API.', icon: 'code' },
+      { label: 'RSS', detail: 'Posts recentes do blog.', icon: 'layers' },
+      { label: 'Build', detail: 'Astro gera a pasta dist/.', icon: 'check' },
+      { label: 'Deploy', detail: 'GitHub Pages serve o estático.', icon: 'cloud' }
+    ]
   }
 };

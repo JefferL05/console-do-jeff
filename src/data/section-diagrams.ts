@@ -47,5 +47,9 @@ export const sectionDiagrams: Record<string, Diagram[]> = {
   'onda': [
     { title: 'Como uma faixa chega ao ouvido', nodes: ['Busca no YouTube', 'Resolução de áudio', 'ExoPlayer ou MediaPlayer'], note: 'Se um arquivo baixado existir, ele tem prioridade. A tela do player mostra qual motor está em uso.' },
     { title: 'Privacidade em camadas', nodes: ['Dados no aparelho', 'Cache de capas privado', 'Sem analytics'], note: 'O WebView não acessa arquivos locais nem expõe ponte JavaScript nativa. URLs temporárias não são gravadas.' }
+  ],
+  'portfolio': [
+    { title: 'Do build à página', nodes: ['Astro lê as fontes', 'Gera dist/ estático', 'Pages publica sem servidor'], note: 'Os dados ficam congelados no build. Atualizar o site é commitar um novo deploy.' },
+    { title: 'Dois mundos, uma página', nodes: ['Projetos do GitHub', 'Posts do blog', 'Seção Sobre'], note: 'O portfólio une repositórios e artigos sem duplicar conteúdo: o RSS já traz os posts do Console do Jeff.' }
   ]
 };

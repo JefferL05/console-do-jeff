@@ -3,6 +3,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleImage from '../components/ArticleImage.astro';
 import { url } from '../utils/index';
 const projects = [
+  { id: 'portfolio-site-estatico', name: 'Portfolio', status: 'Disponível', description: 'Site estático que reúne projetos do GitHub e posts do blog em uma página, com dados carregados no build.', demo: 'https://github.com/JefferL05/Portfolio', action: 'Ver código no GitHub', repo: 'https://github.com/JefferL05/Portfolio', stack: ['Astro', 'TypeScript', 'Tailwind', 'GitHub Pages'], news: 'Correção de encoding UTF-8 nos textos e estrutura enxuta: Hero, cards de projeto e posts via RSS.', images: [
+    { src: '/images/posts/onda/cover.webp', alt: 'Identidade visual do Console do Jeff, usada como capa do projeto.' }
+  ] },
   { id: 'onda-app-android-musica', name: 'Onda', status: 'Disponível · em evolução', description: 'App Android de música com busca no YouTube, player online/offline, downloads com fila e biblioteca privada.', demo: 'https://github.com/JefferL05/Onda', action: 'Ver repositório e APK', repo: 'https://github.com/JefferL05/Onda', stack: ['Java', 'Android SDK 35', 'Media3', 'Gradle'], news: 'Versão 0.8.1: correção de foco de áudio, testes com ExoPlayer real e fallback MediaPlayer documentado.', images: [
     { src: '/images/posts/onda/cover.webp', alt: 'Identidade visual do Onda com ondas sonoras em verde-água.' }
   ] },
