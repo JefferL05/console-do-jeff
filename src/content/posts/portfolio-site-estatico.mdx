@@ -7,18 +7,27 @@ author: "Jeff"
 category: "Projetos"
 tags: ["portfolio", "astro", "typescript", "tailwind", "github-pages", "rss"]
 image:
-  url: "/images/posts/onda/cover.webp"
-  alt: "Identidade visual do Console do Jeff com ondas sonoras em verde-água."
+  url: "/images/posts/portfolio/cover.webp"
+  alt: "Arte do Portfolio: janela de terminal listando os projetos e o deploy concluído."
 draft: false
 ---
 
 import Callout from '../../components/Callout.astro';
+import Screenshot from '../../components/Screenshot.astro';
 import SectionDiagram from '../../components/SectionDiagram.astro';
 import { url as siteUrl } from '../../utils/index';
 
 O **Portfolio** é a página de entrada que construí para reunir, em um só lugar, os projetos do meu GitHub e os posts do **Console do Jeff**. A decisão central foi simples: em vez de manter um site dinâmico com backend, ele é **totalmente estático** — os dados chegam de duas fontes públicas (a API do GitHub e o feed RSS do blog) no momento do build.
 
 O resultado é uma página leve, gratuita para hospedar no GitHub Pages e fácil de manter.
+
+<Screenshot
+  src="/images/posts/portfolio/fluxo.webp"
+  alt="Diagrama do fluxo do Portfolio: GitHub API e Blog RSS alimentam o build do Astro, que gera a pasta dist/ publicada no GitHub Pages."
+  caption="O caminho completo: duas fontes públicas são lidas no build, o Astro gera arquivos estáticos e o GitHub Pages serve o resultado sem servidor."
+  width={1280}
+  height={720}
+/>
 
 Código fonte: [JefferL05/Portfolio](https://github.com/JefferL05/Portfolio).
 

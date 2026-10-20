@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0e17"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <rect x="0" y="0" width="4" height="720" fill="#22d3ee" opacity="0.6"/>
+
+  <text x="70" y="86" font-family="'JetBrains Mono',Consolas,monospace" font-size="15" fill="#22d3ee" letter-spacing="3">FLUXO DE DADOS NO BUILD</text>
+  <text x="70" y="130" font-family="'JetBrains Mono',Consolas,monospace" font-size="27" font-weight="700" fill="#F1F5F9">Duas fontes públicas, nenhum servidor</text>
+
+  <!-- Fonte 1: GitHub -->
+  <g transform="translate(70,186)">
+    <rect width="300" height="150" rx="14" fill="#111827" stroke="#334155" stroke-width="1.5"/>
+    <circle cx="40" cy="44" r="16" fill="#22d3ee" fill-opacity="0.18"/>
+    <path d="M40 33a11 11 0 0 0-3.5 21.4c.55.1.75-.24.75-.54v-1.9c-3 .65-3.65-1.28-3.65-1.28-.5-1.25-1.2-1.58-1.2-1.58-1-.64.07-.62.07-.62 1.1.08 1.67 1.12 1.67 1.12.98 1.66 2.5 1.1 2.95.92.1-.7.38-1.15.68-1.42-2.45-.28-5.02-1.22-5.02-5.45 0-1.2.43-2.2 1.13-2.95-.11-.28-.48-1.4.1-2.92 0 0 .92-.3 3.02 1.13a10.4 10.4 0 0 1 5.5 0c2.1-1.43 3.02-1.13 3.02-1.13.58 1.52.21 2.64.11 2.92.7.75 1.13 1.75 1.13 2.95 0 4.24-2.58 5.16-5.03 5.44.4.35.75 1.02.75 2.06v3.05c0 .3.2.64.77.53A11 11 0 0 0 40 33Z" fill="#22d3ee"/>
+    <text x="66" y="49" font-family="'JetBrains Mono',Consolas,monospace" font-size="19" fill="#E2E8F0">GitHub API</text>
+    <text x="26" y="92" font-family="'JetBrains Mono',Consolas,monospace" font-size="14" fill="#94A3B8">/users/JefferL05</text>
+    <text x="26" y="116" font-family="'JetBrains Mono',Consolas,monospace" font-size="14" fill="#94A3B8">/users/JefferL05/repos</text>
+    <text x="26" y="138" font-family="'JetBrains Mono',Consolas,monospace" font-size="13" fill="#64748B">forks e arquivados são filtrados</text>
+  </g>
+
+  <!-- Fonte 2: RSS -->
+  <g transform="translate(70,356)">
+    <rect width="300" height="150" rx="14" fill="#111827" stroke="#334155" stroke-width="1.5"/>
+    <circle cx="40" cy="44" r="16" fill="#4ade80" fill-opacity="0.18"/>
+    <path d="M32 36a12 12 0 0 1 12 12M32 43a5 5 0 0 1 5 5" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="33" cy="48" r="2.6" fill="#4ade80"/>
+    <text x="66" y="49" font-family="'JetBrains Mono',Consolas,monospace" font-size="19" fill="#E2E8F0">Blog RSS</text>
+    <text x="26" y="92" font-family="'JetBrains Mono',Consolas,monospace" font-size="14" fill="#94A3B8">console-do-jeff/rss.xml</text>
+    <text x="26" y="116" font-family="'JetBrains Mono',Consolas,monospace" font-size="14" fill="#94A3B8">título · link · categorias</text>
+    <text x="26" y="138" font-family="'JetBrains Mono',Consolas,monospace" font-size="13" fill="#64748B">posts recentes do blog</text>
+  </g>
+
+  <!-- setas -->
+  <path d="M390 261 h48" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M430 251 l14 10 -14 10" fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M390 431 h48" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M430 421 l14 10 -14 10" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Build -->
+  <g transform="translate(450,186)">
+    <rect width="330" height="320" rx="14" fill="#1e293b" fill-opacity="0.45" stroke="#22d3ee" stroke-opacity="0.45" stroke-width="1.5"/>
+    <text x="165" y="46" text-anchor="middle" font-family="'JetBrains Mono',Consolas,monospace" font-size="14" fill="#22d3ee" letter-spacing="3">BUILD</text>
+    <text x="165" y="82" text-anchor="middle" font-family="'JetBrains Mono',Consolas,monospace" font-size="21" fill="#F1F5F9">Astro</text>
+    <line x1="36" y1="104" x2="294" y2="104" stroke="#334155" stroke-width="1"/>
+    <text x="36" y="140" font-family="'JetBrains Mono',Consolas,monospace" font-size="14" fill="#94A3B8">Hero + ProjectCard</text>
+    <text x="36" y="168" font-family="'JetBrains Mono',Consolas,monospace" font-size="14" fill="#94A3B8">BlogCard + seções</text>
+    <text x="36" y="196" font-family="'JetBrains Mono',Consolas,monospace" font-size="14" fill="#94A3B8">Tailwind para o estilo</text>
+    <text x="36" y="224" font-family="'JetBrains Mono',Consolas,monospace" font-size="14" fill="#94A3B8">TypeScript nos contratos</text>
+    <rect x="36" y="248" width="258" height="46" rx="9" fill="#0a0e17" stroke="#22d3ee" stroke-opacity="0.35"/>
+    <text x="165" y="277" text-anchor="middle" font-family="'JetBrains Mono',Consolas,monospace" font-size="15" fill="#4ade80">dist/ estático</text>
+  </g>
+
+  <path d="M800 346 h44" stroke="#facc15" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M836 336 l14 10 -14 10" fill="none" stroke="#facc15" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Deploy -->
+  <g transform="translate(856,186)">
+    <rect width="354" height="320" rx="14" fill="#111827" stroke="#334155" stroke-width="1.5"/>
+    <text x="26" y="46" font-family="'JetBrains Mono',Consolas,monospace" font-size="14" fill="#facc15" letter-spacing="3">DEPLOY</text>
+    <text x="26" y="86" font-family="'JetBrains Mono',Consolas,monospace" font-size="20" fill="#F1F5F9">GitHub Pages</text>
+    <line x1="26" y1="108" x2="328" y2="108" stroke="#334155" stroke-width="1"/>
+    <circle cx="36" cy="146" r="7" fill="#4ade80"/>
+    <text x="56" y="152" font-family="'JetBrains Mono',Consolas,monospace" font-size="15" fill="#CBD5E1">sem servidor</text>
+    <circle cx="36" cy="182" r="7" fill="#4ade80"/>
+    <text x="56" y="188" font-family="'JetBrains Mono',Consolas,monospace" font-size="15" fill="#CBD5E1">sem custo</text>
+    <circle cx="36" cy="218" r="7" fill="#4ade80"/>
+    <text x="56" y="224" font-family="'JetBrains Mono',Consolas,monospace" font-size="15" fill="#CBD5E1">atualiza no push</text>
+    <rect x="26" y="248" width="302" height="46" rx="9" fill="#0a0e17" stroke="#22d3ee" stroke-opacity="0.3"/>
+    <text x="177" y="277" text-anchor="middle" font-family="'JetBrains Mono',Consolas,monospace" font-size="15" fill="#4ade80">✓ deploy concluído</text>
+  </g>
+
+  <text x="70" y="620" font-family="'JetBrains Mono',Consolas,monospace" font-size="14" fill="#475569">ASTRO · TAILWIND CSS · TYPESCRIPT · GITHUB PAGES</text>
+  <text x="70" y="648" font-family="'JetBrains Mono',Consolas,monospace" font-size="13" fill="#3F4B5C">os dados ficam congelados no build: atualizar o site é fazer um novo deploy</text>
+</svg>
