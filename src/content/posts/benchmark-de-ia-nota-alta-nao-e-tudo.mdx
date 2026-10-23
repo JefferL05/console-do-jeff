@@ -1,0 +1,98 @@
+---
+title: "Benchmark de IA: por que a nota mais alta não resolve o seu problema"
+description: "Rankings de IA ajudam a comparar, mas não contam a história toda. Entenda o que um benchmark mede e como escolher um modelo pelo seu uso real."
+pubDate: 2026-10-23
+sameDayOrder: 2
+author: "Jeff"
+category: "IA"
+tags: ["inteligência-artificial", "llms", "benchmarks", "escolha-de-ferramentas"]
+image:
+  url: "/images/posts/artigos-ia/benchmark-ia.png"
+  alt: "Ilustração abstrata sobre a comparação de modelos de inteligência artificial"
+draft: false
+---
+
+import Callout from '../../components/Callout.astro';
+import { url as siteUrl } from '../../utils/index';
+
+Quase toda semana aparece um ranking novo dizendo qual é "a melhor IA do momento". É difícil não olhar para o primeiro lugar e pensar: pronto, achei a resposta. Mas escolher uma IA só pela nota é como escolher um carro só pela potência do motor. O número é verdadeiro, só não conta tudo o que você precisa saber.
+
+Neste texto, vou explicar em linguagem simples o que esses rankings medem, o que eles deixam de fora e como tomar uma decisão melhor para o seu dia a dia.
+
+## O que é um benchmark, em palavras simples
+
+Um **benchmark** é uma prova padronizada. Os criadores escolhem uma lista de tarefas, aplicam essa mesma prova em vários modelos e comparem as notas.
+
+Pense no boletim escolar. Um aluno com nota 10 em matemática é excelente em matemática. Isso não significa que ele seja o melhor motorista, o melhor cozinheiro ou a melhor pessoa para resolver um problema de encanamento. A prova mede uma coisa específica.
+
+Com IA é igual. Um modelo pode ir muito bem em programação e ser apenas razoável para escrever textos. Outro pode ser ótimo em inglês e fraco em português. Outro pode acertar quase tudo, mas demorar demais para responder.
+
+<Callout type="info" title="A analogia do boletim">
+  A nota mostra desempenho em uma prova. Ela não mostra preço, velocidade, privacidade nem o quanto o modelo entende do seu trabalho. São coisas diferentes.
+</Callout>
+
+## O que a nota não mostra
+
+Antes de trocar tudo por causa de um ranking, vale olhar para o que ficou de fora:
+
+- **O seu tipo de tarefa.** Se você escreve textos curtos, um modelo que é campeão em provas de matemática pode não ser a melhor escolha.
+- **O seu idioma.** Muitas provas são feitas em inglês. O desempenho em português pode ser diferente.
+- **O preço.** Um modelo pode ser excelente e caro. Se você usa muito, a conta cresce rápido.
+- **A velocidade.** Para um chat, alguns segundos incomodam. Para um trabalho que roda de madrugada, não faz diferença.
+- **A privacidade.** Se você vai colar dados de clientes, precisa saber para onde esses dados vão.
+- **A memória.** Cada modelo tem um limite de texto que consegue "segurar" de uma vez. Isso muda tudo em documentos longos.
+
+Nenhum desses itens aparece na nota principal. E, na prática, eles costumam decidir se a ferramenta vai funcionar ou não no seu caso.
+
+## Quatro números que importam mais que a nota
+
+### 1. Custo por uso
+
+Quase todo modelo cobra por quantidade de texto processado. A unidade usada é o **token**, que é mais ou menos um pedaço de palavra. Você não precisa decorar a conta: só precisa saber que textos longos e muitas perguntas custam mais.
+
+A pergunta certa é: "quanto eu vou gastar por mês usando isso do jeito que eu uso?". Um modelo "melhor" que custa cinco vezes mais só vale a pena se a diferença aparecer no resultado.
+
+### 2. Velocidade de resposta
+
+Velocidade é o tempo entre você enviar a pergunta e receber a resposta. Para conversar, isso pesa bastante. Para gerar um relatório que ninguém está esperando na tela, pesa menos.
+
+### 3. Memória de contexto
+
+A "memória" do modelo é o quanto de texto ele consegue considerar de uma vez. Se você precisa analisar um contrato inteiro ou um projeto grande, essa memória importa mais do que a nota em provas curtas.
+
+### 4. Qualidade no seu trabalho
+
+Essa é a mais importante e a mais difícil de medir. A única forma honesta de saber é testar com tarefas parecidas com as suas.
+
+## Como testar em 20 minutos
+
+Você não precisa de um laboratório. Separe cinco tarefas reais do seu dia e faça o mesmo pedido para dois ou três modelos:
+
+1. Um texto que você já escreveu e conhece o resultado esperado.
+2. Um problema técnico que você já sabe resolver.
+3. Um resumo de um documento longo.
+4. Uma pergunta em português com detalhes do seu contexto.
+5. Uma tarefa chata e repetitiva que você gostaria de automatizar.
+
+Anote três coisas para cada modelo: a resposta ficou boa, quanto tempo levou e quanto você pagaria por aquele uso. Em vinte minutos você terá uma resposta melhor do que qualquer ranking genérico.
+
+<Callout type="success" title="Regra simples">
+  Use o ranking para montar uma lista curta de candidatos. Use os seus próprios testes para escolher o vencedor.
+</Callout>
+
+## Então a nota não serve para nada?
+
+Serve, sim. Ela ajuda a eliminar opções ruins e a descobrir modelos que você nem conhecia. O erro é tratar a nota como uma resposta final, quando ela é só o começo da conversa.
+
+O melhor modelo para você não é necessariamente o primeiro da lista. É aquele que resolve o seu problema com um custo e uma velocidade que fazem sentido para a sua realidade.
+
+Se quiser se aprofundar no assunto, vale ler quem testa isso de verdade, com dezenas de rodadas e critérios abertos. Só lembre: os números mudam rápido. O que não muda é o método: teste no seu contexto antes de decidir.
+
+## Referências e leitura recomendada
+
+- [Devo usar o que tem nota maior?](https://www.akitaonrails.com/2026/07/19/llm-benchmark-devo-usar-o-que-tem-nota-maior/) — discussão sobre o peso dos rankings.
+- [LLM Benchmark v4: o veredito de open source até outubro de 2026](https://www.akitaonrails.com/2026/10/22/llm-benchmark-v4-o-veredito-de-open-source-ate-out-2026/) — exemplo de comparação com vários critérios.
+
+Este artigo foi escrito originalmente para o Console do Jeff. As fontes acima serviram de inspiração e referência, não de texto-base para cópia.
+
+Se você ainda está escolhendo qual ferramenta usar no dia a dia, vale ler também o artigo <a href={siteUrl('/blog/qual-ia-melhor-para-programar')}>Qual IA é a melhor para programar?</a>.

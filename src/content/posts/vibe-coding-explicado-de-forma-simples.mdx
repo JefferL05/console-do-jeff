@@ -1,0 +1,126 @@
+---
+title: "Vibe coding: programar conversando com a IA (sem se dar mal)"
+description: "Vibe coding é descrever o que você quer em português e deixar a IA escrever o código. Entenda quando isso ajuda, quando atrapalha e como reduzir os riscos."
+pubDate: 2026-10-23
+sameDayOrder: 1
+author: "Jeff"
+category: "IA"
+tags: ["vibe-coding", "inteligência-artificial", "programação", "boas-práticas"]
+image:
+  url: "/images/posts/artigos-ia/vibe-coding.png"
+  alt: "Ilustração abstrata sobre programação com assistência de inteligência artificial"
+draft: false
+---
+
+import Callout from '../../components/Callout.astro';
+import { url as siteUrl } from '../../utils/index';
+
+**Vibe coding** é um jeito de programar em que você descreve o que quer em português e a IA escreve o código. Em vez de digitar cada linha, você conversa: pede uma tela, explica a regra do negócio, aponta o erro e vai ajustando.
+
+É uma ferramenta poderosa. Também é uma ferramenta que engana bem. Este texto explica, sem enrolação, quando usar, quando evitar e como não se machucar.
+
+## A analogia do GPS
+
+Pense no vibe coding como um GPS muito rápido. Ele conhece muitos caminhos e responde na hora. Mas o GPS não sabe se a rua está interditada, se o carro está sem gasolina ou se aquele atalho passa por um lugar perigoso.
+
+Se você olha para a tela e confia sem pensar, pode parar dentro de um lago. Se você usa a sugestão como ponto de partida e mantém os olhos na estrada, chega mais rápido e com segurança.
+
+Com código é igual: a IA acelera o caminho, mas quem decide ainda é você.
+
+## O que é uma "demo" e o que é "produção"
+
+Quase todo mundo que começa com vibe coding passa pelo mesmo momento de euforia. A IA entrega uma aplicação que abre, tem botões bonitos e parece funcionar. É Impressionante.
+
+Só que existe uma diferença gigante entre uma **demo** e um **sistema em produção**:
+
+- A demo é a casa modelo. Bonita, arrumada, sem ninguém morando.
+- A produção é a casa onde alguém mora de verdade. Tem encanamento, fiação, conta de luz e um chuveiro que não pode queimar.
+
+Na demo, o login funciona. Em produção, é preciso pensar em quem pode entrar, o que cada pessoa pode ver, o que acontece quando a internet cai e o que fazer quando alguém tenta burlar o sistema.
+
+A IA é muito boa em montar a casa modelo. A parte de morar nela ainda depende de gente que entende do assunto.
+
+## Os cinco tropeços mais comuns
+
+### 1. O código parece certo
+
+Esse é o tropeço mais perigoso. A IA escreve código com muita confiança, e código confiante parece correto. Mas "parecer certo" não é "estar certo".
+
+Se você não sabe ler o que foi gerado, fica difícil separar uma solução de verdade de uma solução que só funciona no exemplo.
+
+### 2. Segurança que fica só na tela
+
+Um exemplo simples: a IA esconde o botão de administrador para quem não é administrador. A tela fica perfeita. O problema é que esconder um botão não impede ninguém de chamar o endereço diretamente.
+
+Segurança de verdade é feita no servidor, com regras claras de quem pode fazer o quê. Isso ainda precisa de revisão humana.
+
+### 3. Custos que aparecem depois
+
+Colocar uma aplicação no ar costuma ser barato. Manter a aplicação no ar, com banco de dados, imagens, e-mails e backups, é outra história. A IA não vai lembrar de te avisar que aquela escolha simples vai gerar uma conta mensal.
+
+### 4. Dependências demais
+
+Quanto mais peças de fora o projeto usa, mais coisas podem quebrar. A IA tende a sugerir bibliotecas para tudo. Cada uma resolve um problema e cria uma responsabilidade nova: atualizar, entender e acompanhar falhas.
+
+### 5. Nenhum teste
+
+Sem testes, você só descobre que algo quebrou quando um usuário reclama. A IA pode escrever testes, mas ela também pode escrever testes que só confirmam o próprio erro. Testar o comportamento importante ainda é trabalho de quem entende o problema.
+
+<Callout type="warning" title="O teste do mundo real">
+  Antes de considerar algo pronto, pergunte: "o que acontece se um usuário fizer tudo errado?". Se a resposta for "não sei", ainda não está pronto.
+</Callout>
+
+## Como usar vibe coding sem se dar mal
+
+Você não precisa abandonar a ferramenta. Só precisa usá-la com alguns cuidados simples:
+
+1. **Comece pequeno.** Uma tela, uma função, um problema por vez. Projetos grandes de uma vez escondem erros grandes.
+2. **Use controle de versão.** Git é o seu botão de desfazer. Faça commits pequenos e frequentes.
+3. **Peça explicações.** Antes de aceitar, pergunte: "explique o que esse código faz e o que pode dar errado".
+4. **Teste com dados reais.** Nada de testar só com o exemplo bonito que a IA inventou.
+5. **Nunca cole segredos.** Senhas, chaves de API e dados de clientes não devem ir para o chat.
+6. **Revise permissões.** Quem pode ver, quem pode editar e quem pode apagar? Isso precisa estar claro no servidor.
+7. **Tenha um plano B.** Se a IA travar, você sabe continuar sozinho? Se a resposta for não, estude o básico antes de depender dela.
+
+## Quando o vibe coding ajuda de verdade
+
+Ele brilha em situações como:
+
+- criar um protótipo para validar uma ideia;
+- aprender um assunto novo com exemplos;
+- automatizar tarefas pequenas e repetitivas;
+- escrever a primeira versão de algo que você já sabe revisar;
+- explorar alternativas sem medo de errar.
+
+## Quando é melhor parar
+
+Vale repensar quando o projeto envolve:
+
+- dinheiro, pagamentos ou dados sensíveis;
+- muitas pessoas usando ao mesmo tempo;
+- regras de negócio complexas;
+- algo que precisa durar anos;
+- situações em que um erro pequeno causa um prejuízo grande.
+
+Nesses casos, a IA continua útil, mas como assistente. A decisão e a revisão precisam ser humanas.
+
+<Callout type="success" title="Em uma frase">
+  Vibe coding acelera quem sabe revisar. Ele também acelera o estrago de quem não sabe.
+</Callout>
+
+## Conclusão
+
+Vibe coding não é mágica nem vilão. É uma forma mais rápida de escrever software, com os mesmos riscos de sempre, só que em velocidade maior.
+
+A diferença entre um projeto que dá certo e um projeto que vira dor de cabeça raramente está no modelo de IA. Está no cuidado de quem revisa, testa e entende o que foi construído.
+
+Se quiser ver exemplos reais de acertos e tropeços, vale acompanhar quem publica o processo completo, inclusive os erros. É onde se aprende mais.
+
+## Referências e leitura recomendada
+
+- [Meu primeiro fracasso com vibe code e como consertei](https://www.akitaonrails.com/2026/03/05/meu-primeiro-fracasso-com-vibe-code-e-como-consertei-frank-yomik/) — relato de um problema real e da correção.
+- [Vibe code: do zero à produção em 6 dias](https://www.akitaonrails.com/2026/02/16/vibe-code-do-zero-a-producao-em-6-dias-the-m-akita-chronicles/) — exemplo de processo completo.
+
+Este artigo foi escrito originalmente para o Console do Jeff. As fontes acima serviram de inspiração e referência, não de texto-base para cópia.
+
+Para entender melhor o papel do julgamento humano, leia também <a href={siteUrl('/blog/limites-das-llms-na-programacao')}>Os limites das LLMs na programação</a>.
