@@ -10,18 +10,72 @@ interface Props {
   image?: string;
   article?: boolean;
   pubDate?: Date;
+  updatedDate?: Date;
+  author?: string;
+  category?: string;
+  tags?: string[];
+  readingTime?: number;
 }
 
 const {
   title,
-   description = 'Projetos, código e aprendizados de Jefferson Lopes no desenvolvimento de software.',
+  description = 'Projetos, código e aprendizados de Jefferson Lopes no desenvolvimento de software.',
   image = '/og-default.png',
   article = false,
-  pubDate
+  pubDate,
+  updatedDate,
+  author = 'Jefferson Lopes',
+  category,
+  tags = [],
+  readingTime
 } = Astro.props;
 
+const siteName = 'Console do Jeff';
+const siteRoot = new URL(import.meta.env.BASE_URL, Astro.site);
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const siteImage = image.startsWith('http') ? image : url(image);
+const ogImage = new URL(siteImage, Astro.site);
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: siteName,
+  url: siteRoot.toString(),
+  description,
+  inLanguage: 'pt-BR',
+  author: {
+    '@type': 'Person',
+    name: author,
+    url: 'https://github.com/JefferL05'
+  }
+};
+
+const articleSchema = article && pubDate
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: title,
+      description,
+      image: [ogImage.toString()],
+      datePublished: pubDate.toISOString(),
+      dateModified: (updatedDate ?? pubDate).toISOString(),
+      author: { '@type': 'Person', name: author },
+      publisher: {
+        '@type': 'Organization',
+        name: siteName,
+        logo: {
+          '@type': 'ImageObject',
+          url: new URL(url('/og-default.png'), Astro.site).toString()
+        }
+      },
+      mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL.toString() },
+      url: canonicalURL.toString(),
+      inLanguage: 'pt-BR',
+      ...(tags.length ? { keywords: tags } : {}),
+      ...(category ? { articleSection: category } : {}),
+      ...(readingTime ? { timeRequired: `PT${readingTime}M` } : {})
+    }
+  : null;
 ---
 
 <!doctype html>
@@ -30,8 +84,11 @@ const siteImage = image.startsWith('http') ? image : url(image);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="index, follow" />
-    <meta name="author" content="Jeff" />
+    <meta name="author" content={author} />
     <meta name="generator" content="Astro" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1b1916" media="(prefers-color-scheme: dark)" />
     
     {/* Canonical URL - previne conteúdo duplicado */}
     <link rel="canonical" href={canonicalURL} />
@@ -39,49 +96,74 @@ const siteImage = image.startsWith('http') ? image : url(image);
     <title>{title}</title>
     <meta name="description" content={description} />
     
-    {/* Favicon e RSS */}
+    {/* Favicon, manifest, sitemap e RSS */}
     <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
+    <link rel="manifest" href={url('/site.webmanifest')} />
+    <link rel="sitemap" type="application/xml" href={url('/sitemap-index.xml')} />
     <link rel="alternate" type="application/rss+xml" title="RSS Feed" href={url('/rss.xml')} />
+    
+    {/* Tipografia: preconnect + font-display swap (evita bloqueio de renderização) */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap"
+    />
     
     {/* Open Graph - SEO e partilha em redes sociais */}
     <meta property="og:type" content={article ? 'article' : 'website'} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={new URL(siteImage, Astro.site)} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={description} />
     <meta property="og:locale" content="pt_BR" />
-    <meta property="og:site_name" content="Console do Jeff" />
+    <meta property="og:site_name" content={siteName} />
     
     {/* Twitter Cards - partilha no Twitter */}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={new URL(siteImage, Astro.site)} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={description} />
     
-    {/* Data de publicação para artigos */}
+    {/* Metadados de artigo */}
     {article && pubDate && (
-      <meta property="article:published_time" content={pubDate.toISOString()} />
+      <>
+        <meta property="article:published_time" content={pubDate.toISOString()} />
+        <meta property="article:modified_time" content={(updatedDate ?? pubDate).toISOString()} />
+        {category && <meta property="article:section" content={category} />}
+        {tags.map(tag => <meta property="article:tag" content={tag} />)}
+      </>
+    )}
+    {tags.length > 0 && <meta name="keywords" content={tags.join(', ')} />}
+    
+    {/* Dados estruturados schema.org */}
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(websiteSchema)} />
+    {articleSchema && (
+      <script type="application/ld+json" is:inline set:html={JSON.stringify(articleSchema)} />
     )}
     
     {/* Script de tema - executa imediatamente para evitar flash */}
     <script is:inline>
       // Script inline mínimo para evitar flash de tema
       (function() {
+        var root = document.documentElement;
         var theme;
         try { theme = localStorage.getItem('theme'); } catch {}
-        try {
-          document.documentElement.dataset.reading = localStorage.getItem('reading-mode') === 'illustrated' ? 'illustrated' : 'text';
-        } catch { document.documentElement.dataset.reading = 'text'; }
-        try {
-          var size = Number(localStorage.getItem('reading-size'));
-          if ([90, 100, 110, 120, 130].includes(size)) document.documentElement.style.setProperty('--reading-scale', String(size / 100));
-        } catch {}
-        if (!theme) {
+        if (theme !== 'light' && theme !== 'dark') {
           theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
-        }
+        root.classList.remove('light', 'dark');
+        root.classList.add(theme);
+        root.style.colorScheme = theme;
+        try {
+          root.dataset.reading = localStorage.getItem('reading-mode') === 'illustrated' ? 'illustrated' : 'text';
+        } catch { root.dataset.reading = 'text'; }
+        try {
+          var size = Number(localStorage.getItem('reading-size'));
+          if ([90, 100, 110, 120, 130].includes(size)) root.style.setProperty('--reading-scale', String(size / 100));
+        } catch {}
       })();
     </script>
   </head>

@@ -5,6 +5,9 @@
 @layer base {
   html {
     font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   
   ::selection {
@@ -88,7 +91,31 @@ html {
 .dark :focus-visible { outline-color: #67e8f9; }
 .skip-link { position: fixed; left: 12px; top: -100px; z-index: 100; background: #fff; color: #111; border: 2px solid #0e7490; border-radius: 8px; padding: 12px 18px; }
 .skip-link:focus { top: 12px; }
-.article-body { font-size: calc(1.125rem * var(--reading-scale, 1)); overflow-wrap: anywhere; }
+.article-body {
+  font-family: 'Newsreader', Charter, Georgia, 'Times New Roman', serif;
+  font-size: calc(1.1875rem * var(--reading-scale, 1));
+  line-height: 1.75;
+  max-width: 70ch;
+  margin-inline: auto;
+  overflow-wrap: break-word;
+  font-kerning: normal;
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+  hyphens: auto;
+}
+.article-body :where(h1, h2, h3, h4, h5, h6) {
+  font-family: 'Inter', system-ui, sans-serif;
+  letter-spacing: -.012em;
+  line-height: 1.2;
+}
+.article-body :where(p, li) { text-wrap: pretty; }
+.article-body :where(pre, code, kbd, samp) {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  hyphens: none;
+}
+.article-body :where(pre) { font-size: .9em; line-height: 1.65; }
+.article-body :where(a) { text-underline-offset: .12em; text-decoration-skip-ink: auto; }
+.article-body :where(img, video, iframe) { max-width: 100%; height: auto; }
 .blog-article h1, .article-body h2, .article-body h3 { scroll-margin-top: 150px; }
 .article-body pre { max-width: 100%; overflow-x: auto; }
 .article-body table { display: block; max-width: 100%; overflow-x: auto; }

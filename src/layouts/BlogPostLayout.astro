@@ -54,7 +54,18 @@ const related = (await getCollection('posts', ({ data }) => !data.draft))
   .slice(0, 3);
 ---
 
-<BaseLayout title={`${title} | Console do Jeff`} description={description} image={image?.url} article pubDate={pubDate}>
+<BaseLayout
+  title={`${title} | Console do Jeff`}
+  description={description}
+  image={image?.url}
+  article
+  pubDate={pubDate}
+  updatedDate={updatedDate}
+  author={author}
+  category={category}
+  tags={tags}
+  readingTime={readingTime}
+>
   <article class="blog-article max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-8">
       <a href={url('/blog')} class="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mb-6">
