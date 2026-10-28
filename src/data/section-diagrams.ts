@@ -51,5 +51,9 @@ export const sectionDiagrams: Record<string, Diagram[]> = {
   'portfolio': [
     { title: 'Do build à página', nodes: ['Astro lê as fontes', 'Gera dist/ estático', 'Pages publica sem servidor'], note: 'Os dados ficam congelados no build. Atualizar o site é commitar um novo deploy.' },
     { title: 'Dois mundos, uma página', nodes: ['Projetos do GitHub', 'Posts do blog', 'Seção Sobre'], note: 'O portfólio une repositórios e artigos sem duplicar conteúdo: o RSS já traz os posts do Console do Jeff.' }
+  ],
+  'deliberate-practice': [
+    { title: 'Prática comum vs. deliberada', nodes: ['Objetivo claro', 'Foco total + feedback', 'Fora da zona de conforto'], note: 'Escrever código no piloto automático não conta. Só melhora quem repete com intenção de corrigir erros.' },
+    { title: 'Ciclo de aprendizagem', nodes: ['Tente com dificuldade', 'Receba feedback', 'Refine e repita'], note: 'O desconforto cognitivo é o sinal de que novas conexões estão sendo criadas. Descanse entre sessões.' }
   ]
 };
